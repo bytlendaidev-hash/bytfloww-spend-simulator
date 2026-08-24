@@ -44,6 +44,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
     { id: 'MERCHANTS', label: 'Merchants' },
     { id: 'COMMITMENTS', label: 'Commitments' },
     { id: 'TRENDS', label: 'Trends' },
+    { id: 'STATEMENTS', label: '📄 Statements' },
   ];
 
   return (
@@ -89,6 +90,22 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
 
         {/* Right Action Icons */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          {/* Statement Hub Quick Button */}
+          <button
+            onClick={() => onSelectTab('STATEMENTS')}
+            className={`px-3 h-9 sm:h-10 rounded-2xl flex items-center gap-1.5 border font-black text-xs transition ${
+              activeTab === 'STATEMENTS'
+                ? isDark ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5]' : 'bg-[#0D9488] text-white border-[#0D9488]'
+                : isDark 
+                ? 'bg-[#152028] border-[#273B49] text-slate-200 hover:bg-[#1C2C38]' 
+                : 'bg-white border-slate-300 text-slate-800 hover:bg-slate-100 shadow-sm'
+            }`}
+            title="Bank Statement Upload & Intelligence Hub"
+          >
+            <span>📄</span>
+            <span className="hidden sm:inline">Statement Hub</span>
+          </button>
+
           {/* Ask AI Copilot Bubble Button */}
           <button
             onClick={onOpenCopilot}

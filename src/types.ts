@@ -185,6 +185,7 @@ export type SpendTab =
   | 'MERCHANTS' 
   | 'COMMITMENTS' 
   | 'TRENDS' 
+  | 'STATEMENTS'
   | 'BUDGETS' 
   | 'SUBSCRIPTIONS' 
   | 'ACCOUNTS' 
@@ -200,3 +201,90 @@ export interface FilterState {
   paymentMode: string | null;
   highValueOnly: boolean;
 }
+
+// ── BANK STATEMENT BACKEND API TYPES ────────────────────────────────────
+
+export interface StatementReconciliation {
+  isReconciled: boolean;
+  computedClosingBalance: number;
+  statedClosingBalance: number | null;
+  discrepancy: number;
+  totalInflow: number;
+  totalOutflow: number;
+  openingBalance: number | null;
+}
+
+export interface StatementFacts {
+  totalIncome: number;
+  totalExpense: number;
+  netCashFlow: number;
+  trueEconomicExpense: number;
+  internalTransfers: number;
+  debtPayments: number;
+  totalInflow: number;
+  totalOutflow: number;
+  savingsRate: number;
+  transactionCount: number;
+}
+
+export interface StatementInsightItem {
+  type: string;
+  title: string;
+  description: string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'SUCCESS';
+}
+
+export interface StatementTransactionItem {
+  id?: string;
+  date: string;
+  narration: string;
+  debit: number | null;
+  credit: number | null;
+  balance: number | null;
+  category?: string;
+  referenceNumber?: string | null;
+  isTransfer?: boolean;
+  isLoan?: boolean;
+}
+
+export interface BackendStatementUploadResult {
+  statement: {
+    id: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    financialAccountId: string;
+    status: 'PARSED' | 'PROCESSING' | 'FAILED';
+    uploadedAt: string;
+  };
+  file: {
+    id: string;
+    fileName: string;
+  };
+  transactionCount: number;
+  parsedCount: number;
+  insertedCount: number;
+  duplicateCount: number;
+  reconciliation?: StatementReconciliation;
+  insights?: StatementInsightItem[];
+  facts: StatementFacts;
+  transactions?: StatementTransactionItem[];
+  bankDetected?: string;
+}
+
+export interface BackendStatementListItem {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  financialAccountId: string;
+  status: string;
+  uploadedAt: string;
+  statementPeriodStart?: string;
+  statementPeriodEnd?: string;
+  openingBalance?: number;
+  closingBalance?: number;
+  bankName?: string;
+  accountMask?: string;
+}
+

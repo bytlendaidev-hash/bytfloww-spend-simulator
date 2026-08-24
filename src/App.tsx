@@ -18,6 +18,7 @@ import { AccountManagementScreen } from './components/AccountManagementScreen';
 import { AssistantScreen } from './components/AssistantScreen';
 import { EmptyUploadState } from './components/EmptyUploadState';
 import { LoginScreen } from './components/LoginScreen';
+import { BankStatementModule } from './components/BankStatementModule';
 
 // Modals & Overlays
 import { TransactionDetailModal } from './components/TransactionDetailModal';
@@ -253,6 +254,19 @@ export const App: React.FC = () => {
                 snapshot={snapshot}
                 isDark={isDark}
                 onSelectPeriod={handleSelectPeriod}
+              />
+            )}
+
+            {activeTab === 'STATEMENTS' && (
+              <BankStatementModule
+                isDark={isDark}
+                onMergeTransactions={(newEvents) => {
+                  setEvents(prev => [...newEvents, ...prev]);
+                  if (currentXml) {
+                    handleXmlParsed(currentXml, selectedPeriodKey);
+                  }
+                }}
+                onSelectEvent={(ev) => setSelectedEvent(ev)}
               />
             )}
 
