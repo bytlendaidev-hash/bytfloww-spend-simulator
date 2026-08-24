@@ -162,16 +162,24 @@ export const App: React.FC = () => {
       ) : (
         /* ── 3. IF XML LOADED: SHOW SPEND INTELLIGENCE DASHBOARD ──────── */
         <>
-          <div className="flex items-center justify-between mb-2 px-2 text-xs">
-            <span className="font-semibold text-slate-500">
-              User: <strong className="text-slate-800 dark:text-white">{currentUser.name}</strong> ({currentUser.phone})
+          <div className="flex items-center justify-between mb-2.5 px-1 text-[11px] sm:text-xs">
+            <span className={`font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              Session: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{currentUser.name}</strong> ({currentUser.phone})
             </span>
-            <button
-              onClick={handleLogout}
-              className="text-rose-500 font-semibold hover:underline"
-            >
-              Sign Out 🚪
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleResetDataset}
+                className={`text-[11px] font-bold hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+              >
+                🔄 Reset XML
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-rose-500 font-bold hover:underline"
+              >
+                Sign Out 🚪
+              </button>
+            </div>
           </div>
 
           <SpendHeader
@@ -188,18 +196,7 @@ export const App: React.FC = () => {
             totalParsedCount={rawCount}
           />
 
-          <div className="flex justify-end mb-3">
-            <button
-              onClick={handleResetDataset}
-              className={`px-3 py-1 rounded-xl text-[11px] font-bold border transition ${
-                isDark ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-600'
-              }`}
-            >
-              🔄 Clear & Upload Another XML
-            </button>
-          </div>
-
-          <div className="pb-24">
+          <div className="pb-28">
             {activeTab === 'OVERVIEW' && (
               <SpendOverviewTab
                 snapshot={snapshot}
