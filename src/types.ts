@@ -247,6 +247,67 @@ export interface StatementTransactionItem {
   isLoan?: boolean;
 }
 
+export interface StatementInflowItem {
+  category: string;
+  source: string;
+  count: number;
+  totalAmount: number;
+  sharePercent: number;
+}
+
+export interface StatementCategoryItem {
+  name: string;
+  icon: string;
+  count: number;
+  debit: number;
+  credit: number;
+  sharePercent: number;
+  avgTicket: number;
+}
+
+export interface StatementLenderItem {
+  id: string;
+  lenderName: string;
+  productType: string;
+  totalBorrowed: number;
+  totalRepaid: number;
+  netDelta: number;
+  borrowCount: number;
+  repayCount: number;
+  status: 'ACTIVE_LINE' | 'SERVICED_EMI' | 'REPAID';
+}
+
+export interface StatementMonthlyVelocityItem {
+  monthKey: string;
+  monthName: string;
+  inflows: number;
+  outflows: number;
+  netFlow: number;
+  txnCount: number;
+  closingBalance: number | null;
+  trend: 'SURPLUS' | 'DEFICIT' | 'NEUTRAL';
+}
+
+export interface StatementPayeeItem {
+  rank: number;
+  name: string;
+  totalVolume: number;
+  debit: number;
+  credit: number;
+  txnCount: number;
+  category: string;
+  primaryChannel: string;
+}
+
+export interface StatementChannelItem {
+  channel: string;
+  icon: string;
+  txnCount: number;
+  debit: number;
+  credit: number;
+  volumeShare: number;
+}
+
 export interface BackendStatementUploadResult {
   statement: {
     id: string;
@@ -270,6 +331,19 @@ export interface BackendStatementUploadResult {
   facts: StatementFacts;
   transactions?: StatementTransactionItem[];
   bankDetected?: string;
+  accountHolder?: string;
+  accountNo?: string;
+  ifsc?: string;
+  branch?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  // Deep Forensic Intelligence Arrays
+  inflowDecomposition?: StatementInflowItem[];
+  categoryDecomposition?: StatementCategoryItem[];
+  lenderMatrix?: StatementLenderItem[];
+  monthlyVelocity?: StatementMonthlyVelocityItem[];
+  topPayees?: StatementPayeeItem[];
+  channelSplit?: StatementChannelItem[];
 }
 
 export interface BackendStatementListItem {
@@ -292,12 +366,17 @@ export type ActiveModule = 'SMS_INTELLIGENCE' | 'BANK_STATEMENTS';
 
 export type StatementSection = 
   | 'OVERVIEW' 
-  | 'UPLOAD' 
-  | 'LEDGER' 
-  | 'ACCOUNTS' 
+  | 'INFLOW'
+  | 'CATEGORIES'
   | 'LOANS' 
-  | 'RECURRING' 
+  | 'VELOCITY'
+  | 'MERCHANTS'
+  | 'CHANNELS'
+  | 'LEDGER' 
+  | 'UPLOAD' 
   | 'COPILOT' 
+  | 'ACCOUNTS' 
+  | 'RECURRING' 
   | 'ARCHIVE';
 
 export interface BackendFinancialAccount {
