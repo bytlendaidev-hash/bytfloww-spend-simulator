@@ -52,6 +52,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   const [statementResult, setStatementResult] = useState<BackendStatementUploadResult | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [directionFilter, setDirectionFilter] = useState<'ALL' | 'DEBIT' | 'CREDIT'>('ALL');
+  const [ledgerVisibleCount, setLedgerVisibleCount] = useState(100);
   const [isMerged, setIsMerged] = useState(false);
 
   // Backend Data Collections
@@ -170,7 +171,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
 
     // Default statement load if not present
     if (!statementResult) {
-      loadSampleExcelStatement();
+      loadRealHdfcStatementXls();
     }
   };
 
@@ -253,7 +254,23 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
     }
   };
 
-  // Sample Statement Loaders
+  const loadRealHdfcStatementXls = async () => {
+    setIsProcessing(true);
+    setErrorMessage(null);
+    setProcessingProgress(15);
+    setProcessingStage('1/5 Fetching HDFC Statement (.xls - 1,781 Transactions)...');
+
+    try {
+      const res = await fetch('/Acct_Statement_9082.xls');
+      const blob = await res.blob();
+      const file = new File([blob], 'Acct Statement_9082_13082026_18.55.44.xls', { type: 'application/vnd.ms-excel' });
+      await processStatementFile(file);
+    } catch (e: any) {
+      console.warn('Error fetching HDFC XLS:', e);
+      loadSampleExcelStatement();
+    }
+  };
+
   const loadSampleStatement = () => {
     const sampleCsv = `Date,Narration,Chq/Ref Number,Withdrawal (Dr),Deposit (Cr),Balance
 01/08/2026,SALARY CREDIT ACME CORP PVT LTD,SAL88941,,52000.00,78861.00
@@ -830,9 +847,17 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
 
           {/* Quick Demo Loaders */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            <span className={`text-xs font-bold mr-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Try instant sample statements:
-            </span>
+            <button
+              onClick={loadRealHdfcStatementXls}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
+                isDark 
+                  ? 'bg-teal-500/20 hover:bg-teal-500/30 border-teal-500/40 text-[#00F2FE]' 
+                  : 'bg-teal-50 hover:bg-teal-100 border-teal-300 text-teal-900'
+              }`}
+            >
+              <span>⚡</span>
+              <span>Load Deepankar Gautam HDFC Statement (.xls - 1,781 txns)</span>
+            </button>
             <button
               onClick={loadSampleExcelStatement}
               className={`px-3.5 py-2 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
@@ -853,7 +878,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               }`}
             >
               <span>📄</span>
-              <span>Load Sample HDFC CSV</span>
+              <span>Load Sample CSV</span>
             </button>
           </div>
         </div>
@@ -867,7 +892,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className={`text-sm sm:text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Extracted Statement Ledger ({filteredTransactions.length} of {(statementResult?.transactions || []).length})
+                Extracted Statement Ledger (Showing {Math.min(ledgerVisibleCount, filteredTransactions.length)} of {filteredTransactions.length} items)
               </h3>
               <p className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Raw bank debits, credits, and verified running balance
@@ -922,7 +947,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredTransactions.map((tx) => (
+                {filteredTransactions.slice(0, ledgerVisibleCount).map((tx) => (
                   <tr key={tx.id} className={`transition ${isDark ? 'hover:bg-[#18242D]' : 'hover:bg-slate-50'}`}>
                     <td className="py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">
                       {tx.date}
@@ -939,29 +964,46 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                     </td>
                     <td className="py-2.5 px-3">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                        tx.category === 'Income'
+                        tx.category === 'Salary & Income' || tx.category === 'Income'
                           ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-emerald-50 text-emerald-800 border-emerald-200')
-                          : tx.category === 'EMI / Debt'
+                          : tx.category === 'Loans & EMIs' || tx.category === 'EMI / Debt'
                           ? (isDark ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' : 'bg-amber-50 text-amber-800 border-amber-200')
+                          : tx.category === 'Credit Card Bills'
+                          ? (isDark ? 'bg-rose-500/20 text-rose-300 border-rose-400/30' : 'bg-rose-50 text-rose-800 border-rose-200')
                           : (isDark ? 'bg-white/5 text-slate-300 border-white/10' : 'bg-slate-100 text-slate-700 border-slate-200')
                       }`}>
                         {tx.category || 'General'}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold text-rose-500">
-                      {tx.debit ? `₹${tx.debit.toLocaleString('en-IN')}` : '—'}
+                      {tx.debit ? `₹${tx.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                     </td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
-                      {tx.credit ? `₹${tx.credit.toLocaleString('en-IN')}` : '—'}
+                      {tx.credit ? `₹${tx.credit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                     </td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-300">
-                      {tx.balance ? `₹${tx.balance.toLocaleString('en-IN')}` : '—'}
+                      {tx.balance ? `₹${tx.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {filteredTransactions.length > ledgerVisibleCount && (
+            <div className="pt-2 text-center">
+              <button
+                onClick={() => setLedgerVisibleCount((prev) => prev + 100)}
+                className={`py-2.5 px-6 rounded-2xl text-xs font-black transition border shadow-sm ${
+                  isDark
+                    ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-teal-300'
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
+                }`}
+              >
+                Load Next 100 Transactions ({filteredTransactions.length - ledgerVisibleCount} remaining) ↓
+              </button>
+            </div>
+          )}
         </div>
       )}
 
