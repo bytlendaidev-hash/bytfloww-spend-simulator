@@ -308,6 +308,85 @@ export interface StatementChannelItem {
   volumeShare: number;
 }
 
+export interface CanonicalTransaction {
+  id: string;
+  transactionDate: string;
+  valueDate: string;
+  rawNarration: string;
+  normalizedNarration: string;
+  debit: number | null;
+  credit: number | null;
+  amount: number;
+  direction: 'DEBIT' | 'CREDIT';
+  balanceAfter: number | null;
+  currency: string;
+  channel: 'UPI' | 'NEFT' | 'IMPS' | 'ATM' | 'ACH' | 'POS' | 'CHQ' | 'INTERNAL' | 'OTHER';
+  referenceNumber: string | null;
+  entityId: string;
+  entityName: string;
+  entityType: 'EMPLOYER' | 'LENDER' | 'MERCHANT' | 'PERSON' | 'UTILITY' | 'GOVERNMENT' | 'BANK' | 'UNKNOWN';
+  financialType: 'INCOME' | 'EXPENSE' | 'TRANSFER' | 'DEBT_REPAYMENT' | 'DEBT_DISBURSEMENT' | 'CASH_WITHDRAWAL' | 'FEE_TAX';
+  isEconomicExpense: boolean; // True lifestyle consumption
+  isMoneyMovement: boolean;   // Transfers, borrowings, self-sweeps
+  isSalary: boolean;
+  isLoan: boolean;
+  isRecurring: boolean;
+  isAnomaly: boolean;
+  category: string;
+  subcategory: string;
+  categoryConfidence: number;
+  classificationMethod: 'RULE' | 'REGEX' | 'ENTITY' | 'FUZZY' | 'EMBEDDING' | 'USER_OVERRIDE';
+}
+
+export interface CounterpartyEntity {
+  id: string;
+  name: string;
+  aliases: string[];
+  totalSent: number;
+  totalReceived: number;
+  netFlow: number; // positive = received more, negative = sent more
+  transactionCount: number;
+  averageAmount: number;
+  firstTransactionDate: string;
+  lastTransactionDate: string;
+  relationshipConfidence: number;
+  entityType: 'PERSON' | 'MERCHANT' | 'LENDER' | 'EMPLOYER' | 'UTILITY';
+  primaryChannel: string;
+}
+
+export interface EvidenceMetricItem {
+  metric: string;
+  currentValue: string | number;
+  baselineValue?: string | number;
+  deltaPercent?: number;
+}
+
+export interface EvidenceBackedInsight {
+  id: string;
+  type: 'RISK' | 'WARNING' | 'OBSERVATION' | 'POSITIVE' | 'OPPORTUNITY';
+  severity: 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
+  title: string;
+  summary: string;
+  whyItMatters: string;
+  evidence: EvidenceMetricItem[];
+  recommendedAction: string;
+  sourceTxnIds?: string[];
+  confidence: number;
+}
+
+export interface RecurringMandate {
+  id: string;
+  merchantName: string;
+  entityName: string;
+  amount: number;
+  frequency: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL' | 'CUSTOM';
+  category: string;
+  confidence: number;
+  lastBilledDate: string;
+  nextExpectedDate: string;
+  status: 'ACTIVE' | 'PAUSED' | 'COMPLETED';
+}
+
 export interface BackendStatementUploadResult {
   statement: {
     id: string;
@@ -344,6 +423,11 @@ export interface BackendStatementUploadResult {
   monthlyVelocity?: StatementMonthlyVelocityItem[];
   topPayees?: StatementPayeeItem[];
   channelSplit?: StatementChannelItem[];
+  // Canonical Intelligence Entities
+  canonicalTransactions?: CanonicalTransaction[];
+  peopleCounterparties?: CounterpartyEntity[];
+  evidenceInsights?: EvidenceBackedInsight[];
+  recurringMandates?: RecurringMandate[];
 }
 
 export interface BackendStatementListItem {
@@ -366,18 +450,23 @@ export type ActiveModule = 'SMS_INTELLIGENCE' | 'BANK_STATEMENTS';
 
 export type StatementSection = 
   | 'OVERVIEW' 
-  | 'INFLOW'
-  | 'CATEGORIES'
+  | 'TRANSACTIONS'
+  | 'SPENDING'
+  | 'INCOME'
   | 'LOANS' 
-  | 'VELOCITY'
-  | 'MERCHANTS'
-  | 'CHANNELS'
-  | 'LEDGER' 
-  | 'UPLOAD' 
-  | 'COPILOT' 
-  | 'ACCOUNTS' 
-  | 'RECURRING' 
-  | 'ARCHIVE';
+  | 'PEOPLE'
+  | 'RECURRING'
+  | 'CASH_FLOW'
+  | 'INSIGHTS'
+  | 'AI_ANALYST'
+  | 'UPLOAD'
+  | 'INFLOW'       // backwards compat alias
+  | 'CATEGORIES'   // backwards compat alias
+  | 'VELOCITY'     // backwards compat alias
+  | 'MERCHANTS'    // backwards compat alias
+  | 'CHANNELS'     // backwards compat alias
+  | 'LEDGER'       // backwards compat alias
+  | 'COPILOT';     // backwards compat alias
 
 export interface BackendFinancialAccount {
   id: string;

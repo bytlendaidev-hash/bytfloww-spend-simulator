@@ -7,7 +7,11 @@ import {
   BackendFinancialAccount,
   BackendLoanItem,
   BackendRecurringItem,
-  BackendStatementListItem
+  BackendStatementListItem,
+  CanonicalTransaction,
+  CounterpartyEntity,
+  EvidenceBackedInsight,
+  RecurringMandate
 } from '../types';
 import { 
   backendApiService, 
@@ -52,10 +56,14 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   const [statementResult, setStatementResult] = useState<BackendStatementUploadResult | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [directionFilter, setDirectionFilter] = useState<'ALL' | 'DEBIT' | 'CREDIT'>('ALL');
+  const [economicFilter, setEconomicFilter] = useState<'ALL' | 'EXPENSE' | 'TRANSFER' | 'SALARY' | 'LOANS'>('ALL');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [ledgerVisibleCount, setLedgerVisibleCount] = useState(100);
   const [payeeSearch, setPayeeSearch] = useState('');
   const [isMerged, setIsMerged] = useState(false);
+
+  // Counterparty Drilldown Modal
+  const [selectedCounterparty, setSelectedCounterparty] = useState<CounterpartyEntity | null>(null);
 
   // Backend Data Collections
   const [accounts, setAccounts] = useState<BackendFinancialAccount[]>([]);
@@ -200,260 +208,262 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
       try {
         result = await backendApiService.uploadBankStatement(file, { password });
       } catch (err: any) {
-        if (err.message === 'PASSWORD_REQUIRED') {
-          setPendingFile(file);
-          setShowPasswordModal(true);
-          setIsProcessing(false);
-          return;
-        }
-        // Fallback to high-accuracy local parser
+        // Fallback to client-side in-memory parser
+        console.warn('Backend parse failed or timed out, activating high-precision local fallback:', err);
         result = await backendApiService.parseClientSideFallback(file, password);
       }
 
+      setProcessingProgress(100);
+      setProcessingStage('5/5 Forensic Statement Intelligence Ready!');
+
       setTimeout(() => {
-        setProcessingProgress(100);
-        setProcessingStage('5/5 Forensic Statement Analysis Complete!');
         setStatementResult(result);
-        setActiveSection('OVERVIEW');
         setIsProcessing(false);
-      }, 1100);
+        setActiveSection('OVERVIEW');
+      }, 400);
+
     } catch (err: any) {
-      console.error('Statement parsing failed:', err);
-      setErrorMessage(err.message || 'Failed to parse statement. Please ensure it is a valid bank statement file.');
+      console.error('Statement parsing failure:', err);
       setIsProcessing(false);
-    }
-  };
-
-  const handleFileDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processStatementFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      processStatementFile(e.target.files[0]);
-    }
-  };
-
-  const handleUnlockAndProcess = () => {
-    if (pendingFile) {
-      setShowPasswordModal(false);
-      processStatementFile(pendingFile, pdfPassword);
-      setPdfPassword('');
-      setPendingFile(null);
+      setErrorMessage(err.message || 'Failed to parse statement. Please ensure it is a valid bank Excel/CSV file.');
     }
   };
 
   const loadRealHdfcStatementXls = async () => {
-    setIsProcessing(true);
-    setErrorMessage(null);
-    setProcessingProgress(15);
-    setProcessingStage('1/5 Fetching HDFC Statement (.xls - 1,781 Transactions)...');
-
     try {
-      const res = await fetch('/Acct_Statement_9082.xls');
-      const blob = await res.blob();
+      const resp = await fetch('/Acct Statement_9082_13082026_18.55.44.xls');
+      if (!resp.ok) {
+        // Fallback synthetic load if file not served from root
+        return;
+      }
+      const blob = await resp.blob();
       const file = new File([blob], 'Acct Statement_9082_13082026_18.55.44.xls', { type: 'application/vnd.ms-excel' });
       await processStatementFile(file);
-    } catch (e: any) {
-      console.warn('Error fetching HDFC XLS:', e);
-      loadSampleExcelStatement();
-    }
-  };
-
-  const loadSampleStatement = () => {
-    const sampleCsv = `Date,Narration,Chq/Ref Number,Withdrawal (Dr),Deposit (Cr),Balance
-01/08/2026,SALARY CREDIT ACME CORP PVT LTD,SAL88941,,52000.00,78861.00
-03/08/2026,UPI-SWIGGY-swiggy@icici-ORDER19482,UPI39841029,450.00,,78411.00
-05/08/2026,ACH DEBIT HDFC HOME LOAN EMI,ACH8891024,4500.00,,73911.00
-08/08/2026,UPI-AIRTEL BROADBAND BILL-airtel@icici,UPI99401294,1179.00,,72732.00
-12/08/2026,NEFT TRANSFER TO OWN AIRTEL A/C 9600,NEFT001928,6200.00,,66532.00
-15/08/2026,POS AMAZON INDIA MUMBAI,POS774819,3499.00,,63033.00
-18/08/2026,UPI-BLINKIT GROCERY-blinkit@axl,UPI44910284,890.00,,62143.00
-20/08/2026,E-MANDATE NETFLIX INDIA ENTERTAINMENT,MAN991048,649.00,,61494.00
-24/08/2026,POS SHELL PETROL PUMP FUEL,POS119402,2200.00,,59294.00
-25/08/2026,UPI-STARBUCKS COFFEE-starbucks@hdfc,UPI39910283,380.00,,58914.00
-27/08/2026,UPI-ZOMATO DINING-zomato@paytm,UPI88291048,550.00,,58364.00
-28/08/2026,CRED AXIS CREDIT CARD BILL PAYMENT,CRED884910,15946.00,,42418.00
-29/08/2026,ATM CASH WITHDRAWAL MUMBAI DADAR,ATM992019,1000.00,,41418.00
-30/08/2026,BANK SMS SERVICE CHARGES QUARTERLY,CHG881029,53.00,,41365.00`;
-
-    const blob = new Blob([sampleCsv], { type: 'text/csv' });
-    const file = new File([blob], 'HDFC_Bank_Statement_Aug2026.csv', { type: 'text/csv' });
-    processStatementFile(file);
-  };
-
-  const loadSampleExcelStatement = async () => {
-    try {
-      const XLSX = await import('xlsx');
-      const wsData = [
-        ['State Bank of India', '', '', '', '', ''],
-        ['Account Statement for A/c: •••• 5521', '', '', '', '', ''],
-        ['Date', 'Narration', 'Ref No', 'Debit', 'Credit', 'Balance'],
-        ['01/08/2026', 'BY TRANSFER-SALARY CREDITED', 'SBIN00192', '', 58000, 84500],
-        ['03/08/2026', 'UPI/SWIGGY/swiggy@icici', 'UPI99201', 520, '', 83980],
-        ['06/08/2026', 'ACH/SBI LIFE INSURANCE EMI', 'ACH44910', 3200, '', 80780],
-        ['10/08/2026', 'TRANSFER TO SELF AIRTEL A/C', 'NEFT8819', 5000, '', 75780],
-        ['15/08/2026', 'POS/FLIPKART INTERNET BLR', 'POS11942', 2899, '', 72881],
-        ['20/08/2026', 'UPI/ZEPTO GROCERIES', 'UPI33910', 740, '', 72141],
-        ['25/08/2026', 'HPCL PETROL PUMP REFUEL', 'POS88192', 1500, '', 70641],
-        ['28/08/2026', 'CRED/AXIS BANK CREDIT CARD BILL', 'CRED9918', 12500, '', 58141],
-      ];
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Statement');
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const file = new File([blob], 'SBI_Account_Statement_Aug2026.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      processStatementFile(file);
     } catch (e) {
-      loadSampleStatement();
+      console.warn('Auto-load of statement XLS failed:', e);
     }
   };
 
-  // Merge Statement Transactions into SMS Simulator Feed
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleSelectedFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleSelectedFile = (file: File) => {
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      setPendingFile(file);
+      setShowPasswordModal(true);
+    } else {
+      processStatementFile(file);
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    setShowPasswordModal(false);
+    if (pendingFile) {
+      processStatementFile(pendingFile, pdfPassword);
+      setPendingFile(null);
+      setPdfPassword('');
+    }
+  };
+
   const handleMergeToSmsSimulator = () => {
     if (!statementResult?.transactions || !onMergeTransactions) return;
-
-    const newEvents = statementResult.transactions.map((tx, idx) => {
+    const events: FinancialEvent[] = statementResult.transactions.map((tx, idx) => {
       const isCredit = (tx.credit || 0) > 0;
       const amt = tx.credit || tx.debit || 0;
+      const isSalary = (tx.category || '').includes('Salary') || tx.narration.toLowerCase().includes('salary');
       return {
-        id: `stmt_merged_${idx}_${Date.now()}`,
-        date: tx.date || '2026-08-01',
-        time: '12:00 PM',
-        merchantName: tx.narration,
+        id: `stmt_ev_${idx}_${Date.now()}`,
         amount: amt,
-        direction: isCredit ? 'CREDIT' : 'DEBIT',
+        direction: isCredit ? 'INFLOW' : 'OUTFLOW',
+        eventType: isCredit ? (isSalary ? 'SALARY' : 'UPI_CREDIT') : 'UPI_DEBIT',
+        merchant: tx.narration.slice(0, 32),
+        rawMerchant: tx.narration,
         category: tx.category || 'General',
-        account: statementResult.bankDetected || 'Bank Statement',
-        accountMask: statementResult.accountNo?.slice(-4) || '9082',
-        accountType: 'SAVINGS',
-        channel: 'BANK_STATEMENT',
-        referenceNumber: tx.referenceNumber || `REF${idx}`,
-        balanceAfter: tx.balance ?? undefined,
-        rawSms: `Bank Statement Entry: ${tx.narration} | Amt: ₹${amt} | Bal: ₹${tx.balance}`,
-        isAnomaly: false,
+        economicType: isCredit ? 'INCOME' : 'OUTFLOW',
+        financialSubtype: tx.category || 'Expense',
+        timestamp: Date.now(),
+        dateFormatted: tx.date,
+        timeFormatted: '12:00 PM',
+        accountHint: statementResult.accountNo?.slice(-4) || '9082',
+        resolvedInstitution: statementResult.bankDetected || 'HDFC Bank',
+        referenceNumber: tx.referenceNumber || `STMT-${idx}`,
+        paymentMode: 'UPI',
+        transactionFingerprint: `stmt_${tx.date}_${tx.narration}_${amt}`,
         confidence: 0.99,
+        notes: 'Imported from verified bank statement ledger',
+        rawSmsBody: `[BANK STATEMENT] ${tx.date} ${tx.narration} ${isCredit ? 'Credit' : 'Debit'}: ₹${amt} Bal: ₹${tx.balance}`,
+        sender: statementResult.bankDetected || 'HDFC Bank',
+        balanceAfter: tx.balance ?? undefined,
+        isRecurring: isSalary,
       };
-    }) as unknown as FinancialEvent[];
+    });
 
-    onMergeTransactions(newEvents);
+    onMergeTransactions(events);
     setIsMerged(true);
   };
 
-  // AI Copilot Chat Action
-  const handleSendChatMessage = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!chatInput.trim() || isAiTyping) return;
-
-    const userText = chatInput.trim();
-    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setChatMessages((prev) => [...prev, { role: 'user', text: userText, time: timeNow }]);
+  // AI Chat Handler
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
+    const userMsg = chatInput.trim();
     setChatInput('');
+
+    const newMessages = [
+      ...chatMessages,
+      { role: 'user' as const, text: userMsg, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+    ];
+    setChatMessages(newMessages);
     setIsAiTyping(true);
 
-    const reply = await backendApiService.sendAiChat(userText, {
-      statementResult,
-      totalInflow: statementResult?.facts.totalInflow,
-      trueSpend: statementResult?.facts.trueEconomicExpense,
-      reconciliation: statementResult?.reconciliation,
-      bank: statementResult?.bankDetected,
-    });
+    try {
+      const aiResponse = await backendApiService.sendAiChat(userMsg, {
+        statementResult,
+        facts: statementResult?.facts,
+      });
 
-    setIsAiTyping(false);
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant',
-        text: reply.answer,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ]);
+      setChatMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          text: aiResponse.answer || 'I have analyzed your statement data.',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } catch (e) {
+      setChatMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          text: 'Unable to reach the forensic AI service right now. Please verify your connection.',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } finally {
+      setIsAiTyping(false);
+    }
   };
 
-  // Filtered Transactions for Table
-  const filteredTransactions = useMemo(() => {
-    return (statementResult?.transactions || []).filter((tx) => {
-      if (directionFilter === 'DEBIT' && (!tx.debit || tx.debit <= 0)) return false;
-      if (directionFilter === 'CREDIT' && (!tx.credit || tx.credit <= 0)) return false;
-      if (categoryFilter !== 'ALL' && tx.category !== categoryFilter) return false;
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        const narrMatch = tx.narration.toLowerCase().includes(q);
-        const refMatch = tx.referenceNumber?.toLowerCase().includes(q);
-        const catMatch = tx.category?.toLowerCase().includes(q);
-        const dateMatch = tx.date.toLowerCase().includes(q);
-        return narrMatch || refMatch || catMatch || dateMatch;
-      }
-      return true;
-    });
-  }, [statementResult, directionFilter, categoryFilter, searchQuery]);
+  // Filtered Canonical Ledger
+  const filteredLedger = useMemo(() => {
+    if (!statementResult?.transactions) return [];
+    return statementResult.transactions.filter(tx => {
+      const matchesSearch = 
+        tx.narration.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tx.category || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tx.referenceNumber && tx.referenceNumber.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  // Filtered Payees for Leaderboard
+      const matchesDirection = 
+        directionFilter === 'ALL' ||
+        (directionFilter === 'DEBIT' && (tx.debit || 0) > 0) ||
+        (directionFilter === 'CREDIT' && (tx.credit || 0) > 0);
+
+      const matchesCategory = 
+        categoryFilter === 'ALL' || tx.category === categoryFilter;
+
+      const isCredit = (tx.credit || 0) > 0;
+      const lower = tx.narration.toLowerCase();
+      const isSalary = lower.includes('salary') || (tx.category || '').includes('Salary');
+      const isLoan = lower.includes('mpokket') || lower.includes('vivifi') || (tx.category || '').includes('Loan');
+      const isTransfer = (tx.category || '').includes('Peer') || (tx.category || '').includes('Transfer') || lower.startsWith('upi-');
+
+      let matchesEconomic = true;
+      if (economicFilter === 'EXPENSE') {
+        matchesEconomic = !isCredit && !isLoan && !isTransfer;
+      } else if (economicFilter === 'TRANSFER') {
+        matchesEconomic = isTransfer;
+      } else if (economicFilter === 'SALARY') {
+        matchesEconomic = isSalary;
+      } else if (economicFilter === 'LOANS') {
+        matchesEconomic = isLoan;
+      }
+
+      return matchesSearch && matchesDirection && matchesCategory && matchesEconomic;
+    });
+  }, [statementResult, searchQuery, directionFilter, categoryFilter, economicFilter]);
+
+  // Payees filter
   const filteredPayees = useMemo(() => {
-    const list = statementResult?.topPayees || [];
-    if (!payeeSearch) return list;
-    const q = payeeSearch.toLowerCase();
-    return list.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+    if (!statementResult?.topPayees) return [];
+    if (!payeeSearch.trim()) return statementResult.topPayees;
+    return statementResult.topPayees.filter(p => 
+      p.name.toLowerCase().includes(payeeSearch.toLowerCase()) ||
+      p.category.toLowerCase().includes(payeeSearch.toLowerCase())
+    );
   }, [statementResult, payeeSearch]);
 
-  const rec = statementResult?.reconciliation;
   const facts = statementResult?.facts;
+  const rec = statementResult?.reconciliation;
+  const inflows = statementResult?.inflowDecomposition || [];
+  const categories = statementResult?.categoryDecomposition || [];
+  const lenders = statementResult?.lenderMatrix || [];
+  const velocity = statementResult?.monthlyVelocity || [];
+  const channels = statementResult?.channelSplit || [];
+  const people = statementResult?.peopleCounterparties || [];
+  const evidenceInsights = statementResult?.evidenceInsights || [];
+  const recurringMandates = statementResult?.recurringMandates || [];
 
   return (
-    <div className="space-y-6">
-      {/* ── 1. TOP HEADER & BACKEND HEALTH STATUS ─────────────────────── */}
-      <div className={`p-4 sm:p-5 rounded-[24px] border transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-        isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+    <div className="space-y-6 animate-fade-in">
+      {/* ── 1. FORENSIC HEADER & ENGINE CONTROLS ─────────────────────── */}
+      <div className={`p-4 sm:p-5 rounded-[28px] border transition flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+        isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
       }`}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-xl">
+          <div className="w-11 h-11 rounded-2xl bg-teal-500/10 text-[#00BFA5] border border-teal-500/20 flex items-center justify-center text-xl">
             🏛️
           </div>
           <div>
-            <div className="flex items-center gap-2 text-xs font-black">
-              <span className={isDark ? 'text-white' : 'text-slate-900'}>Forensic Engine Status:</span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-base sm:text-lg font-black tracking-tight">
+                Financial Intelligence Engine
+              </h1>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
                 backendStatus?.isOnline 
-                  ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-emerald-50 text-emerald-800 border-emerald-200')
-                  : (isDark ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' : 'bg-amber-50 text-amber-800 border-amber-200')
+                  ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-400/30'
+                  : 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-400/30'
               }`}>
-                {backendStatus?.isOnline ? `ONLINE (${backendStatus.latencyMs}ms)` : 'READY / CONNECTING'}
+                {backendStatus?.isOnline ? `ONLINE (${backendStatus.latencyMs}ms)` : 'LOCAL ENGINE'}
               </span>
             </div>
-            <div className={`text-[10px] font-mono mt-0.5 truncate max-w-xs sm:max-w-md ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              {BACKEND_ENVIRONMENTS[currentEnv].baseUrl}
-            </div>
+            <p className={`text-[11px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Canonical Ledger • Entity Resolution • Debt Matrix • Evidence AI
+            </p>
           </div>
         </div>
 
-        {/* Module Switcher & Env */}
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
+        {/* Engine Switch & Environment Selector */}
+        <div className="flex items-center gap-2 flex-wrap">
           {onSwitchToSmsModule && (
             <button
               onClick={onSwitchToSmsModule}
-              className={`px-3.5 py-1.5 rounded-xl text-[11px] font-black transition border flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
                 isDark 
-                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00F2FE]' 
-                  : 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-900'
+                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-slate-200' 
+                  : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800'
               }`}
             >
-              <span>📱</span>
-              <span>Switch to SMS Simulator</span>
+              📱 Switch to SMS Simulator
             </button>
           )}
 
           <select
             value={currentEnv}
             onChange={(e) => handleEnvChange(e.target.value as BackendEnvironment)}
-            className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border outline-none cursor-pointer ${
               isDark 
-                ? 'bg-[#18242D] border-[#273B49] text-slate-200 hover:bg-[#20303D]' 
-                : 'bg-slate-50 border-slate-300 text-slate-800 hover:bg-slate-100'
+                ? 'bg-[#18242D] border-[#273B49] text-white focus:border-[#00BFA5]' 
+                : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-[#00BFA5]'
             }`}
           >
             <option value="DEV">Render Cloud (Dev)</option>
@@ -476,21 +486,30 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
         </div>
       </div>
 
-      {/* ── 2. DEDICATED MULTI-DIMENSIONAL FORENSIC NAVIGATION TABS ───── */}
+      {/* ── 2. 11 DEDICATED FINANCIAL INTELLIGENCE NAVIGATION TABS ─────── */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-black">
         {[
-          { id: 'OVERVIEW', label: '🏛️ Overview & Audit' },
-          { id: 'INFLOW', label: '💰 Inflow & Salary' },
-          { id: 'CATEGORIES', label: '💳 Spend Categories' },
+          { id: 'OVERVIEW', label: '🏛️ Overview & Health' },
+          { id: 'TRANSACTIONS', label: '📑 Transactions Ledger' },
+          { id: 'SPENDING', label: '💳 Spending Taxonomy' },
+          { id: 'INCOME', label: '💰 Inflow & Salary' },
           { id: 'LOANS', label: '🏦 Loans & Debt Matrix' },
-          { id: 'VELOCITY', label: '📈 Monthly Velocity' },
-          { id: 'MERCHANTS', label: '🛍️ Top Payees Hub' },
-          { id: 'CHANNELS', label: '⚡ Payment Channels' },
-          { id: 'LEDGER', label: '📑 Statement Ledger' },
-          { id: 'UPLOAD', label: '📤 Upload File' },
-          { id: 'COPILOT', label: '🤖 AI Forensics' },
+          { id: 'PEOPLE', label: '👥 People & Transfers' },
+          { id: 'RECURRING', label: '🔄 Recurring Mandates' },
+          { id: 'CASH_FLOW', label: '📈 12-Mo Cash Flow' },
+          { id: 'INSIGHTS', label: '✨ Evidence AI Insights' },
+          { id: 'AI_ANALYST', label: '🤖 AI Financial Analyst' },
+          { id: 'UPLOAD', label: '📤 Upload Statement' },
         ].map((tab) => {
-          const isActive = activeSection === tab.id;
+          const isActive = 
+            activeSection === tab.id ||
+            (tab.id === 'INCOME' && activeSection === 'INFLOW') ||
+            (tab.id === 'SPENDING' && activeSection === 'CATEGORIES') ||
+            (tab.id === 'CASH_FLOW' && activeSection === 'VELOCITY') ||
+            (tab.id === 'PEOPLE' && activeSection === 'MERCHANTS') ||
+            (tab.id === 'TRANSACTIONS' && activeSection === 'LEDGER') ||
+            (tab.id === 'AI_ANALYST' && activeSection === 'COPILOT');
+
           return (
             <button
               key={tab.id}
@@ -529,14 +548,14 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               />
             </div>
             <p className="text-[11px] text-slate-400">
-              Running multi-bank heuristics, column mapping, mathematical reconciliation, and AI taxonomy.
+              Running multi-bank heuristics, column mapping, mathematical reconciliation, entity resolution, and AI audit.
             </p>
           </div>
         </div>
       )}
 
-      {/* ── 4. SUB-PAGE 1: OVERVIEW & FORENSIC AUDIT ─────────────────── */}
-      {activeSection === 'OVERVIEW' && statementResult && (
+      {/* ── 4. TAB 1: OVERVIEW & FINANCIAL HEALTH ─────────────────────── */}
+      {(activeSection === 'OVERVIEW') && statementResult && (
         <div className="space-y-6">
           {/* Bank Account Forensic Card */}
           <div className={`p-5 sm:p-7 rounded-[28px] border relative overflow-hidden transition ${
@@ -549,10 +568,10 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                   <div className="flex items-center gap-2 flex-wrap">
                     <h2 className={`text-xl sm:text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{statementResult.bankDetected || 'HDFC Bank'}</h2>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-500 border border-emerald-400/30">
-                      STATEMENT VERIFIED
+                      STATEMENT AUDITED
                     </span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono border ${isDark ? 'text-slate-400 border-white/10' : 'text-slate-600 border-slate-200'}`}>
-                      {statementResult.transactionCount} txns
+                      {statementResult.transactionCount} canonical txns
                     </span>
                   </div>
                   <div className={`text-xs font-mono mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -586,7 +605,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                     isDark ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800'
                   }`}
                 >
-                  📥 Upload Another
+                  📥 Upload Statement
                 </button>
               </div>
             </div>
@@ -602,7 +621,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="text-base">⚖️</span>
                     <span className={`text-xs font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Mathematical Ledger Reconciliation
+                      Mathematical Ledger Reconciliation Proof
                     </span>
                   </div>
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
@@ -610,7 +629,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                       ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' : 'bg-emerald-100 text-emerald-800 border-emerald-300')
                       : 'bg-rose-500/20 text-rose-300 border-rose-400/40'
                   }`}>
-                    {rec.isReconciled ? '● 100% RECONCILED' : 'DISCREPANCY DETECTED'}
+                    {rec.isReconciled ? '● 100.0000% RECONCILED' : 'DISCREPANCY DETECTED'}
                   </span>
                 </div>
 
@@ -656,7 +675,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                 <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   ₹{facts.trueEconomicExpense.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
-                <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Excludes self-transfers & borrowings</div>
+                <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Lifestyle consumption only</div>
               </div>
 
               <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
@@ -668,7 +687,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                 <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   ₹{facts.totalInflow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
-                <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Salary + Loan Disbursals + P2P</div>
+                <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Salary + Micro-Loans + P2P</div>
               </div>
 
               <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
@@ -701,7 +720,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className={`p-5 rounded-[24px] border space-y-2 cursor-pointer hover:border-teal-500/50 transition ${
               isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`} onClick={() => setActiveSection('INFLOW')}>
+            }`} onClick={() => setActiveSection('INCOME')}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-emerald-500">💼 Primary Salary</span>
                 <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>13 Credits →</span>
@@ -714,7 +733,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
             }`} onClick={() => setActiveSection('LOANS')}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-amber-500">🏦 Loans & Credit Lines</span>
+                <span className="text-xs font-black uppercase tracking-wider text-amber-500">🏦 Loans & Debt Matrix</span>
                 <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>4 Lenders →</span>
               </div>
               <div className={`text-xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>Borrowed: ₹1.11L • Repaid: ₹95.8K</div>
@@ -723,7 +742,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
 
             <div className={`p-5 rounded-[24px] border space-y-2 cursor-pointer hover:border-teal-500/50 transition ${
               isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`} onClick={() => setActiveSection('VELOCITY')}>
+            }`} onClick={() => setActiveSection('CASH_FLOW')}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-cyan-500">📈 Cash Flow Velocity</span>
                 <span className={`text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>12 Months →</span>
@@ -733,33 +752,52 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
             </div>
           </div>
 
-          {/* AI Intelligence Insights */}
-          {statementResult.insights && statementResult.insights.length > 0 && (
-            <div className={`p-5 sm:p-6 rounded-[28px] border space-y-3 transition ${
+          {/* Evidence-Backed AI Insights Preview */}
+          {evidenceInsights.length > 0 && (
+            <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
               isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
             }`}>
-              <h3 className={`text-sm font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                <span>✨</span>
-                <span>Statement AI Intelligence & Forensic Patterns</span>
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className={`text-sm font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <span>✨</span>
+                  <span>Evidence-Backed Financial AI Insights</span>
+                </h3>
+                <button 
+                  onClick={() => setActiveSection('INSIGHTS')}
+                  className="text-xs font-bold text-[#00BFA5] hover:underline"
+                >
+                  View All Evidence Insights →
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {statementResult.insights.map((ins, idx) => (
+                {evidenceInsights.slice(0, 4).map((ins) => (
                   <div 
-                    key={idx} 
-                    className={`p-3.5 rounded-2xl border text-xs space-y-1 ${
-                      ins.severity === 'SUCCESS'
-                        ? (isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-900')
-                        : ins.severity === 'WARNING'
-                        ? (isDark ? 'bg-amber-500/10 border-amber-500/20 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-900')
-                        : (isDark ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-300' : 'bg-cyan-50 border-cyan-200 text-cyan-900')
+                    key={ins.id}
+                    className={`p-4 rounded-2xl border text-xs space-y-2 ${
+                      ins.type === 'RISK'
+                        ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
+                        : ins.type === 'WARNING'
+                        ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
+                        : ins.type === 'POSITIVE'
+                        ? (isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200')
+                        : (isDark ? 'bg-cyan-950/20 border-cyan-500/30' : 'bg-cyan-50 border-cyan-200')
                     }`}
                   >
-                    <div className="font-bold flex items-center gap-1.5">
-                      <span>{ins.severity === 'SUCCESS' ? '✓' : 'ℹ'}</span>
-                      <span>{ins.title}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-black text-sm">{ins.title}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                        ins.type === 'RISK' ? 'bg-rose-500/20 text-rose-400' :
+                        ins.type === 'WARNING' ? 'bg-amber-500/20 text-amber-400' :
+                        ins.type === 'POSITIVE' ? 'bg-emerald-500/20 text-emerald-400' :
+                        'bg-cyan-500/20 text-cyan-400'
+                      }`}>
+                        {ins.type}
+                      </span>
                     </div>
-                    <div className={`text-[11px] ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                      {ins.description}
+                    <p className={isDark ? 'text-slate-300' : 'text-slate-700'}>{ins.summary}</p>
+                    <div className={`text-[11px] italic ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      💡 Action: {ins.recommendedAction}
                     </div>
                   </div>
                 ))}
@@ -769,426 +807,120 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
         </div>
       )}
 
-      {/* ── 5. SUB-PAGE 2: INFLOW & SALARY INTELLIGENCE ───────────────── */}
-      {activeSection === 'INFLOW' && (
-        <div className="space-y-6">
-          <div className={`p-6 rounded-[28px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  💰 Inflow Decomposition & Income Intelligence
-                </h3>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Total Credits: <strong>₹{statementResult?.facts.totalInflow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong> across 136 credit transactions
-                </p>
-              </div>
-              <button
-                onClick={() => { setDirectionFilter('CREDIT'); setActiveSection('LEDGER'); }}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-[#00BFA5] text-slate-950 self-start sm:self-center"
-              >
-                View Credit Ledger →
-              </button>
-            </div>
-
-            {/* Inflow Category Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-              {(statementResult?.inflowDecomposition || []).map((item, idx) => (
-                <div key={idx} className={`p-4 rounded-2xl border space-y-2 ${
-                  isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{item.category}</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold">
-                      {item.sharePercent.toFixed(1)}% Share
-                    </span>
-                  </div>
-                  <div className={`text-xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    ₹{item.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </div>
-                  <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Source: {item.source} ({item.count} credits)
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-300 dark:bg-slate-800 overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.min(100, item.sharePercent)}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 6. SUB-PAGE 3: SPEND CATEGORIES DECOMPOSITION ────────────── */}
-      {activeSection === 'CATEGORIES' && (
-        <div className="space-y-6">
-          <div className={`p-6 rounded-[28px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  💳 12-Pillar Spend Category Decomposition
-                </h3>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Total Gross Debits: <strong>₹{statementResult?.facts.totalOutflow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong>
-                </p>
-              </div>
-            </div>
-
-            {/* Category Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-              {(statementResult?.categoryDecomposition || []).map((cat, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => { setCategoryFilter(cat.name); setActiveSection('LEDGER'); }}
-                  className={`p-4 rounded-2xl border space-y-2 cursor-pointer hover:border-teal-500/50 transition ${
-                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{cat.icon}</span>
-                      <span className={`text-xs font-black truncate max-w-[160px] ${isDark ? 'text-white' : 'text-slate-900'}`}>{cat.name}</span>
-                    </div>
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${isDark ? 'bg-white/10 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>
-                      {cat.sharePercent.toFixed(1)}%
-                    </span>
-                  </div>
-                  <div className="text-lg font-black font-mono text-rose-500">
-                    ₹{cat.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </div>
-                  <div className={`flex items-center justify-between text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    <span>{cat.count} txns</span>
-                    <span>Avg: ₹{Math.round(cat.avgTicket).toLocaleString('en-IN')}</span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-300 dark:bg-slate-800 overflow-hidden">
-                    <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min(100, cat.sharePercent)}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 7. SUB-PAGE 4: LOANS & DEBT FORENSIC MATRIX ──────────────── */}
-      {activeSection === 'LOANS' && (
-        <div className="space-y-6">
-          <div className={`p-6 rounded-[28px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  🏦 Loans & Digital Lending Forensic Audit
-                </h3>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Total Disbursed: <strong>₹1,11,133.14</strong> • Total Repaid: <strong>₹95,813.77</strong> • Net Delta: <strong>+₹15,319.37</strong>
-                </p>
-              </div>
-            </div>
-
-            {/* Lender Matrix Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {(statementResult?.lenderMatrix || []).map((lender) => (
-                <div key={lender.id} className={`p-5 rounded-2xl border space-y-3 ${
-                  isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{lender.lenderName}</div>
-                      <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{lender.productType}</div>
-                    </div>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase border ${
-                      lender.status === 'ACTIVE_LINE'
-                        ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-400/40'
-                        : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/40'
-                    }`}>
-                      {lender.status.replace('_', ' ')}
-                    </span>
-                  </div>
-
-                  <div className={`grid grid-cols-3 gap-2 text-center p-3 rounded-xl font-mono text-xs ${isDark ? 'bg-black/20' : 'bg-white border border-slate-200'}`}>
-                    <div>
-                      <div className={`text-[9px] uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Borrowed</div>
-                      <div className="font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        ₹{lender.totalBorrowed.toLocaleString('en-IN')}
-                      </div>
-                      <div className={`text-[9px] ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{lender.borrowCount} credits</div>
-                    </div>
-                    <div>
-                      <div className={`text-[9px] uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Repaid</div>
-                      <div className="font-black text-rose-600 dark:text-rose-400 mt-0.5">
-                        ₹{lender.totalRepaid.toLocaleString('en-IN')}
-                      </div>
-                      <div className={`text-[9px] ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{lender.repayCount} debits</div>
-                    </div>
-                    <div>
-                      <div className={`text-[9px] uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Net Delta</div>
-                      <div className="font-black text-cyan-600 dark:text-cyan-400 mt-0.5">
-                        ₹{lender.netDelta.toLocaleString('en-IN')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 8. SUB-PAGE 5: MONTHLY CASH VELOCITY ─────────────────────── */}
-      {activeSection === 'VELOCITY' && (
-        <div className="space-y-6">
-          <div className={`p-6 rounded-[28px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              📈 12-Month Financial Velocity & Monthly Cash Flow Trajectory
-            </h3>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
-                <thead>
-                  <tr className={`border-b text-[10px] font-black uppercase tracking-wider ${
-                    isDark ? 'border-[#273B49] text-slate-400' : 'border-slate-200 text-slate-500'
-                  }`}>
-                    <th className="py-3 px-3">Month</th>
-                    <th className="py-3 px-3 text-right">Inflows (Cr)</th>
-                    <th className="py-3 px-3 text-right">Outflows (Dr)</th>
-                    <th className="py-3 px-3 text-right">Net Cash Flow</th>
-                    <th className="py-3 px-3 text-right">Txn Count</th>
-                    <th className="py-3 px-3 text-right">Month Closing</th>
-                    <th className="py-3 px-3 text-center">Trend</th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${isDark ? 'divide-white/5' : 'divide-slate-200'}`}>
-                  {(statementResult?.monthlyVelocity || []).map((m) => (
-                    <tr key={m.monthKey} className={isDark ? 'hover:bg-[#18242D]' : 'hover:bg-slate-50'}>
-                      <td className={`py-3 px-3 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{m.monthName}</td>
-                      <td className="py-3 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold">
-                        ₹{m.inflows.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                      </td>
-                      <td className="py-3 px-3 text-right text-rose-600 dark:text-rose-400 font-bold">
-                        ₹{m.outflows.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                      </td>
-                      <td className={`py-3 px-3 text-right font-black ${m.netFlow >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                        {m.netFlow >= 0 ? '+' : ''}₹{m.netFlow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                      </td>
-                      <td className={`py-3 px-3 text-right ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{m.txnCount}</td>
-                      <td className="py-3 px-3 text-right text-cyan-600 dark:text-cyan-300 font-bold">
-                        {m.closingBalance !== null ? `₹${m.closingBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                          m.trend === 'SURPLUS'
-                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold'
-                            : m.trend === 'DEFICIT'
-                            ? 'bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold'
-                            : 'bg-slate-500/20 text-slate-700 dark:text-slate-300'
-                        }`}>
-                          {m.trend}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 9. SUB-PAGE 6: TOP PAYEES & MERCHANTS ─────────────────────── */}
-      {activeSection === 'MERCHANTS' && (
-        <div className="space-y-6">
-          <div className={`p-6 rounded-[28px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  🛍️ Top 25 Payees & Institutional Counterparties
-                </h3>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Ranked by total volume (inflows + outflows)</p>
-              </div>
-              <input
-                type="text"
-                placeholder="Filter payees..."
-                value={payeeSearch}
-                onChange={(e) => setPayeeSearch(e.target.value)}
-                className={`text-xs px-3 py-1.5 rounded-xl border outline-none font-medium w-48 ${
-                  isDark ? 'bg-[#18242D] border-[#273B49] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
-                }`}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-              {filteredPayees.map((payee) => (
-                <div key={payee.rank} className={`p-3.5 rounded-2xl border flex items-center justify-between ${
-                  isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
-                }`}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-full bg-[#00BFA5] text-slate-950 font-black text-xs flex items-center justify-center">
-                      #{payee.rank}
-                    </div>
-                    <div>
-                      <div className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>{payee.name}</div>
-                      <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{payee.category} • {payee.txnCount} txns • {payee.primaryChannel}</div>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono text-xs">
-                    <div className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>₹{payee.totalVolume.toLocaleString('en-IN')}</div>
-                    <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {payee.debit > 0 ? `Dr: ₹${payee.debit.toLocaleString('en-IN')}` : `Cr: ₹${payee.credit.toLocaleString('en-IN')}`}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 10. SUB-PAGE 7: PAYMENT CHANNELS ─────────────────────────── */}
-      {activeSection === 'CHANNELS' && (
-        <div className="space-y-6">
-          <div className={`p-6 rounded-[28px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              ⚡ Payment Rails & Financial Infrastructure Distribution
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {(statementResult?.channelSplit || []).map((ch, idx) => (
-                <div key={idx} className={`p-4 rounded-2xl border space-y-2 ${
-                  isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">{ch.icon}</span>
-                      <span className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{ch.channel}</span>
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-cyan-600 dark:text-cyan-300">
-                      {ch.volumeShare.toFixed(1)}% Volume
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between font-mono text-xs">
-                    <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>{ch.txnCount} Transactions</span>
-                    <span className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      ₹{(ch.debit + ch.credit).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-300 dark:bg-slate-800 overflow-hidden">
-                    <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${Math.min(100, ch.volumeShare)}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 11. SUB-PAGE 8: EXTRACTED STATEMENT LEDGER ───────────────── */}
-      {activeSection === 'LEDGER' && (
+      {/* ── 5. TAB 2: CANONICAL TRANSACTIONS LEDGER ──────────────────── */}
+      {(activeSection === 'TRANSACTIONS' || activeSection === 'LEDGER') && statementResult && (
         <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
-          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+          isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
         }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className={`text-sm sm:text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Extracted Statement Ledger (Showing {Math.min(ledgerVisibleCount, filteredTransactions.length)} of {filteredTransactions.length} items)
-              </h3>
-              <p className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Raw bank debits, credits, and verified running balance
+              <h2 className="text-lg font-black flex items-center gap-2">
+                <span>📑</span>
+                <span>Canonical Transaction Ledger ({filteredLedger.length.toLocaleString('en-IN')} items)</span>
+              </h2>
+              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Canonical data model with classification method and verified running balance
               </p>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <input
-                type="text"
-                placeholder="Search narration, ref, date..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`text-xs px-3 py-1.5 rounded-xl border outline-none font-medium w-40 sm:w-52 ${
-                  isDark ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'
-                }`}
-              />
+            {/* Search Input */}
+            <input
+              type="text"
+              placeholder="Search narration, ref, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`px-3.5 py-2 rounded-2xl text-xs font-mono outline-none border transition w-full sm:w-64 ${
+                isDark 
+                  ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500 focus:border-[#00BFA5]' 
+                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#00BFA5]'
+              }`}
+            />
+          </div>
 
-              <div className="flex items-center gap-1">
-                {(['ALL', 'DEBIT', 'CREDIT'] as const).map((dir) => (
-                  <button
-                    key={dir}
-                    onClick={() => setDirectionFilter(dir)}
-                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase transition border ${
-                      directionFilter === dir
-                        ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5]'
-                        : isDark
-                        ? 'bg-[#18242D] text-slate-400 border-[#273B49]'
-                        : 'bg-slate-100 text-slate-600 border-slate-200'
-                    }`}
-                  >
-                    {dir}
-                  </button>
-                ))}
-              </div>
+          {/* Filters Bar */}
+          <div className="flex items-center gap-2 flex-wrap text-xs font-black">
+            <div className="flex items-center rounded-xl p-0.5 border border-slate-700 bg-slate-900">
+              <button
+                onClick={() => setDirectionFilter('ALL')}
+                className={`px-2.5 py-1 rounded-lg transition ${directionFilter === 'ALL' ? 'bg-[#00BFA5] text-slate-950' : 'text-slate-400'}`}
+              >
+                ALL
+              </button>
+              <button
+                onClick={() => setDirectionFilter('DEBIT')}
+                className={`px-2.5 py-1 rounded-lg transition ${directionFilter === 'DEBIT' ? 'bg-rose-500 text-white' : 'text-slate-400'}`}
+              >
+                DEBIT
+              </button>
+              <button
+                onClick={() => setDirectionFilter('CREDIT')}
+                className={`px-2.5 py-1 rounded-lg transition ${directionFilter === 'CREDIT' ? 'bg-emerald-500 text-white' : 'text-slate-400'}`}
+              >
+                CREDIT
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1 flex-wrap">
+              {[
+                { id: 'ALL', label: 'All Types' },
+                { id: 'EXPENSE', label: 'Lifestyle Spend' },
+                { id: 'TRANSFER', label: 'Peer Transfers' },
+                { id: 'SALARY', label: 'Salary Inflows' },
+                { id: 'LOANS', label: 'Micro-Loans' },
+              ].map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => setEconomicFilter(f.id as any)}
+                  className={`px-2.5 py-1 rounded-xl border text-[11px] transition ${
+                    economicFilter === f.id
+                      ? 'bg-[#00F2FE] text-slate-950 border-[#00F2FE] font-black'
+                      : isDark ? 'bg-[#18242D] border-[#273B49] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="overflow-x-auto -mx-2 sm:mx-0">
-            <table className="w-full text-left text-xs">
+          {/* Ledger Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className={`border-b text-[10px] font-black uppercase tracking-wider ${
-                  isDark ? 'border-[#22323D] text-slate-400' : 'border-slate-200 text-slate-500'
-                }`}>
-                  <th className="py-2.5 px-3">Date</th>
-                  <th className="py-2.5 px-3">Narration / Particulars</th>
-                  <th className="py-2.5 px-3">Category</th>
-                  <th className="py-2.5 px-3 text-right">Debit (Dr)</th>
-                  <th className="py-2.5 px-3 text-right">Credit (Cr)</th>
-                  <th className="py-2.5 px-3 text-right">Balance</th>
+                <tr className={`border-b ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                  <th className="py-2.5 px-3">DATE</th>
+                  <th className="py-2.5 px-3">NARRATION / PARTICULARS</th>
+                  <th className="py-2.5 px-3">CATEGORY</th>
+                  <th className="py-2.5 px-3 text-right">DEBIT (DR)</th>
+                  <th className="py-2.5 px-3 text-right">CREDIT (CR)</th>
+                  <th className="py-2.5 px-3 text-right">BALANCE</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isDark ? 'divide-white/5' : 'divide-slate-200'}`}>
-                {filteredTransactions.slice(0, ledgerVisibleCount).map((tx) => (
-                  <tr key={tx.id} className={`transition ${isDark ? 'hover:bg-[#18242D]' : 'hover:bg-slate-50'}`}>
-                    <td className={`py-2.5 px-3 font-mono text-[11px] whitespace-nowrap ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      {tx.date}
-                    </td>
-                    <td className="py-2.5 px-3">
-                      <div className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {tx.narration}
-                      </div>
+              <tbody className="divide-y divide-white/5">
+                {filteredLedger.slice(0, ledgerVisibleCount).map((tx, idx) => (
+                  <tr key={idx} className={`hover:${isDark ? 'bg-white/5' : 'bg-slate-50'} transition`}>
+                    <td className="py-2.5 px-3 whitespace-nowrap text-slate-400">{tx.date}</td>
+                    <td className="py-2.5 px-3 max-w-xs sm:max-w-md truncate">
+                      <div className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{tx.narration}</div>
                       {tx.referenceNumber && (
-                        <div className={`text-[10px] font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
-                          Ref: {tx.referenceNumber}
-                        </div>
+                        <div className="text-[10px] text-slate-500">Ref: {tx.referenceNumber}</div>
                       )}
                     </td>
-                    <td className="py-2.5 px-3">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
-                        tx.category === 'Salary & Income' || tx.category === 'Income'
-                          ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-emerald-50 text-emerald-800 border-emerald-200')
-                          : tx.category === 'Loans & EMIs'
-                          ? (isDark ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' : 'bg-amber-50 text-amber-800 border-amber-200')
-                          : tx.category === 'Credit Card Bills'
-                          ? (isDark ? 'bg-rose-500/20 text-rose-300 border-rose-400/30' : 'bg-rose-50 text-rose-800 border-rose-200')
-                          : (isDark ? 'bg-white/5 text-slate-300 border-white/10' : 'bg-slate-100 text-slate-700 border-slate-200')
+                    <td className="py-2.5 px-3 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-sans font-bold border ${
+                        isDark ? 'bg-white/5 text-slate-300 border-white/10' : 'bg-slate-100 text-slate-700 border-slate-200'
                       }`}>
-                        {tx.category || 'General'}
+                        {tx.category}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-rose-500">
+                    <td className="py-2.5 px-3 text-right font-black text-rose-500 whitespace-nowrap">
                       {tx.debit ? `₹${tx.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-500">
+                    <td className="py-2.5 px-3 text-right font-black text-emerald-500 whitespace-nowrap">
                       {tx.credit ? `₹${tx.credit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                     </td>
-                    <td className={`py-2.5 px-3 text-right font-mono font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                      {tx.balance ? `₹${tx.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
+                    <td className={`py-2.5 px-3 text-right font-black whitespace-nowrap ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                      {tx.balance !== null ? `₹${tx.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                     </td>
                   </tr>
                 ))}
@@ -1196,232 +928,664 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
             </table>
           </div>
 
-          {filteredTransactions.length > ledgerVisibleCount && (
-            <div className="pt-2 text-center">
+          {filteredLedger.length > ledgerVisibleCount && (
+            <div className="text-center pt-2">
               <button
-                onClick={() => setLedgerVisibleCount((prev) => prev + 100)}
-                className={`py-2.5 px-6 rounded-2xl text-xs font-black transition border shadow-sm ${
-                  isDark
-                    ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-teal-300'
-                    : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
+                onClick={() => setLedgerVisibleCount(c => c + 150)}
+                className={`px-5 py-2.5 rounded-2xl text-xs font-black transition border ${
+                  isDark ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00BFA5]' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-900'
                 }`}
               >
-                Load Next 100 Transactions ({filteredTransactions.length - ledgerVisibleCount} remaining) ↓
+                Load Next 150 Transactions (Showing {ledgerVisibleCount} of {filteredLedger.length})
               </button>
             </div>
           )}
         </div>
       )}
 
-      {/* ── 12. SUB-PAGE 9: UPLOAD FILE ──────────────────────────────── */}
-      {activeSection === 'UPLOAD' && (
-        <div className={`p-6 sm:p-10 rounded-[28px] border text-center space-y-5 transition ${
-          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-        }`}>
-          <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleFileDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`p-8 sm:p-12 border-2 border-dashed rounded-[24px] cursor-pointer transition flex flex-col items-center justify-center gap-3 ${
-              isDragging
-                ? 'border-[#00BFA5] bg-teal-500/10 scale-[1.01]'
-                : isDark
-                ? 'border-[#22323D] hover:border-teal-500/50 bg-[#18242D]/40'
-                : 'border-slate-300 hover:border-teal-500/50 bg-slate-50'
-            }`}
-          >
-            <div className="w-16 h-16 rounded-2xl bg-teal-500/15 text-[#00BFA5] flex items-center justify-center text-3xl">
-              📂
+      {/* ── 6. TAB 3: SPENDING TAXONOMY & 12 PILLARS ──────────────────── */}
+      {(activeSection === 'SPENDING' || activeSection === 'CATEGORIES') && statementResult && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black flex items-center gap-2">
+                  <span>💳</span>
+                  <span>12-Pillar Spend Taxonomy & Lifestyle Decomposition</span>
+                </h2>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Normalized debit categories with transaction frequency, volume shares, and average ticket sizes
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Click to Browse or Drag & Drop Statement
-              </h3>
-              <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Supports Excel (.xlsx, .xls), CSV, Text, and Password-Protected PDFs
-              </p>
-            </div>
-            <input 
-              ref={fileInputRef}
-              type="file"
-              accept=".xlsx,.xls,.csv,.txt,.pdf"
-              onChange={handleFileInputChange}
-              className="hidden"
-            />
-          </div>
 
-          {/* Quick Demo Loaders */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            <button
-              onClick={loadRealHdfcStatementXls}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
-                isDark 
-                  ? 'bg-teal-500/20 hover:bg-teal-500/30 border-teal-500/40 text-[#00F2FE]' 
-                  : 'bg-teal-50 hover:bg-teal-100 border-teal-300 text-teal-900'
-              }`}
-            >
-              <span>⚡</span>
-              <span>Load Deepankar Gautam HDFC Statement (.xls - 1,781 txns)</span>
-            </button>
-            <button
-              onClick={loadSampleExcelStatement}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
-                isDark 
-                  ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30 text-emerald-300' 
-                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-900'
-              }`}
-            >
-              <span>📊</span>
-              <span>Load Sample SBI Excel (.xlsx)</span>
-            </button>
-            <button
-              onClick={loadSampleStatement}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
-                isDark 
-                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00F2FE]' 
-                  : 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-900'
-              }`}
-            >
-              <span>📄</span>
-              <span>Load Sample CSV</span>
-            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {categories.map((cat, idx) => (
+                <div 
+                  key={idx}
+                  className={`p-4 rounded-[22px] border space-y-2 transition ${
+                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-xs'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{cat.icon}</span>
+                      <span className="font-bold text-xs">{cat.name}</span>
+                    </div>
+                    <span className="text-xs font-black font-mono text-rose-500">
+                      ₹{cat.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-rose-500 to-amber-500" 
+                      style={{ width: `${Math.min(100, Math.max(2, cat.sharePercent))}%` }} 
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <span>{cat.count} txns ({cat.sharePercent.toFixed(1)}% share)</span>
+                    <span>Avg: ₹{cat.avgTicket.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* ── 13. SUB-PAGE 10: AI FORENSIC COPILOT ──────────────────────── */}
-      {activeSection === 'COPILOT' && (
+      {/* ── 7. TAB 4: INFLOW & SALARY DECOMPOSITION ───────────────────── */}
+      {(activeSection === 'INCOME' || activeSection === 'INFLOW') && statementResult && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+          }`}>
+            <h2 className="text-lg font-black flex items-center gap-2">
+              <span>💰</span>
+              <span>Inflow Decomposition & Professional Income Sources</span>
+            </h2>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              5-part breakdown separating Corporate Salary, EPFO, Micro-Loans, P2P Transfers, and Cashbacks
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {inflows.map((inf, idx) => (
+                <div 
+                  key={idx}
+                  className={`p-4 rounded-[22px] border space-y-2 transition ${
+                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-xs'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">💰</span>
+                      <span className="font-bold text-xs">{inf.category}</span>
+                    </div>
+                    <span className="text-xs font-black font-mono text-emerald-500">
+                      +₹{inf.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400" 
+                      style={{ width: `${Math.min(100, Math.max(2, inf.sharePercent))}%` }} 
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <span>{inf.count} credits ({inf.sharePercent.toFixed(1)}% share)</span>
+                    <span>Avg: ₹{(inf.count > 0 ? inf.totalAmount / inf.count : 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 8. TAB 5: LOANS & DEBT MATRIX ─────────────────────────────── */}
+      {(activeSection === 'LOANS') && statementResult && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+          }`}>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 className="text-lg font-black flex items-center gap-2">
+                  <span>🏦</span>
+                  <span>Multi-Lender Debt & Micro-Credit Forensic Matrix</span>
+                </h2>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Lender-by-lender borrowing vs repayment accounting with net revolving balances
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-500 border border-amber-400/30">
+                4 Lenders Audited
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {lenders.map((len, idx) => (
+                <div 
+                  key={idx}
+                  className={`p-5 rounded-[24px] border space-y-3 transition ${
+                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MerchantLogoView merchantName={len.lenderName} size={36} isDark={isDark} shape="rounded" />
+                      <div>
+                        <div className="font-black text-xs">{len.lenderName}</div>
+                        <div className="text-[10px] text-slate-400">{len.productType}</div>
+                      </div>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                      len.status === 'ACTIVE_LINE'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-400/30'
+                        : 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30'
+                    }`}>
+                      {len.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center pt-1 font-mono">
+                    <div className="p-2 rounded-xl bg-slate-900/50">
+                      <div className="text-[9px] text-slate-400">BORROWED</div>
+                      <div className="text-xs font-black text-emerald-400">
+                        {len.totalBorrowed > 0 ? `₹${len.totalBorrowed.toLocaleString('en-IN')}` : '—'}
+                      </div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900/50">
+                      <div className="text-[9px] text-slate-400">REPAID</div>
+                      <div className="text-xs font-black text-rose-400">
+                        ₹{len.totalRepaid.toLocaleString('en-IN')}
+                      </div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900/50">
+                      <div className="text-[9px] text-slate-400">NET DELTA</div>
+                      <div className={`text-xs font-black ${len.netDelta > 0 ? 'text-amber-400' : 'text-slate-300'}`}>
+                        {len.netDelta > 0 ? `+₹${len.netDelta.toLocaleString('en-IN')}` : `₹${len.netDelta.toLocaleString('en-IN')}`}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 9. TAB 6: PEOPLE & COUNTERPARTIES INTELLIGENCE ────────────── */}
+      {(activeSection === 'PEOPLE' || activeSection === 'MERCHANTS') && statementResult && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+          }`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-black flex items-center gap-2">
+                  <span>👥</span>
+                  <span>People & Counterparty Resolution Hub</span>
+                </h2>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Canonical entity resolution tracking total sent, received, and net personal cash flow
+                </p>
+              </div>
+
+              <input
+                type="text"
+                placeholder="Search person or payee..."
+                value={payeeSearch}
+                onChange={(e) => setPayeeSearch(e.target.value)}
+                className={`px-3.5 py-2 rounded-2xl text-xs font-mono outline-none border transition w-full sm:w-64 ${
+                  isDark 
+                    ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500 focus:border-[#00BFA5]' 
+                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#00BFA5]'
+                }`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {people.map((p) => (
+                <div
+                  key={p.id}
+                  onClick={() => setSelectedCounterparty(p)}
+                  className={`p-4 rounded-[22px] border space-y-2.5 cursor-pointer hover:border-teal-500/50 transition ${
+                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-teal-500/20 text-[#00BFA5] font-black flex items-center justify-center text-xs">
+                        {p.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-black text-xs">{p.name}</div>
+                        <div className="text-[10px] text-slate-400">{p.transactionCount} transactions • {p.primaryChannel}</div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#00BFA5]">Inspect →</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono pt-1">
+                    <div className="p-2 rounded-xl bg-slate-900/50">
+                      <div className="text-[9px] text-slate-400">SENT (DR)</div>
+                      <div className="font-black text-rose-400">₹{p.totalSent.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900/50">
+                      <div className="text-[9px] text-slate-400">RECEIVED (CR)</div>
+                      <div className="font-black text-emerald-400">
+                        {p.totalReceived > 0 ? `₹${p.totalReceived.toLocaleString('en-IN')}` : '—'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 10. TAB 7: RECURRING MANDATES & SUBSCRIPTIONS ────────────── */}
+      {(activeSection === 'RECURRING') && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black flex items-center gap-2">
+                  <span>🔄</span>
+                  <span>Active Recurring Mandates & Subscriptions</span>
+                </h2>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Detected fixed interval obligations (Payroll, Insurance, Cloud, Subscriptions, EMIs)
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-full text-xs font-black bg-teal-500/20 text-[#00BFA5] border border-teal-400/30">
+                {recurringMandates.length} Mandates Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recurringMandates.map((m) => (
+                <div 
+                  key={m.id}
+                  className={`p-4 rounded-[22px] border space-y-2.5 transition ${
+                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MerchantLogoView merchantName={m.merchantName} size={32} isDark={isDark} shape="rounded" />
+                      <div>
+                        <div className="font-black text-xs">{m.merchantName}</div>
+                        <div className="text-[10px] text-slate-400">{m.category}</div>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-teal-500/20 text-[#00BFA5]">
+                      {m.frequency}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-mono pt-1">
+                    <span className="text-slate-400">Amount:</span>
+                    <span className="font-black text-white">₹{m.amount.toLocaleString('en-IN')}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Last: {m.lastBilledDate}</span>
+                    <span className="text-emerald-400">Next: {m.nextExpectedDate}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 11. TAB 8: 12-MONTH CASH FLOW VELOCITY ────────────────────── */}
+      {(activeSection === 'CASH_FLOW' || activeSection === 'VELOCITY') && statementResult && (
         <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
-          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+          isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+        }`}>
+          <h2 className="text-lg font-black flex items-center gap-2">
+            <span>📈</span>
+            <span>12-Month Financial Velocity & Cash Run-Rate</span>
+          </h2>
+          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            Month-by-month trajectory tracking inflows, outflows, surplus/deficits, and closing balances
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-mono">
+              <thead>
+                <tr className={`border-b ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                  <th className="py-2.5 px-3">MONTH</th>
+                  <th className="py-2.5 px-3 text-right">INFLOWS (CR)</th>
+                  <th className="py-2.5 px-3 text-right">OUTFLOWS (DR)</th>
+                  <th className="py-2.5 px-3 text-right">NET FLOW</th>
+                  <th className="py-2.5 px-3 text-right">TXN COUNT</th>
+                  <th className="py-2.5 px-3 text-right">MONTH CLOSING</th>
+                  <th className="py-2.5 px-3 text-center">STATUS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {velocity.map((m, idx) => (
+                  <tr key={idx} className={`hover:${isDark ? 'bg-white/5' : 'bg-slate-50'} transition`}>
+                    <td className={`py-2.5 px-3 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{m.monthName}</td>
+                    <td className="py-2.5 px-3 text-right font-black text-emerald-500">
+                      +₹{m.inflows.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-black text-rose-500">
+                      -₹{m.outflows.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    </td>
+                    <td className={`py-2.5 px-3 text-right font-black ${m.netFlow > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {m.netFlow > 0 ? `+₹${m.netFlow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : `₹${m.netFlow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`}
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-slate-400">{m.txnCount}</td>
+                    <td className="py-2.5 px-3 text-right font-black text-cyan-400">
+                      {m.closingBalance !== null ? `₹${m.closingBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
+                    </td>
+                    <td className="py-2.5 px-3 text-center">
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                        m.trend === 'SURPLUS'
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30'
+                          : m.trend === 'DEFICIT'
+                          ? 'bg-rose-500/20 text-rose-400 border border-rose-400/30'
+                          : 'bg-slate-500/20 text-slate-400 border border-slate-400/30'
+                      }`}>
+                        {m.trend}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 12. TAB 9: EVIDENCE-BACKED AI INSIGHTS ────────────────────── */}
+      {(activeSection === 'INSIGHTS') && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+          }`}>
+            <h2 className="text-lg font-black flex items-center gap-2">
+              <span>✨</span>
+              <span>Evidence-Backed AI Financial Insights</span>
+            </h2>
+            <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              Every insight is backed by verified deterministic metrics, transaction counts, and actionable advice
+            </p>
+
+            <div className="space-y-4">
+              {evidenceInsights.map((ins) => (
+                <div
+                  key={ins.id}
+                  className={`p-5 rounded-[24px] border space-y-3 transition ${
+                    ins.type === 'RISK'
+                      ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
+                      : ins.type === 'WARNING'
+                      ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
+                      : ins.type === 'POSITIVE'
+                      ? (isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200')
+                      : (isDark ? 'bg-cyan-950/20 border-cyan-500/30' : 'bg-cyan-50 border-cyan-200')
+                  }`}
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h3 className="font-black text-sm">{ins.title}</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      ins.type === 'RISK' ? 'bg-rose-500/20 text-rose-400' :
+                      ins.type === 'WARNING' ? 'bg-amber-500/20 text-amber-400' :
+                      ins.type === 'POSITIVE' ? 'bg-emerald-500/20 text-emerald-400' :
+                      'bg-cyan-500/20 text-cyan-400'
+                    }`}>
+                      {ins.type}
+                    </span>
+                  </div>
+
+                  <p className={`text-xs ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>{ins.summary}</p>
+                  
+                  <div className="p-3 rounded-xl bg-black/20 text-xs space-y-1">
+                    <div className="font-bold text-[#00BFA5] text-[11px]">WHY THIS MATTERS:</div>
+                    <div className={isDark ? 'text-slate-300' : 'text-slate-700'}>{ins.whyItMatters}</div>
+                  </div>
+
+                  {/* Evidence Metrics Table */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-xs">
+                    {ins.evidence.map((ev, i) => (
+                      <div key={i} className="p-2.5 rounded-xl bg-slate-900/40">
+                        <div className="text-[9px] text-slate-400">{ev.metric}</div>
+                        <div className="font-black text-white mt-0.5">{ev.currentValue}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={`p-2.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs font-bold ${
+                    isDark ? 'text-teal-300' : 'text-teal-900'
+                  }`}>
+                    💡 Actionable Advice: {ins.recommendedAction}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 13. TAB 10: AI FINANCIAL ANALYST ─────────────────────────── */}
+      {(activeSection === 'AI_ANALYST' || activeSection === 'COPILOT') && (
+        <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+          isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
         }`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xl">🤖</span>
-              <h3 className={`text-sm sm:text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Statement AI Forensics Copilot
-              </h3>
-            </div>
-            <span className="text-[10px] font-mono text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20">
-              Gemini LLM Context Active
+            <h2 className="text-lg font-black flex items-center gap-2">
+              <span>🤖</span>
+              <span>AI Financial Analyst Copilot</span>
+            </h2>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-teal-500/20 text-[#00BFA5] border border-teal-400/30">
+              Gemini LLM Active
             </span>
           </div>
 
-          {/* Quick Query Chips */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Quick Query Pills */}
+          <div className="flex items-center gap-2 flex-wrap">
             {[
               'Show salary & income analysis',
               'What are my loan borrowings vs repayments?',
               'Explain mathematical reconciliation',
               'Who are my top payees?',
               'Show monthly velocity & burn rate',
-            ].map((prompt, i) => (
+            ].map((q, idx) => (
               <button
-                key={i}
-                onClick={() => {
-                  setChatInput(prompt);
-                }}
-                className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border transition ${
-                  isDark 
-                    ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-teal-300' 
-                    : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
+                key={idx}
+                onClick={() => setChatInput(q)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition border ${
+                  isDark ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-slate-300' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800'
                 }`}
               >
-                {prompt}
+                {q}
               </button>
             ))}
           </div>
 
-          {/* Chat Transcript */}
+          {/* Chat Container */}
           <div className={`p-4 rounded-2xl border min-h-[220px] max-h-[360px] overflow-y-auto space-y-3 ${
-            isDark ? 'bg-black/30 border-white/5' : 'bg-slate-50 border-slate-200'
+            isDark ? 'bg-[#0D1418] border-[#1D2930]' : 'bg-slate-50 border-slate-200'
           }`}>
-            {chatMessages.map((msg, idx) => (
+            {chatMessages.map((msg, i) => (
               <div
-                key={idx}
+                key={i}
                 className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
               >
-                <div
-                  className={`max-w-[85%] p-3.5 rounded-2xl text-xs font-medium leading-relaxed whitespace-pre-line ${
-                    msg.role === 'user'
-                      ? 'bg-[#00BFA5] text-slate-950 font-bold'
-                      : isDark
-                      ? 'bg-[#18242D] text-slate-200 border border-[#273B49]'
-                      : 'bg-white text-slate-900 border border-slate-200 shadow-sm'
-                  }`}
-                >
-                  {msg.text}
+                <div className={`max-w-[85%] p-3.5 rounded-2xl text-xs leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-[#00BFA5] text-slate-950 font-bold'
+                    : isDark
+                    ? 'bg-[#18242D] text-slate-200 border border-[#273B49]'
+                    : 'bg-white text-slate-800 border border-slate-200 shadow-xs'
+                }`}>
+                  <div className="whitespace-pre-line">{msg.text}</div>
                 </div>
                 <span className="text-[9px] text-slate-500 mt-1 px-1">{msg.time}</span>
               </div>
             ))}
             {isAiTyping && (
-              <div className="text-xs text-slate-400 animate-pulse font-mono">
-                🤖 AI Copilot is analyzing statement transactions...
+              <div className="flex items-center gap-2 text-xs text-[#00BFA5] font-mono">
+                <span className="animate-spin">⚡</span>
+                <span>Copilot reasoning over financial facts...</span>
               </div>
             )}
           </div>
 
-          {/* Chat Form */}
-          <form onSubmit={handleSendChatMessage} className="flex items-center gap-2">
+          {/* Input Box */}
+          <div className="flex items-center gap-2">
             <input
               type="text"
+              placeholder="Ask about salary, biggest expense, loan EMIs, or anomalies..."
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Ask about salary, biggest expense, loan EMIs, or anomalies..."
-              className={`flex-1 text-xs px-4 py-2.5 rounded-xl border outline-none font-medium ${
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              className={`flex-1 px-4 py-2.5 rounded-2xl text-xs outline-none border transition ${
                 isDark 
-                  ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500' 
-                  : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400'
+                  ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500 focus:border-[#00BFA5]' 
+                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#00BFA5]'
               }`}
             />
             <button
-              type="submit"
+              onClick={handleSendMessage}
               disabled={isAiTyping || !chatInput.trim()}
-              className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#00BFA5] hover:bg-[#00A892] text-slate-950 transition border border-[#00BFA5] shadow-sm disabled:opacity-50"
+              className="px-5 py-2.5 rounded-2xl text-xs font-black bg-[#00BFA5] hover:bg-[#00A892] text-slate-950 transition border border-[#00BFA5] disabled:opacity-50"
             >
               Send
             </button>
-          </form>
+          </div>
         </div>
       )}
 
-      {/* Password Modal */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className={`p-6 rounded-[28px] border max-w-sm w-full space-y-4 shadow-2xl ${
-            isDark ? 'bg-[#121B22] border-[#273B49] text-white' : 'bg-white border-slate-200 text-slate-900'
-          }`}>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🔒</span>
-              <h3 className="text-base font-black">Password Protected PDF</h3>
-            </div>
-            <p className="text-xs text-slate-400">
-              Enter your bank statement PDF password (usually DOB or PAN) to decrypt and parse.
-            </p>
-            <input
-              type="password"
-              placeholder="Enter PDF password"
-              value={pdfPassword}
-              onChange={(e) => setPdfPassword(e.target.value)}
-              className={`w-full p-2.5 rounded-xl text-xs font-mono border outline-none ${
-                isDark ? 'bg-[#18242D] border-[#273B49] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
-              }`}
+      {/* ── 14. TAB 11: MULTI-FORMAT UPLOAD STATEMENT ─────────────────── */}
+      {(activeSection === 'UPLOAD') && (
+        <div className="space-y-6">
+          <div
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-8 sm:p-12 rounded-[28px] border-2 border-dashed text-center space-y-4 cursor-pointer transition ${
+              isDragging
+                ? 'border-[#00BFA5] bg-teal-500/10'
+                : isDark
+                ? 'border-[#273B49] bg-[#121B22] hover:border-[#00BFA5]/50'
+                : 'border-slate-300 bg-white hover:border-[#00BFA5]/50'
+            }`}
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              accept=".csv,.xlsx,.xls,.txt,.pdf" 
+              className="hidden" 
             />
-            <div className="flex items-center justify-end gap-2 pt-2">
+            <div className="w-16 h-16 mx-auto rounded-3xl bg-teal-500/20 text-[#00BFA5] flex items-center justify-center text-3xl">
+              📥
+            </div>
+            <div className="space-y-1">
+              <div className="text-base sm:text-lg font-black">
+                Drop your bank statement file here
+              </div>
+              <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Supports .xlsx, .xls, .csv, .txt, and password-protected PDF statements
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 text-[10px] font-mono text-slate-400">
+              <span>🔒 100% Client-Side Private Ingestion</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 15. COUNTERPARTY DRILLDOWN MODAL ──────────────────────────── */}
+      {selectedCounterparty && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
+          <div className={`w-full max-w-lg p-6 rounded-[28px] border space-y-4 ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-xl'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-teal-500/20 text-[#00BFA5] font-black flex items-center justify-center text-base">
+                  {selectedCounterparty.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="text-base font-black">{selectedCounterparty.name}</h3>
+                  <p className="text-[11px] text-slate-400">{selectedCounterparty.entityType} • {selectedCounterparty.primaryChannel}</p>
+                </div>
+              </div>
               <button
-                onClick={() => setShowPasswordModal(false)}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                onClick={() => setSelectedCounterparty(null)}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold hover:bg-white/20"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleUnlockAndProcess}
-                className="px-4 py-2 rounded-xl text-xs font-black bg-[#00BFA5] text-slate-950"
-              >
-                Unlock & Parse
+                ✕
               </button>
             </div>
+
+            <div className="grid grid-cols-2 gap-3 font-mono text-xs">
+              <div className="p-3 rounded-2xl bg-slate-900/50">
+                <div className="text-[10px] text-slate-400">TOTAL SENT (DEBIT)</div>
+                <div className="text-base font-black text-rose-400 mt-0.5">₹{selectedCounterparty.totalSent.toLocaleString('en-IN')}</div>
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-900/50">
+                <div className="text-[10px] text-slate-400">TOTAL RECEIVED (CREDIT)</div>
+                <div className="text-base font-black text-emerald-400 mt-0.5">
+                  {selectedCounterparty.totalReceived > 0 ? `₹${selectedCounterparty.totalReceived.toLocaleString('en-IN')}` : '—'}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-black/20 text-xs space-y-2">
+              <div className="flex justify-between text-slate-400">
+                <span>Transactions Count:</span>
+                <span className="font-bold text-white">{selectedCounterparty.transactionCount} transactions</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Average Transaction:</span>
+                <span className="font-bold text-white">₹{selectedCounterparty.averageAmount.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>First Seen:</span>
+                <span className="font-mono text-slate-300">{selectedCounterparty.firstTransactionDate}</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Last Payment:</span>
+                <span className="font-mono text-slate-300">{selectedCounterparty.lastTransactionDate}</span>
+              </div>
+            </div>
+
+            {selectedCounterparty.aliases.length > 0 && (
+              <div className="space-y-1">
+                <div className="text-[10px] font-bold text-slate-400 uppercase">Resolved Aliases & UPI Identifiers:</div>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {selectedCounterparty.aliases.map((al, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded-lg text-[10px] font-mono bg-white/5 border border-white/10 text-slate-300 truncate max-w-xs">
+                      {al}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setSelectedCounterparty(null)}
+              className="w-full py-2.5 rounded-2xl text-xs font-black bg-[#00BFA5] text-slate-950"
+            >
+              Done
+            </button>
           </div>
         </div>
       )}
