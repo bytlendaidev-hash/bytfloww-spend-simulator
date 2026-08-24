@@ -6,5 +6,14 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false,
+    proxy: {
+      '/api/render': {
+        target: 'https://backend-api-bytfllow-dev.onrender.com',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api\/render/, ''),
+      },
+    },
   },
 });
+

@@ -81,10 +81,24 @@ class BackendApiService {
 
   public getBaseUrl(): string {
     if (this.customBaseUrl) return this.customBaseUrl;
+    if (
+      this.currentEnv === 'DEV' &&
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ) {
+      return '/api/render/api/v1';
+    }
     return BACKEND_ENVIRONMENTS[this.currentEnv].baseUrl;
   }
 
   public getHealthUrl(): string {
+    if (
+      this.currentEnv === 'DEV' &&
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ) {
+      return '/api/render/health/ready';
+    }
     const base = this.getBaseUrl().replace('/api/v1', '');
     return `${base}/health/ready`;
   }
