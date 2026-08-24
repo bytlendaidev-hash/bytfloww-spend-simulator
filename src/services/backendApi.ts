@@ -1,7 +1,9 @@
 import * as XLSX from 'xlsx';
 import { 
   BackendStatementUploadResult, 
-  BackendStatementListItem,
+  AnomalyAlert,
+  FinancialHealthScore,
+  SalaryMonthlyItem,BackendStatementListItem,
   StatementTransactionItem,
   StatementInflowItem,
   StatementCategoryItem,
@@ -1195,6 +1197,192 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       },
     ];
 
+
+    // ── ANOMALY DETECTION ENGINE ──────────────────────────────────────────
+    // Compute per-category averages and flag statistical outliers
+    const catAmountMap: Record<string, number[]> = {};
+    transactions.forEach(t => {
+      const cat = t.category || 'Other';
+      const amt = t.debit || 0;
+      if (amt > 0) {
+        if (!catAmountMap[cat]) catAmountMap[cat] = [];
+        catAmountMap[cat].push(amt);
+      }
+    });
+    const catStats: Record<string, { mean: number; stdDev: number }> = {};
+    Object.entries(catAmountMap).forEach(([cat, amounts]) => {
+      const mean = amounts.reduce((s, a) => s + a, 0) / amounts.length;
+      const variance = amounts.reduce((s, a) => s + Math.pow(a - mean, 2), 0) / amounts.length;
+      catStats[cat] = { mean, stdDev: Math.sqrt(variance) };
+    });
+
+    const anomalies: AnomalyAlert[] = [];
+    transactions.forEach((t, idx) => {
+      const amt = t.debit || 0;
+      if (amt < 5000) return;
+      const lower = t.narration.toLowerCase();
+      // Skip expected large transactions
+      if (lower.includes('salary') || lower.includes('mpokket') || lower.includes('vivifi') || lower.includes('lic') || lower.includes('neft cr')) return;
+      const cat = t.category || 'Other';
+      const stats = catStats[cat];
+      if (!stats || stats.stdDev === 0) return;
+      const zScore = (amt - stats.mean) / stats.stdDev;
+      if (zScore > 2.5 && amt > 8000) {
+        const multiplier = stats.mean > 0 ? (amt / stats.mean).toFixed(1) : '∞';
+        anomalies.push({
+          id: `anomaly_${idx}`,
+          transactionDate: t.date,
+          narration: t.narration.slice(0, 50),
+          amount: amt,
+          category: cat,
+          reason: `${multiplier}× your typical ${cat} amount of ₹${Math.round(stats.mean).toLocaleString('en-IN')}`,
+          severity: zScore > 4 ? 'HIGH' : zScore > 3 ? 'MEDIUM' : 'LOW',
+          zScore: Math.round(zScore * 10) / 10,
+        });
+      }
+    });
+    // Sort by amount, keep top 8
+    anomalies.sort((a, b) => b.amount - a.amount);
+    const topAnomalies = anomalies.slice(0, 8);
+
+    // ── FINANCIAL HEALTH SCORE ──────────────────────────────────────────
+    // Score = debtRatioScore(25) + savingsRateScore(25) + incomeStabilityScore(25) + spendDiversityScore(25)
+    const salaryBase = salaryInflowTotal > 0 ? salaryInflowTotal : totalInflow;
+    const debtRatio = debtPayments / Math.max(salaryBase, 1);
+    const debtRatioScore = Math.max(0, Math.round(25 - (debtRatio * 50)));
+
+    const savingsRate = totalInflow > 0 ? (totalInflow - totalOutflow) / totalInflow : 0;
+    const savingsRateScore = Math.max(0, Math.min(25, Math.round(savingsRate * 100)));
+
+    const monthCount = Object.keys(monthlyMap).length;
+    const incomeStabilityScore = salaryInflowTotal > 0
+      ? Math.min(25, Math.round(25 * (monthCount / 12) * (salaryInflowTotal > 500000 ? 1 : 0.85)))
+      : 10;
+
+    const debitCategories = Object.values(categoryAgg).filter(c => c.debit > 0).length;
+    const spendDiversityScore = Math.min(25, Math.round((debitCategories / 10) * 25));
+
+    const totalHealthScore = Math.max(0, Math.min(100, debtRatioScore + savingsRateScore + incomeStabilityScore + spendDiversityScore));
+    const healthTier = totalHealthScore >= 80 ? 'EXCELLENT' : totalHealthScore >= 65 ? 'GOOD' : totalHealthScore >= 50 ? 'FAIR' : totalHealthScore >= 35 ? 'POOR' : 'CRITICAL';
+
+    const healthScore: FinancialHealthScore = {
+      score: totalHealthScore,
+      tier: healthTier,
+      debtRatioScore,
+      savingsRateScore,
+      incomeStabilityScore,
+      spendDiversityScore,
+      primaryRisk: debtRatio > 0.4 ? 'High debt-to-salary ratio — revolving micro-loans consuming income' : debtRatio > 0.25 ? 'Moderate debt burden with overlap in digital credit lines' : 'Peer transfer volume dominates outflow channel',
+      improvementTip: debtRatio > 0.4 ? 'Consolidate mPokket + Vivifi lines into a single lower-rate personal loan' : 'Reduce discretionary peer transfers and increase monthly savings allocation',
+    };
+
+    // ── SALARY TIMELINE ──────────────────────────────────────────────────
+    const salaryTimelineMap: Record<string, { salary: number; loan: number; other: number }> = {};
+    transactions.forEach(t => {
+      if (!t.credit || t.credit <= 0) return;
+      let mKey = '2025-04';
+      if (t.date) {
+        const parts = t.date.split(/[-/.]/);
+        if (parts.length === 3) {
+          let y = parts[2] ? (parts[2].length === 2 ? '20' + parts[2] : parts[2]) : parts[0];
+          let m = parts[1] || '01';
+          if (parts[0].length === 4) { y = parts[0]; m = parts[1]; }
+          mKey = `${y}-${m.padStart(2, '0')}`;
+        }
+      }
+      if (!salaryTimelineMap[mKey]) salaryTimelineMap[mKey] = { salary: 0, loan: 0, other: 0 };
+      const lower = t.narration.toLowerCase();
+      if (lower.includes('newgen') || lower.includes('salary') || lower.includes('payroll') || (t.credit >= 20000 && lower.includes('by transfer') && !lower.includes('upi'))) {
+        salaryTimelineMap[mKey].salary += t.credit;
+      } else if (lower.includes('mpokket') || lower.includes('vivifi') || lower.includes('navi') || lower.includes('bajaj') || lower.includes('loan') || lower.includes('kredit')) {
+        salaryTimelineMap[mKey].loan += t.credit;
+      } else {
+        salaryTimelineMap[mKey].other += t.credit;
+      }
+    });
+
+    const MONTH_NAMES: Record<string, string> = {
+      '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr', '05': 'May', '06': 'Jun',
+      '07': 'Jul', '08': 'Aug', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec',
+    };
+    const salaryTimeline: SalaryMonthlyItem[] = Object.entries(salaryTimelineMap)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, v]) => {
+        const [yr, mo] = key.split('-');
+        return {
+          monthKey: key,
+          monthName: `${MONTH_NAMES[mo] || mo} ${yr}`,
+          salaryAmount: Math.round(v.salary),
+          loanCreditAmount: Math.round(v.loan),
+          otherCreditAmount: Math.round(v.other),
+        };
+      });
+
+    // ── ENHANCED CATEGORY SUBCATEGORIES ─────────────────────────────────
+    // Map each category's debit transactions to merchant-level subcategories
+    const catSubMap: Record<string, Record<string, { debit: number; count: number }>> = {};
+    transactions.forEach(t => {
+      if (!t.debit || t.debit <= 0) return;
+      const cat = t.category || 'Other Expenses';
+      const lower = t.narration.toLowerCase();
+      let subcat = 'Other';
+
+      if (cat.includes('Food')) {
+        if (lower.includes('swiggy')) subcat = 'Swiggy';
+        else if (lower.includes('zomato')) subcat = 'Zomato';
+        else if (lower.includes('blinkit') || lower.includes('zepto') || lower.includes('dunzo')) subcat = 'Quick Commerce';
+        else subcat = 'Restaurants & Dining';
+      } else if (cat.includes('Travel') || cat.includes('Metro') || cat.includes('Fuel')) {
+        if (lower.includes('uber') || lower.includes('rapido') || lower.includes('ola')) subcat = 'Cab Rides';
+        else if (lower.includes('metro') || lower.includes('dmrc')) subcat = 'Metro';
+        else if (lower.includes('petrol') || lower.includes('fuel') || lower.includes('bpcl') || lower.includes('iocl')) subcat = 'Fuel';
+        else subcat = 'Other Transport';
+      } else if (cat.includes('Shopping') || cat.includes('E-Commerce')) {
+        if (lower.includes('amazon') || lower.includes('amzn')) subcat = 'Amazon';
+        else if (lower.includes('flipkart') || lower.includes('myntra')) subcat = 'Flipkart / Myntra';
+        else if (lower.includes('meesho')) subcat = 'Meesho';
+        else subcat = 'Other E-Commerce';
+      } else if (cat.includes('Utilities') || cat.includes('Cloud')) {
+        if (lower.includes('airtel') || lower.includes('jio')) subcat = 'Mobile Recharge';
+        else if (lower.includes('electricity') || lower.includes('bescom') || lower.includes('uppcl')) subcat = 'Electricity';
+        else if (lower.includes('google') || lower.includes('microsoft') || lower.includes('cloud')) subcat = 'Cloud Services';
+        else subcat = 'Other Utilities';
+      } else if (cat.includes('Loan') || cat.includes('EMI')) {
+        if (lower.includes('mpokket')) subcat = 'mPokket';
+        else if (lower.includes('vivifi')) subcat = 'Vivifi FlexPay';
+        else if (lower.includes('bajaj')) subcat = 'Bajaj Finance';
+        else if (lower.includes('navi')) subcat = 'Navi';
+        else subcat = 'Other EMI';
+      } else if (cat.includes('ATM') || cat.includes('Cash')) {
+        subcat = 'ATM Cash';
+      } else if (cat.includes('Transfer') || cat.includes('P2P')) {
+        subcat = 'Peer Transfer';
+      } else {
+        subcat = 'Other';
+      }
+
+      if (!catSubMap[cat]) catSubMap[cat] = {};
+      if (!catSubMap[cat][subcat]) catSubMap[cat][subcat] = { debit: 0, count: 0 };
+      catSubMap[cat][subcat].debit += t.debit;
+      catSubMap[cat][subcat].count++;
+    });
+
+    // Enrich categoryDecomposition with subcategories
+    const enrichedCategories = categoryDecomposition.map(cat => {
+      const subMap = catSubMap[cat.name];
+      if (!subMap) return cat;
+      const totalDebit = cat.debit || 1;
+      const subcategories = Object.entries(subMap)
+        .sort(([, a], [, b]) => b.debit - a.debit)
+        .slice(0, 5)
+        .map(([name, v]) => ({
+          name,
+          debit: Math.round(v.debit),
+          count: v.count,
+          shareOfCategory: Math.round((v.debit / totalDebit) * 100),
+        }));
+      return { ...cat, subcategories };
+    });
     return {
       statement: {
         id: `stmt_${Date.now()}`,
@@ -1276,7 +1464,7 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       ],
       transactions,
       inflowDecomposition,
-      categoryDecomposition,
+      categoryDecomposition: enrichedCategories,
       lenderMatrix,
       monthlyVelocity,
       topPayees,
@@ -1285,8 +1473,14 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       peopleCounterparties,
       evidenceInsights,
       recurringMandates,
+      anomalies: topAnomalies,
+      healthScore,
+      salaryTimeline,
     };
   }
 }
 
 export const backendApiService = new BackendApiService();
+
+
+

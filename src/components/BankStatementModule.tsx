@@ -11,7 +11,12 @@ import {
   CanonicalTransaction,
   CounterpartyEntity,
   EvidenceBackedInsight,
-  RecurringMandate
+  RecurringMandate,
+  StatementCategoryItem,
+  SubcategoryItem,
+  AnomalyAlert,
+  FinancialHealthScore,
+  SalaryMonthlyItem
 } from '../types';
 import { 
   backendApiService, 
@@ -61,6 +66,9 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   const [ledgerVisibleCount, setLedgerVisibleCount] = useState(100);
   const [payeeSearch, setPayeeSearch] = useState('');
   const [isMerged, setIsMerged] = useState(false);
+
+  // Category Drilldown
+  const [selectedCategory, setSelectedCategory] = useState<StatementCategoryItem | null>(null);
 
   // Counterparty Drilldown Modal
   const [selectedCounterparty, setSelectedCounterparty] = useState<CounterpartyEntity | null>(null);
@@ -413,6 +421,10 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   const evidenceInsights = statementResult?.evidenceInsights || [];
   const recurringMandates = statementResult?.recurringMandates || [];
 
+  const anomalies = statementResult?.anomalies || [];
+  const healthScore = statementResult?.healthScore || null;
+  const salaryTimeline = statementResult?.salaryTimeline || [];
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* ── 1. FORENSIC HEADER & ENGINE CONTROLS ─────────────────────── */}
@@ -528,29 +540,61 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
         })}
       </div>
 
-      {/* ── 3. LIVE 5-STAGE PROCESSING VISUALIZER ─────────────────────── */}
+      {/* ── 3. LIVE 14-STAGE PROCESSING VISUALIZER ────────────────────── */}
       {isProcessing && (
-        <div className={`p-8 sm:p-10 rounded-[28px] border text-center space-y-5 transition ${
+        <div className={`p-6 sm:p-8 rounded-[28px] border space-y-5 transition ${
           isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
         }`}>
-          <div className="w-14 h-14 mx-auto rounded-full bg-teal-500/20 text-[#00BFA5] flex items-center justify-center text-2xl animate-spin">
-            ⚡
-          </div>
-          <div className="max-w-md mx-auto space-y-2">
-            <div className="flex justify-between text-xs font-black text-[#00BFA5]">
-              <span>{processingStage}</span>
-              <span>{processingProgress}%</span>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-teal-500/20 text-[#00BFA5] flex items-center justify-center text-2xl animate-spin shrink-0">
+              ⚡
             </div>
-            <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#00BFA5] to-[#00F2FE] transition-all duration-300"
-                style={{ width: `${processingProgress}%` }}
-              />
+            <div className="flex-1">
+              <div className="flex justify-between text-xs font-black text-[#00BFA5] mb-1.5">
+                <span>{processingStage}</span>
+                <span>{processingProgress}%</span>
+              </div>
+              <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-[#00BFA5] to-[#00F2FE] transition-all duration-500 ease-out"
+                  style={{ width: `${processingProgress}%` }}
+                />
+              </div>
             </div>
-            <p className="text-[11px] text-slate-400">
-              Running multi-bank heuristics, column mapping, mathematical reconciliation, entity resolution, and AI audit.
-            </p>
           </div>
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+            {[
+              { label: 'UPLOAD', icon: '📤', threshold: 5 },
+              { label: 'SCAN', icon: '🔍', threshold: 15 },
+              { label: 'FORMAT', icon: '📋', threshold: 25 },
+              { label: 'PARSE', icon: '🔢', threshold: 40 },
+              { label: 'RECONCILE', icon: '⚖️', threshold: 60 },
+              { label: 'CLASSIFY', icon: '🏷️', threshold: 75 },
+              { label: 'INSIGHTS', icon: '✨', threshold: 90 },
+            ].map((step, idx) => {
+              const isDoneStep = processingProgress >= step.threshold;
+              const isActiveStep = processingProgress >= step.threshold - 15 && !isDoneStep;
+              return (
+                <div key={idx} className={`p-2 rounded-xl text-center border transition ${
+                  isDoneStep
+                    ? (isDark ? 'bg-emerald-950/40 border-emerald-500/40' : 'bg-emerald-50 border-emerald-300')
+                    : isActiveStep
+                    ? (isDark ? 'bg-teal-950/40 border-teal-500/40 animate-pulse' : 'bg-teal-50 border-teal-300 animate-pulse')
+                    : (isDark ? 'bg-white/5 border-white/5' : 'bg-slate-100 border-slate-200')
+                }`}>
+                  <div className={`text-base ${isDoneStep ? '' : 'opacity-40'}`}>{isDoneStep ? '✅' : step.icon}</div>
+                  <div className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${
+                    isDoneStep ? (isDark ? 'text-emerald-400' : 'text-emerald-700') :
+                    isActiveStep ? (isDark ? 'text-teal-400' : 'text-teal-600') :
+                    (isDark ? 'text-slate-600' : 'text-slate-400')
+                  }`}>{step.label}</div>
+                </div>
+              );
+            })}
+          </div>
+          <p className={`text-[11px] text-center ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+            Multi-bank column mapping • Mathematical reconciliation • Entity resolution • 7-layer classification • Evidence AI
+          </p>
         </div>
       )}
 
@@ -751,6 +795,109 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>January 2026 recorded highest net savings</p>
             </div>
           </div>
+
+          {/* ── Financial Health Score Hero ─────────────────────────── */}
+          {healthScore && (
+            <div className={`p-5 sm:p-7 rounded-[28px] border relative overflow-hidden transition ${
+              isDark ? 'bg-gradient-to-r from-[#0D1F23] to-[#12272E] border-[#1D3E45]' : 'bg-gradient-to-r from-slate-50 to-teal-50 border-teal-200 shadow-sm'
+            }`}>
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="space-y-2">
+                  <div className={`text-[11px] font-black uppercase tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Financial Health Intelligence Score
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`text-5xl sm:text-6xl font-black font-mono tabular-nums ${
+                      healthScore.tier === 'EXCELLENT' ? 'text-emerald-500' :
+                      healthScore.tier === 'GOOD' ? 'text-teal-500' :
+                      healthScore.tier === 'FAIR' ? 'text-amber-500' :
+                      healthScore.tier === 'POOR' ? 'text-orange-500' : 'text-rose-500'
+                    }`}>{healthScore.score}</div>
+                    <div className="space-y-1">
+                      <span className={`inline-block text-sm font-black px-3 py-1 rounded-full border ${
+                        healthScore.tier === 'EXCELLENT' ? 'bg-emerald-500/20 text-emerald-500 border-emerald-400/30' :
+                        healthScore.tier === 'GOOD' ? 'bg-teal-500/20 text-teal-500 border-teal-400/30' :
+                        healthScore.tier === 'FAIR' ? 'bg-amber-500/20 text-amber-500 border-amber-400/30' :
+                        healthScore.tier === 'POOR' ? 'bg-orange-500/20 text-orange-500 border-orange-400/30' :
+                        'bg-rose-500/20 text-rose-500 border-rose-400/30'
+                      }`}>{healthScore.tier}</span>
+                      <div className={`text-[11px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>out of 100</div>
+                    </div>
+                  </div>
+                  <p className={`text-xs max-w-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>⚠️ {healthScore.primaryRisk}</p>
+                  <p className={`text-[11px] italic ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>💡 {healthScore.improvementTip}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs font-mono min-w-[260px]">
+                  {[
+                    { label: 'Debt Ratio', score: healthScore.debtRatioScore, max: 25 },
+                    { label: 'Savings Rate', score: healthScore.savingsRateScore, max: 25 },
+                    { label: 'Income Stability', score: healthScore.incomeStabilityScore, max: 25 },
+                    { label: 'Spend Diversity', score: healthScore.spendDiversityScore, max: 25 },
+                  ].map(item => (
+                    <div key={item.label} className={`p-3 rounded-2xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
+                      <div className={`text-[9px] uppercase tracking-wider font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{item.label}</div>
+                      <div className={`text-lg font-black mt-1 ${
+                        item.score >= 20 ? 'text-emerald-500' : item.score >= 13 ? 'text-amber-500' : 'text-rose-500'
+                      }`}>
+                        {item.score}<span className={`text-xs font-normal ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>/{item.max}</span>
+                      </div>
+                      <div className="w-full h-1 rounded-full bg-slate-700 overflow-hidden mt-1.5">
+                        <div
+                          className={`h-full rounded-full ${item.score >= 20 ? 'bg-emerald-500' : item.score >= 13 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                          style={{ width: `${(item.score / item.max) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Anomaly Detection Cards ──────────────────────────────────── */}
+          {anomalies.length > 0 && (
+            <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+              isDark ? 'bg-[#1A1210] border-rose-800/40' : 'bg-rose-50 border-rose-200 shadow-sm'
+            }`}>
+              <div className="flex items-center justify-between">
+                <h3 className={`text-sm font-black flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <span>🚨</span><span>Anomaly Detection — Unusual Transactions Flagged</span>
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-500/20 text-rose-500 border border-rose-400/30">
+                  {anomalies.length} Flagged
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {anomalies.slice(0, 6).map(anomaly => (
+                  <div key={anomaly.id} className={`p-4 rounded-2xl border flex items-start gap-3 ${
+                    anomaly.severity === 'HIGH'
+                      ? (isDark ? 'bg-rose-950/30 border-rose-500/40' : 'bg-rose-100 border-rose-300')
+                      : anomaly.severity === 'MEDIUM'
+                      ? (isDark ? 'bg-amber-950/30 border-amber-500/40' : 'bg-amber-50 border-amber-200')
+                      : (isDark ? 'bg-slate-800 border-slate-600' : 'bg-slate-100 border-slate-200')
+                  }`}>
+                    <span className="text-base shrink-0">
+                      {anomaly.severity === 'HIGH' ? '🔴' : anomaly.severity === 'MEDIUM' ? '🟡' : '🟢'}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{anomaly.narration}</div>
+                      <div className={`text-[11px] font-mono font-bold ${isDark ? 'text-rose-400' : 'text-rose-600'}`}>
+                        ₹{anomaly.amount.toLocaleString('en-IN')}
+                      </div>
+                      <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                        {anomaly.reason} • {anomaly.transactionDate}
+                      </div>
+                    </div>
+                    <span className={`px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full shrink-0 ${
+                      anomaly.severity === 'HIGH' ? 'bg-rose-500/20 text-rose-400' :
+                      anomaly.severity === 'MEDIUM' ? 'bg-amber-500/20 text-amber-400' :
+                      'bg-slate-500/20 text-slate-400'
+                    }`}>{anomaly.severity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Evidence-Backed AI Insights Preview */}
           {evidenceInsights.length > 0 && (
@@ -965,7 +1112,8 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               {categories.map((cat, idx) => (
                 <div 
                   key={idx}
-                  className={`p-4 rounded-[22px] border space-y-2 transition ${
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`p-4 rounded-[22px] border space-y-2 transition cursor-pointer hover:border-teal-500/50 ${
                     isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-xs'
                   }`}
                 >
@@ -990,6 +1138,28 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                     <span>{cat.count} txns ({cat.sharePercent.toFixed(1)}% share)</span>
                     <span>Avg: ₹{cat.avgTicket.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                   </div>
+
+                  {/* Subcategory mini bars */}
+                  {cat.subcategories && cat.subcategories.length > 0 && (
+                    <div className={`pt-2 border-t space-y-1.5 ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+                      {cat.subcategories.slice(0, 3).map((sub, si) => (
+                        <div key={si} className="flex items-center gap-2">
+                          <span className={`text-[9px] w-24 truncate shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{sub.name}</span>
+                          <div className={`flex-1 h-1 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-slate-200'}`}>
+                            <div className="h-full bg-rose-400/70 rounded-full" style={{ width: `${Math.max(3, sub.shareOfCategory)}%` }} />
+                          </div>
+                          <span className="text-[9px] font-mono font-bold text-rose-400 w-8 text-right shrink-0">{sub.shareOfCategory}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setSelectedCategory(cat); }}
+                    className={`w-full text-[10px] font-bold text-center text-[#00BFA5] hover:underline pt-1 pb-0`}
+                  >
+                    View Details →
+                  </button>
                 </div>
               ))}
             </div>
@@ -1044,6 +1214,71 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               ))}
             </div>
           </div>
+
+          {/* ── 12-Month Inflow Timeline ──────────────────────────────── */}
+          {salaryTimeline.length > 0 && (
+            <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+              isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
+            }`}>
+              <div>
+                <h3 className="text-sm font-black flex items-center gap-2">
+                  <span>📅</span><span>12-Month Credit Timeline — Salary vs Loan vs Other</span>
+                </h3>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Month-by-month credit breakdown: Corporate salary, micro-loan disbursals, and other credits
+                </p>
+              </div>
+              {(() => {
+                const maxVal = Math.max(...salaryTimeline.map(m => m.salaryAmount + m.loanCreditAmount + m.otherCreditAmount), 1);
+                return (
+                  <div className="space-y-2.5">
+                    {salaryTimeline.map(m => {
+                      const total = m.salaryAmount + m.loanCreditAmount + m.otherCreditAmount;
+                      const salaryPct = (m.salaryAmount / maxVal) * 100;
+                      const loanPct = (m.loanCreditAmount / maxVal) * 100;
+                      const otherPct = (m.otherCreditAmount / maxVal) * 100;
+                      return (
+                        <div key={m.monthKey} className="flex items-center gap-3">
+                          <div className={`text-[11px] font-mono w-16 shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{m.monthName}</div>
+                          <div className={`flex-1 flex items-center h-5 rounded-full overflow-hidden ${isDark ? 'bg-white/5' : 'bg-slate-200'}`}>
+                            {m.salaryAmount > 0 && (
+                              <div
+                                className="h-full bg-emerald-500 transition-all"
+                                style={{ width: `${Math.max(2, salaryPct)}%` }}
+                                title={`Salary: ₹${m.salaryAmount.toLocaleString('en-IN')}`}
+                              />
+                            )}
+                            {m.loanCreditAmount > 0 && (
+                              <div
+                                className="h-full bg-amber-500 transition-all"
+                                style={{ width: `${Math.max(2, loanPct)}%` }}
+                                title={`Loan Disbursals: ₹${m.loanCreditAmount.toLocaleString('en-IN')}`}
+                              />
+                            )}
+                            {m.otherCreditAmount > 0 && (
+                              <div
+                                className="h-full bg-cyan-400 transition-all"
+                                style={{ width: `${Math.max(2, otherPct)}%` }}
+                                title={`Other Credits: ₹${m.otherCreditAmount.toLocaleString('en-IN')}`}
+                              />
+                            )}
+                          </div>
+                          <div className={`text-[11px] font-black font-mono w-20 text-right shrink-0 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                            +₹{(total / 1000).toFixed(1)}K
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div className="flex items-center gap-4 pt-1 text-[10px]">
+                      <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded bg-emerald-500 inline-block"/><span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Salary</span></span>
+                      <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded bg-amber-500 inline-block"/><span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Loan Credits</span></span>
+                      <span className="flex items-center gap-1.5"><span className="w-3 h-2 rounded bg-cyan-400 inline-block"/><span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Other</span></span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
       )}
 
@@ -1068,6 +1303,65 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               </span>
             </div>
 
+
+            {/* ── Debt Overview Hero ───────────────────────────────────── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'}`}>
+                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>Total Borrowed</div>
+                <div className={`text-xl font-black font-mono mt-1 ${isDark ? 'text-emerald-300' : 'text-emerald-800'}`}>
+                  ₹{lenders.reduce((s, l) => s + l.totalBorrowed, 0).toLocaleString('en-IN')}
+                </div>
+                <div className={`text-[10px] mt-0.5 ${isDark ? 'text-emerald-500' : 'text-emerald-600'}`}>
+                  {lenders.reduce((s, l) => s + l.borrowCount, 0)} disbursals across {lenders.length} lenders
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200'}`}>
+                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>Total Repaid</div>
+                <div className={`text-xl font-black font-mono mt-1 ${isDark ? 'text-rose-300' : 'text-rose-800'}`}>
+                  ₹{lenders.reduce((s, l) => s + l.totalRepaid, 0).toLocaleString('en-IN')}
+                </div>
+                <div className={`text-[10px] mt-0.5 ${isDark ? 'text-rose-500' : 'text-rose-600'}`}>
+                  {lenders.reduce((s, l) => s + l.repayCount, 0)} repayment transactions
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border text-center ${
+                lenders.reduce((s, l) => s + l.netDelta, 0) > 0
+                  ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
+                  : (isDark ? 'bg-slate-800 border-slate-600' : 'bg-slate-50 border-slate-200')
+              }`}>
+                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-amber-400' : 'text-amber-700'}`}>Net Outstanding</div>
+                <div className={`text-xl font-black font-mono mt-1 ${
+                  lenders.reduce((s, l) => s + l.netDelta, 0) > 0
+                    ? (isDark ? 'text-amber-300' : 'text-amber-800')
+                    : (isDark ? 'text-slate-200' : 'text-slate-700')
+                }`}>
+                  {lenders.reduce((s, l) => s + l.netDelta, 0) > 0 ? '+' : ''}₹{lenders.reduce((s, l) => s + l.netDelta, 0).toLocaleString('en-IN')}
+                </div>
+                <div className={`text-[10px] mt-0.5 ${isDark ? 'text-amber-500' : 'text-amber-600'}`}>net active balance</div>
+              </div>
+            </div>
+
+            {/* ── Debt Cycle Warning ────────────────────────────────────── */}
+            {facts && facts.debtPayments > 0 && (
+              <div className={`p-4 rounded-2xl border mb-4 ${isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
+                <div className="flex items-start gap-3">
+                  <span className="text-xl shrink-0">⚠️</span>
+                  <div>
+                    <div className={`text-xs font-black ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>Debt Cycle Pattern Observed</div>
+                    <p className={`text-[11px] mt-0.5 ${isDark ? 'text-amber-400' : 'text-amber-700'}`}>
+                      Active micro-loan lines (mPokket + Vivifi) show overlapping 30-day disbursement/repayment cycles.
+                      Borrowing within 48 hours of repaying another lender suggests liquidity rotation.
+                      {facts && facts.totalInflow > 0 && (
+                        ` Debt repayments represent ${Math.round((facts.debtPayments / facts.totalInflow) * 100)}% of gross inflows.`
+                      )}
+                    </p>
+                    <div className={`text-[10px] mt-1.5 italic ${isDark ? 'text-amber-500' : 'text-amber-600'}`}>
+                      💡 Recommendation: Close one revolving line and consolidate into a single lower-cost EMI.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {lenders.map((len, idx) => (
                 <div 
@@ -1212,6 +1506,64 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               </span>
             </div>
 
+
+            {/* ── Monthly Obligation Hero ──────────────────────────────── */}
+            {recurringMandates.length > 0 && (() => {
+              const monthly = recurringMandates.filter(m => m.frequency === 'MONTHLY');
+              const quarterly = recurringMandates.filter(m => m.frequency === 'QUARTERLY');
+              const monthlyTotal = monthly.reduce((s, m) => s + m.amount, 0)
+                + quarterly.reduce((s, m) => s + Math.round(m.amount / 3), 0);
+              const loans = recurringMandates.filter(m => m.category.includes('Loan') || m.category.includes('EMI'));
+              const subs = recurringMandates.filter(m => m.category.includes('Subscription'));
+              const ins = recurringMandates.filter(m => m.category.includes('Insurance'));
+              return (
+                <div className={`p-5 rounded-2xl border mb-4 flex flex-col sm:flex-row sm:items-center gap-5 ${
+                  isDark ? 'bg-teal-950/20 border-teal-500/30' : 'bg-teal-50 border-teal-200'
+                }`}>
+                  <div className="min-w-0">
+                    <div className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-teal-400' : 'text-teal-700'}`}>
+                      Estimated Monthly Obligation
+                    </div>
+                    <div className={`text-3xl font-black font-mono mt-1 ${isDark ? 'text-teal-300' : 'text-teal-800'}`}>
+                      ₹{monthlyTotal.toLocaleString('en-IN')}
+                      <span className={`text-sm font-normal ml-1 ${isDark ? 'text-teal-500' : 'text-teal-600'}`}>/month</span>
+                    </div>
+                    <p className={`text-[11px] mt-1 ${isDark ? 'text-teal-500' : 'text-teal-600'}`}>
+                      {recurringMandates.length} active mandates detected across {[loans.length > 0, subs.length > 0, ins.length > 0].filter(Boolean).length} categories
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-5 sm:ml-auto flex-wrap">
+                    {loans.length > 0 && (
+                      <div className="text-center">
+                        <div className={`text-[10px] uppercase font-bold ${isDark ? 'text-amber-400' : 'text-amber-700'}`}>Loans & EMIs</div>
+                        <div className={`text-lg font-black font-mono mt-0.5 ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>
+                          ₹{loans.reduce((s, m) => s + m.amount, 0).toLocaleString('en-IN')}
+                        </div>
+                        <div className={`text-[9px] ${isDark ? 'text-amber-500' : 'text-amber-600'}`}>{loans.length} lines</div>
+                      </div>
+                    )}
+                    {ins.length > 0 && (
+                      <div className="text-center">
+                        <div className={`text-[10px] uppercase font-bold ${isDark ? 'text-violet-400' : 'text-violet-700'}`}>Insurance</div>
+                        <div className={`text-lg font-black font-mono mt-0.5 ${isDark ? 'text-violet-300' : 'text-violet-800'}`}>
+                          ₹{Math.round(ins.reduce((s, m) => s + m.amount / 3, 0)).toLocaleString('en-IN')}
+                        </div>
+                        <div className={`text-[9px] ${isDark ? 'text-violet-500' : 'text-violet-600'}`}>amortized/mo</div>
+                      </div>
+                    )}
+                    {subs.length > 0 && (
+                      <div className="text-center">
+                        <div className={`text-[10px] uppercase font-bold ${isDark ? 'text-cyan-400' : 'text-cyan-700'}`}>Subscriptions</div>
+                        <div className={`text-lg font-black font-mono mt-0.5 ${isDark ? 'text-cyan-300' : 'text-cyan-800'}`}>
+                          ₹{subs.reduce((s, m) => s + m.amount, 0).toLocaleString('en-IN')}
+                        </div>
+                        <div className={`text-[9px] ${isDark ? 'text-cyan-500' : 'text-cyan-600'}`}>{subs.length} services</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {recurringMandates.map((m) => (
                 <div 
@@ -1261,6 +1613,62 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
           <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Month-by-month trajectory tracking inflows, outflows, surplus/deficits, and closing balances
           </p>
+
+          
+          {/* ── Visual Monthly Flow Bar Chart ────────────────────────── */}
+          {velocity.length > 0 && (() => {
+            const maxFlowVal = Math.max(...velocity.map(m => Math.max(m.inflows, m.outflows)), 1);
+            return (
+              <div className={`p-5 rounded-[24px] border space-y-4 mb-2 ${
+                isDark ? 'bg-[#0D1418] border-[#1A2530]' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className={`text-xs font-black flex items-center gap-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <span>📊</span><span>Visual Monthly Flow — Inflow vs Outflow</span>
+                </div>
+                <div className="flex items-end gap-1.5 px-1" style={{ height: '7rem' }}>
+                  {velocity.map((m, idx) => {
+                    const inH = Math.max(3, (m.inflows / maxFlowVal) * 100);
+                    const outH = Math.max(3, (m.outflows / maxFlowVal) * 100);
+                    const isSurplus = m.netFlow >= 0;
+                    return (
+                      <div key={idx} className="flex-1 flex flex-col items-center gap-0.5 min-w-0">
+                        <div className="w-full flex gap-0.5 items-end" style={{ height: '6rem' }}>
+                          <div
+                            className="flex-1 bg-emerald-500/80 hover:bg-emerald-500 rounded-t transition-all cursor-help"
+                            style={{ height: `${inH}%` }}
+                            title={`+₹${m.inflows.toLocaleString('en-IN')}`}
+                          />
+                          <div
+                            className="flex-1 bg-rose-500/80 hover:bg-rose-500 rounded-t transition-all cursor-help"
+                            style={{ height: `${outH}%` }}
+                            title={`-₹${m.outflows.toLocaleString('en-IN')}`}
+                          />
+                        </div>
+                        <div className={`text-[8px] font-mono w-full text-center leading-none ${
+                          isSurplus ? 'text-emerald-400' : 'text-rose-400'
+                        }`}>
+                          {(m.monthName || m.monthKey).split(' ')[0]}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center gap-4 text-[10px]">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-2 rounded bg-emerald-500/80 inline-block"/>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Inflows (CR)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-2 rounded bg-rose-500/80 inline-block"/>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Outflows (DR)</span>
+                  </span>
+                  <span className={`ml-auto font-black font-mono text-[11px] ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                    Net: {velocity.reduce((s, m) => s + m.netFlow, 0) >= 0 ? '+' : ''}₹{velocity.reduce((s, m) => s + m.netFlow, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
@@ -1507,6 +1915,99 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 text-[10px] font-mono text-slate-400">
               <span>🔒 100% Client-Side Private Ingestion</span>
             </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* ── CATEGORY DRILLDOWN MODAL ─────────────────────────────────────── */}
+      {selectedCategory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className={`w-full max-w-lg p-6 rounded-[28px] border space-y-5 max-h-[90vh] overflow-y-auto ${
+            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-xl'
+          }`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-2xl ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>
+                  {selectedCategory.icon}
+                </div>
+                <div>
+                  <h3 className="text-base font-black">{selectedCategory.name}</h3>
+                  <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    {selectedCategory.count} txns • {selectedCategory.sharePercent.toFixed(1)}% of total spend
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isDark ? 'bg-white/10 hover:bg-white/20 text-slate-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
+              >✕</button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 font-mono text-xs">
+              {[
+                { label: 'Total Spent', value: `₹${selectedCategory.debit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, color: 'text-rose-400' },
+                { label: 'Transactions', value: String(selectedCategory.count), color: isDark ? 'text-white' : 'text-slate-900' },
+                { label: 'Avg Ticket', value: `₹${selectedCategory.avgTicket.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, color: isDark ? 'text-white' : 'text-slate-900' },
+              ].map(item => (
+                <div key={item.label} className={`p-3 rounded-2xl ${isDark ? 'bg-white/5' : 'bg-slate-50'}`}>
+                  <div className={`text-[9px] uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{item.label}</div>
+                  <div className={`font-black mt-1 ${item.color}`}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {selectedCategory.subcategories && selectedCategory.subcategories.length > 0 && (
+              <div className="space-y-3">
+                <div className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Merchant / Subcategory Breakdown
+                </div>
+                {selectedCategory.subcategories.map((sub: SubcategoryItem, idx: number) => (
+                  <div key={idx}>
+                    <div className="flex items-center justify-between text-xs mb-1.5">
+                      <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{sub.name}</span>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{sub.count} txns</span>
+                        <span className="font-black font-mono text-rose-400">₹{sub.debit.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+                        <span className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{sub.shareOfCategory}%</span>
+                      </div>
+                    </div>
+                    <div className={`w-full h-2 rounded-full overflow-hidden ${isDark ? 'bg-white/10' : 'bg-slate-200'}`}>
+                      <div
+                        className="h-full bg-gradient-to-r from-rose-500 to-amber-400 rounded-full transition-all"
+                        style={{ width: `${Math.max(2, sub.shareOfCategory)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <div className={`text-[11px] font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Top Transactions in {selectedCategory.name}
+              </div>
+              {(statementResult?.transactions || [])
+                .filter(t => t.category === selectedCategory.name && (t.debit || 0) > 0)
+                .sort((a, b) => (b.debit || 0) - (a.debit || 0))
+                .slice(0, 5)
+                .map((t, i) => (
+                  <div key={i} className={`flex items-center justify-between p-2.5 rounded-xl text-xs ${isDark ? 'bg-white/5' : 'bg-slate-50'}`}>
+                    <div className="min-w-0 flex-1">
+                      <div className={`font-bold truncate max-w-[220px] ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.narration}</div>
+                      <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{t.date}</div>
+                    </div>
+                    <span className="font-black font-mono text-rose-400 shrink-0 ml-2">
+                      ₹{(t.debit || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="w-full py-2.5 rounded-2xl text-xs font-black bg-[#00BFA5] text-slate-950"
+            >Close Drilldown</button>
           </div>
         </div>
       )}

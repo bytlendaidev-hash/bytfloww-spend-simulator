@@ -255,6 +255,13 @@ export interface StatementInflowItem {
   sharePercent: number;
 }
 
+export interface SubcategoryItem {
+  name: string;
+  debit: number;
+  count: number;
+  shareOfCategory: number;
+}
+
 export interface StatementCategoryItem {
   name: string;
   icon: string;
@@ -263,6 +270,7 @@ export interface StatementCategoryItem {
   credit: number;
   sharePercent: number;
   avgTicket: number;
+  subcategories?: SubcategoryItem[];
 }
 
 export interface StatementLenderItem {
@@ -387,6 +395,36 @@ export interface RecurringMandate {
   status: 'ACTIVE' | 'PAUSED' | 'COMPLETED';
 }
 
+export interface AnomalyAlert {
+  id: string;
+  transactionDate: string;
+  narration: string;
+  amount: number;
+  category: string;
+  reason: string;
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  zScore?: number;
+}
+
+export interface FinancialHealthScore {
+  score: number;
+  tier: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR' | 'CRITICAL';
+  debtRatioScore: number;
+  savingsRateScore: number;
+  incomeStabilityScore: number;
+  spendDiversityScore: number;
+  primaryRisk: string;
+  improvementTip: string;
+}
+
+export interface SalaryMonthlyItem {
+  monthKey: string;
+  monthName: string;
+  salaryAmount: number;
+  loanCreditAmount: number;
+  otherCreditAmount: number;
+}
+
 export interface BackendStatementUploadResult {
   statement: {
     id: string;
@@ -428,6 +466,10 @@ export interface BackendStatementUploadResult {
   peopleCounterparties?: CounterpartyEntity[];
   evidenceInsights?: EvidenceBackedInsight[];
   recurringMandates?: RecurringMandate[];
+  // Extended intelligence layers
+  anomalies?: AnomalyAlert[];
+  healthScore?: FinancialHealthScore;
+  salaryTimeline?: SalaryMonthlyItem[];
 }
 
 export interface BackendStatementListItem {
