@@ -288,3 +288,49 @@ export interface BackendStatementListItem {
   accountMask?: string;
 }
 
+export type ActiveModule = 'SMS_INTELLIGENCE' | 'BANK_STATEMENTS';
+
+export type StatementSection = 
+  | 'OVERVIEW' 
+  | 'UPLOAD' 
+  | 'LEDGER' 
+  | 'ACCOUNTS' 
+  | 'LOANS' 
+  | 'RECURRING' 
+  | 'COPILOT' 
+  | 'ARCHIVE';
+
+export interface BackendFinancialAccount {
+  id: string;
+  accountName: string;
+  accountNumberMasked: string;
+  bankName: string;
+  accountType: 'SAVINGS' | 'CURRENT' | 'CREDIT_CARD';
+  currentBalance: number;
+  currency: string;
+  isPrimary: boolean;
+  lastSyncedAt?: string;
+}
+
+export interface BackendLoanItem {
+  id: string;
+  lenderName: string;
+  loanType: string;
+  monthlyEmi: number;
+  interestRate?: number;
+  principalAmount?: number;
+  outstandingBalance?: number;
+  nextDueDate?: string;
+}
+
+export interface BackendRecurringItem {
+  id: string;
+  merchantName: string;
+  amount: number;
+  frequency: 'MONTHLY' | 'YEARLY' | 'WEEKLY' | 'CUSTOM';
+  category: string;
+  nextBillingDate?: string;
+  status: 'ACTIVE' | 'PAUSED' | 'CANCELLED';
+}
+
+

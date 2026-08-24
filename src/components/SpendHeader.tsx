@@ -1,11 +1,13 @@
 import React from 'react';
-import { SpendSnapshot, SpendTab } from '../types';
+import { SpendSnapshot, SpendTab, ActiveModule } from '../types';
 
 interface SpendHeaderProps {
   snapshot: SpendSnapshot;
   isDark: boolean;
   activeTab: SpendTab;
+  activeModule?: ActiveModule;
   onSelectTab: (tab: SpendTab) => void;
+  onSelectModule?: (module: ActiveModule) => void;
   onSelectPeriod: (periodKey: string) => void;
   onOpenFilter: () => void;
   onOpenCopilot: () => void;
@@ -19,7 +21,9 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
   snapshot,
   isDark,
   activeTab,
+  activeModule = 'SMS_INTELLIGENCE',
   onSelectTab,
+  onSelectModule,
   onSelectPeriod,
   onOpenFilter,
   onOpenCopilot,
@@ -44,11 +48,59 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
     { id: 'MERCHANTS', label: 'Merchants' },
     { id: 'COMMITMENTS', label: 'Commitments' },
     { id: 'TRENDS', label: 'Trends' },
-    { id: 'STATEMENTS', label: '📄 Statements' },
   ];
 
   return (
     <div className="space-y-3 sm:space-y-4 mb-5 sm:mb-6">
+      {/* ── TOP MODULE SELECTOR BAR (SMS INTELLIGENCE vs BANK STATEMENTS) ── */}
+      {onSelectModule && (
+        <div className={`p-1.5 rounded-2xl border flex items-center justify-between gap-2 transition ${
+          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-slate-100 border-slate-200'
+        }`}>
+          <button
+            onClick={() => onSelectModule('SMS_INTELLIGENCE')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+              activeModule === 'SMS_INTELLIGENCE'
+                ? isDark
+                  ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5] shadow-sm'
+                  : 'bg-white text-slate-950 border-slate-300 shadow-sm'
+                : isDark
+                ? 'text-slate-400 border-transparent hover:text-white'
+                : 'text-slate-600 border-transparent hover:text-slate-900'
+            }`}
+          >
+            <span>📱</span>
+            <span>SMS Spend Intelligence</span>
+            <span className={`px-1.5 py-0.2 rounded-md text-[10px] font-mono ${
+              activeModule === 'SMS_INTELLIGENCE'
+                ? 'bg-black/20 text-slate-950 font-bold'
+                : 'bg-white/10 text-slate-400'
+            }`}>
+              {totalParsedCount} SMS
+            </span>
+          </button>
+
+          <button
+            onClick={() => onSelectModule('BANK_STATEMENTS')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+              activeModule === 'BANK_STATEMENTS'
+                ? isDark
+                  ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5] shadow-sm'
+                  : 'bg-white text-slate-950 border-slate-300 shadow-sm'
+                : isDark
+                ? 'text-slate-400 border-transparent hover:text-white'
+                : 'text-slate-600 border-transparent hover:text-slate-900'
+            }`}
+          >
+            <span>🏛️</span>
+            <span>Bank Statement Forensics</span>
+            <span className="px-1.5 py-0.2 rounded-md text-[10px] font-mono bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
+              RENDER API
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* ── TOP APP BAR (MOBILE RESPONSIVE) ─────────────────────────────── */}
       <div className="flex items-center justify-between gap-2">
         {/* Left: Back Arrow + Logo + Spend Intelligence Title */}
@@ -90,21 +142,19 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
 
         {/* Right Action Icons */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-          {/* Statement Hub Quick Button */}
-          <button
-            onClick={() => onSelectTab('STATEMENTS')}
-            className={`px-3 h-9 sm:h-10 rounded-2xl flex items-center gap-1.5 border font-black text-xs transition ${
-              activeTab === 'STATEMENTS'
-                ? isDark ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5]' : 'bg-[#0D9488] text-white border-[#0D9488]'
-                : isDark 
-                ? 'bg-[#152028] border-[#273B49] text-slate-200 hover:bg-[#1C2C38]' 
-                : 'bg-white border-slate-300 text-slate-800 hover:bg-slate-100 shadow-sm'
-            }`}
-            title="Bank Statement Upload & Intelligence Hub"
-          >
-            <span>📄</span>
-            <span className="hidden sm:inline">Statement Hub</span>
-          </button>
+          {onSelectModule && (
+            <button
+              onClick={() => onSelectModule('BANK_STATEMENTS')}
+              className={`px-3 h-9 sm:h-10 rounded-2xl flex items-center gap-1.5 border font-black text-xs transition ${
+                isDark 
+                  ? 'bg-[#152028] border-[#273B49] text-[#00F2FE] hover:bg-[#1C2C38]' 
+                  : 'bg-white border-slate-300 text-teal-800 hover:bg-slate-100 shadow-sm'
+              }`}
+            >
+              <span>🏛️</span>
+              <span className="hidden sm:inline">Statement Hub</span>
+            </button>
+          )}
 
           {/* Ask AI Copilot Bubble Button */}
           <button

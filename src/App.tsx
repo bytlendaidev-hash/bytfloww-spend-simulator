@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { parseSmsXml } from './engine/xmlParser';
 import { generateWeeklyDebrief } from './engine/accounting';
-import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount } from './types';
+import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount, ActiveModule } from './types';
 
 // Components
 import { AppShell } from './components/AppShell';
@@ -35,6 +35,7 @@ import { CreditCardDrilldownModal } from './components/CreditCardDrilldownModal'
 
 export const App: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
+  const [activeModule, setActiveModule] = useState<ActiveModule>('SMS_INTELLIGENCE');
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string; phone: string } | null>(() => {
     const saved = localStorage.getItem('bytfloww_user');
     return saved ? JSON.parse(saved) : null;
@@ -73,8 +74,14 @@ export const App: React.FC = () => {
   const [showMonthSelector, setShowMonthSelector] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
 
-  const handleLoginSuccess = (user: { name: string; email: string; phone: string }) => {
+  const handleLoginSuccess = (
+    user: { name: string; email: string; phone: string },
+    preferredModule?: ActiveModule
+  ) => {
     setCurrentUser(user);
+    if (preferredModule) {
+      setActiveModule(preferredModule);
+    }
     localStorage.setItem('bytfloww_user', JSON.stringify(user));
   };
 
@@ -118,13 +125,9 @@ export const App: React.FC = () => {
   const selectedMerchantData = snapshot?.topMerchants.find(m => m.name.toLowerCase() === selectedMerchantName?.toLowerCase());
 
   const periodEvents = React.useMemo(() => {
-    if (!selectedPeriodKey || selectedPeriodKey === 'ALL') return events;
-    return events.filter(e => {
-      const d = new Date(e.timestamp);
-      const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      return k === selectedPeriodKey;
-    });
-  }, [events, selectedPeriodKey]);
+    if (!events.length) return [];
+    return events;
+  }, [events]);
 
   return (
     <AppShell
@@ -134,25 +137,65 @@ export const App: React.FC = () => {
       onOpenUpload={() => setShowXmlUpload(true)}
       onOpenDiagnostics={() => setShowDiagnostics(true)}
     >
-      {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ───────────────────── */}
+      {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ──────────────────────── */}
       {!currentUser ? (
         <LoginScreen
           isDark={isDark}
           onLoginSuccess={handleLoginSuccess}
         />
+      ) : activeModule === 'BANK_STATEMENTS' ? (
+        /* ── 2. SEPARATE MODULE: BANK STATEMENT FORENSICS HUB ──────────── */
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-1 text-[11px] sm:text-xs">
+            <span className={`font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              Session: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{currentUser.name}</strong> ({currentUser.phone})
+            </span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setActiveModule('SMS_INTELLIGENCE')}
+                className={`text-[11px] font-bold hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+              >
+                📱 Open SMS Simulator
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-rose-500 font-bold hover:underline"
+              >
+                Sign Out 🚪
+              </button>
+            </div>
+          </div>
+
+          <BankStatementModule
+            isDark={isDark}
+            onMergeTransactions={(newTxs) => {
+              setEvents((prev) => [...newTxs, ...prev]);
+            }}
+            onSwitchToSmsModule={() => setActiveModule('SMS_INTELLIGENCE')}
+            onSelectEvent={(ev) => setSelectedEvent(ev)}
+          />
+        </div>
       ) : !snapshot || events.length === 0 ? (
-        /* ── 2. IF LOGGED IN BUT NO XML: SHOW CLEAN UPLOAD SCREEN ────── */
+        /* ── 3. IF SMS MODULE & NO XML: SHOW CLEAN UPLOAD SCREEN ─────── */
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2 text-xs">
             <span className="font-bold text-slate-500">
               Logged in as: <strong className="text-slate-800 dark:text-white">{currentUser.name}</strong> ({currentUser.phone})
             </span>
-            <button
-              onClick={handleLogout}
-              className="text-rose-500 font-bold hover:underline"
-            >
-              Sign Out 🚪
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setActiveModule('BANK_STATEMENTS')}
+                className="text-teal-600 font-bold hover:underline"
+              >
+                🏛️ Open Statement Hub
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-rose-500 font-bold hover:underline"
+              >
+                Sign Out 🚪
+              </button>
+            </div>
           </div>
           <EmptyUploadState
             isDark={isDark}
@@ -161,7 +204,7 @@ export const App: React.FC = () => {
           />
         </div>
       ) : (
-        /* ── 3. IF XML LOADED: SHOW SPEND INTELLIGENCE DASHBOARD ──────── */
+        /* ── 4. IF SMS XML LOADED: SHOW SPEND INTELLIGENCE DASHBOARD ─── */
         <>
           <div className="flex items-center justify-between mb-2.5 px-1 text-[11px] sm:text-xs">
             <span className={`font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -169,8 +212,14 @@ export const App: React.FC = () => {
             </span>
             <div className="flex items-center gap-3">
               <button
-                onClick={handleResetDataset}
+                onClick={() => setActiveModule('BANK_STATEMENTS')}
                 className={`text-[11px] font-bold hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+              >
+                🏛️ Statement Hub
+              </button>
+              <button
+                onClick={handleResetDataset}
+                className={`text-[11px] font-bold hover:underline ${isDark ? 'text-slate-400' : 'text-slate-600'}`}
               >
                 🔄 Reset XML
               </button>
@@ -187,7 +236,9 @@ export const App: React.FC = () => {
             snapshot={snapshot}
             isDark={isDark}
             activeTab={activeTab}
+            activeModule={activeModule}
             onSelectTab={setActiveTab}
+            onSelectModule={setActiveModule}
             onSelectPeriod={handleSelectPeriod}
             onOpenFilter={() => setShowFilterModal(true)}
             onOpenCopilot={() => setActiveTab('ASSISTANT')}

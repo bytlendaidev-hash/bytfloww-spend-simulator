@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { ActiveModule } from '../types';
 
 interface LoginScreenProps {
   isDark: boolean;
-  onLoginSuccess: (user: { name: string; email: string; phone: string }) => void;
+  onLoginSuccess: (user: { name: string; email: string; phone: string }, preferredModule?: ActiveModule) => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({
@@ -87,12 +88,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     }, 400);
   };
 
-  const handleGuestAccess = () => {
-    onLoginSuccess({
-      name: 'Guest Explorer',
-      email: 'guest@bytlend.local',
-      phone: '+91 ••••• ••••',
-    });
+  const handleGuestAccess = (preferredModule?: ActiveModule) => {
+    onLoginSuccess(
+      {
+        name: 'Guest Explorer',
+        email: 'guest@bytlend.local',
+        phone: '+91 ••••• ••••',
+      },
+      preferredModule
+    );
   };
 
   return (
@@ -293,28 +297,43 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
         )}
 
-        {/* ── GUEST / SANDBOX ACCESS ───────────────────────────────── */}
+        {/* ── MODULE DIRECT ACCESS ───────────────────────────────── */}
         <div className="relative my-5">
           <div className={`absolute inset-0 flex items-center ${isDark ? 'border-t border-[#22323D]' : 'border-t border-slate-200'}`} />
           <div className="relative flex justify-center text-xs uppercase">
             <span className={`px-3 font-bold ${isDark ? 'bg-[#121B22] text-slate-400' : 'bg-white text-slate-500'}`}>
-              or explore
+              or direct module launch
             </span>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleGuestAccess}
-          className={`w-full py-3 px-4 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-2 ${
-            isDark
-              ? 'bg-[#152028] hover:bg-[#1C2C38] text-slate-200 border-[#273B49]'
-              : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-300 shadow-sm'
-          }`}
-        >
-          <span>🚀</span>
-          <span>Continue as Guest Session</span>
-        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => handleGuestAccess('SMS_INTELLIGENCE')}
+            className={`py-3 px-3 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+              isDark
+                ? 'bg-[#152028] hover:bg-[#1C2C38] text-slate-200 border-[#273B49]'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-300 shadow-sm'
+            }`}
+          >
+            <span>📱</span>
+            <span>SMS Simulator</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleGuestAccess('BANK_STATEMENTS')}
+            className={`py-3 px-3 rounded-2xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+              isDark
+                ? 'bg-teal-500/10 hover:bg-teal-500/20 text-[#00F2FE] border-teal-500/30'
+                : 'bg-teal-50 hover:bg-teal-100 text-teal-900 border-teal-200 shadow-sm'
+            }`}
+          >
+            <span>🏛️</span>
+            <span>Statement Hub</span>
+          </button>
+        </div>
 
         <div className={`mt-5 text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           🔒 End-to-End Client Encryption • Zero Secret Tracking • Local In-Memory Parsing

@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   BackendStatementUploadResult, 
   StatementTransactionItem, 
-  FinancialEvent 
+  FinancialEvent,
+  StatementSection,
+  BackendFinancialAccount,
+  BackendLoanItem,
+  BackendRecurringItem,
+  BackendStatementListItem
 } from '../types';
 import { 
   backendApiService, 
@@ -15,12 +20,17 @@ interface BankStatementModuleProps {
   isDark: boolean;
   onMergeTransactions?: (events: FinancialEvent[]) => void;
   onSelectEvent?: (event: FinancialEvent) => void;
+  onSwitchToSmsModule?: () => void;
 }
 
 export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   isDark,
   onMergeTransactions,
+  onSwitchToSmsModule,
 }) => {
+  // Navigation Section
+  const [activeSection, setActiveSection] = useState<StatementSection>('OVERVIEW');
+
   // Environment & Health
   const [currentEnv, setCurrentEnv] = useState<BackendEnvironment>(backendApiService.getEnvironment());
   const [backendStatus, setBackendStatus] = useState<{ isOnline: boolean; latencyMs: number; status: string } | null>(null);
@@ -44,11 +54,29 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   const [directionFilter, setDirectionFilter] = useState<'ALL' | 'DEBIT' | 'CREDIT'>('ALL');
   const [isMerged, setIsMerged] = useState(false);
 
+  // Backend Data Collections
+  const [accounts, setAccounts] = useState<BackendFinancialAccount[]>([]);
+  const [loans, setLoans] = useState<BackendLoanItem[]>([]);
+  const [recurring, setRecurring] = useState<BackendRecurringItem[]>([]);
+  const [archive, setArchive] = useState<BackendStatementListItem[]>([]);
+
+  // AI Copilot Chat State
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string; time: string }>>([
+    {
+      role: 'assistant',
+      text: 'Hello! I am your Statement AI Forensics Copilot. Ask me anything about your uploaded statement, income, loans, or anomaly flags.',
+      time: 'Just now',
+    },
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [isAiTyping, setIsAiTyping] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check backend health on mount
+  // Check backend health & auto-populate default statement on mount
   useEffect(() => {
     checkHealth();
+    loadInitialData();
   }, [currentEnv]);
 
   const checkHealth = async () => {
@@ -58,72 +86,157 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
     setIsCheckingHealth(false);
   };
 
-  const handleEnvChange = (env: BackendEnvironment) => {
-    backendApiService.setEnvironment(env);
-    setCurrentEnv(env);
-    setBackendStatus(null);
+  const loadInitialData = async () => {
+    // Load accounts, loans, recurring from backend / local defaults
+    const accs = await backendApiService.getFinancialAccounts();
+    if (accs && accs.length > 0) {
+      setAccounts(accs);
+    } else {
+      setAccounts([
+        {
+          id: 'acc_1',
+          accountName: 'SBI Salary Savings Account',
+          accountNumberMasked: '•••• 5521',
+          bankName: 'State Bank of India',
+          accountType: 'SAVINGS',
+          currentBalance: 58141,
+          currency: 'INR',
+          isPrimary: true,
+          lastSyncedAt: 'Aug 2026',
+        },
+        {
+          id: 'acc_2',
+          accountName: 'HDFC Privilege Savings',
+          accountNumberMasked: '•••• 8820',
+          bankName: 'HDFC Bank',
+          accountType: 'SAVINGS',
+          currentBalance: 41365,
+          currency: 'INR',
+          isPrimary: false,
+          lastSyncedAt: 'Aug 2026',
+        },
+      ]);
+    }
+
+    const lnList = await backendApiService.getLoans();
+    if (lnList && lnList.length > 0) {
+      setLoans(lnList);
+    } else {
+      setLoans([
+        {
+          id: 'ln_1',
+          lenderName: 'SBI Life Insurance & Loan',
+          loanType: 'Term Insurance & EMI',
+          monthlyEmi: 3200,
+          outstandingBalance: 128000,
+          nextDueDate: '06 Sep 2026',
+        },
+        {
+          id: 'ln_2',
+          lenderName: 'HDFC Home Loan Mandate',
+          loanType: 'Housing Loan',
+          monthlyEmi: 4500,
+          outstandingBalance: 650000,
+          nextDueDate: '05 Sep 2026',
+        },
+      ]);
+    }
+
+    const recList = await backendApiService.getRecurring();
+    if (recList && recList.length > 0) {
+      setRecurring(recList);
+    } else {
+      setRecurring([
+        {
+          id: 'rec_1',
+          merchantName: 'Netflix India Entertainment',
+          amount: 649,
+          frequency: 'MONTHLY',
+          category: 'Entertainment',
+          nextBillingDate: '20 Sep 2026',
+          status: 'ACTIVE',
+        },
+        {
+          id: 'rec_2',
+          merchantName: 'Airtel Broadband Fiber',
+          amount: 1179,
+          frequency: 'MONTHLY',
+          category: 'Utilities',
+          nextBillingDate: '08 Sep 2026',
+          status: 'ACTIVE',
+        },
+      ]);
+    }
+
+    // Default statement load if not present
+    if (!statementResult) {
+      loadSampleExcelStatement();
+    }
   };
 
-  // Process File through Backend API Pipeline
+  const handleEnvChange = (env: BackendEnvironment) => {
+    setCurrentEnv(env);
+    backendApiService.setEnvironment(env);
+    setTimeout(() => checkHealth(), 100);
+  };
+
+  // Pipeline Runner
   const processStatementFile = async (file: File, password?: string) => {
     setIsProcessing(true);
     setErrorMessage(null);
-    setIsMerged(false);
+    setProcessingProgress(10);
+    setProcessingStage('1/5 Ingesting statement file & computing SHA-256 hash...');
 
     try {
-      // Stage 1: Uploading
-      setProcessingStage('Connecting to Render Backend & Uploading Statement...');
-      setProcessingProgress(20);
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 200));
+      setProcessingProgress(35);
+      setProcessingStage('2/5 Running multi-table bank parser & layout matching...');
 
-      // Stage 2: Bank Detection
-      setProcessingStage('Analyzing Statement Header & Auto-Detecting Bank Institution...');
-      setProcessingProgress(45);
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 300));
+      setProcessingProgress(65);
+      setProcessingStage('3/5 Extracting ledger transactions & normalizing debits/credits...');
 
-      // Stage 3: Extraction
-      setProcessingStage('Parsing Multi-Column Ledger, Dates, Debit/Credit Streams...');
-      setProcessingProgress(70);
-
-      // Call the authoritative Render Backend API
+      // Call Render API Backend (with smart fallback if offline)
       const result = await backendApiService.uploadBankStatement(file, { password });
 
-      // Stage 4: Reconciliation
-      setProcessingStage('Reconciling Balances & Synthesizing True Economic Spend...');
-      setProcessingProgress(90);
-      await new Promise(r => setTimeout(r, 400));
+      setProcessingProgress(85);
+      setProcessingStage('4/5 Executing Mathematical Ledger Balance Reconciliation...');
+      await new Promise((r) => setTimeout(r, 250));
 
-      // Stage 5: Complete
       setProcessingProgress(100);
-      setProcessingStage('Statement Intelligence Ready!');
-      await new Promise(r => setTimeout(r, 300));
+      setProcessingStage('5/5 Finalizing True Spend Audit & Financial Insights...');
+      await new Promise((r) => setTimeout(r, 200));
 
       setStatementResult(result);
+      setIsMerged(false);
       setIsProcessing(false);
+      setActiveSection('OVERVIEW');
     } catch (err: any) {
-      console.error('Error processing bank statement:', err);
-      setErrorMessage(err.message || 'Failed to process bank statement. Please check file format.');
       setIsProcessing(false);
+      setErrorMessage(err.message || 'Failed to process statement');
     }
   };
 
-  const handleFileDrop = (e: React.DragEvent) => {
+  // Handle Drag & Drop
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleIncomingFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileSelected(e.dataTransfer.files[0]);
     }
   };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleIncomingFile(e.target.files[0]);
-    }
-  };
-
-  const handleIncomingFile = (file: File) => {
-    const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type.includes('pdf');
-    if (isPdf) {
+  const handleFileSelected = (file: File) => {
+    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
       setPendingFile(file);
       setShowPasswordModal(true);
     } else {
@@ -131,16 +244,16 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
     }
   };
 
-  const submitPasswordAndProcess = () => {
-    setShowPasswordModal(false);
+  const handleUnlockAndProcess = () => {
     if (pendingFile) {
+      setShowPasswordModal(false);
       processStatementFile(pendingFile, pdfPassword || undefined);
       setPendingFile(null);
       setPdfPassword('');
     }
   };
 
-  // Sample Statement Loader for Instant Demo (CSV)
+  // Sample Statement Loaders
   const loadSampleStatement = () => {
     const sampleCsv = `Date,Narration,Chq/Ref Number,Withdrawal (Dr),Deposit (Cr),Balance
 01/08/2026,SALARY CREDIT ACME CORP PVT LTD,SAL88941,,52000.00,78861.00
@@ -163,7 +276,6 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
     processStatementFile(file);
   };
 
-  // Sample Excel (.xlsx) Statement Loader
   const loadSampleExcelStatement = async () => {
     try {
       const XLSX = await import('xlsx');
@@ -234,6 +346,35 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
     setIsMerged(true);
   };
 
+  // AI Copilot Chat Action
+  const handleSendChatMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!chatInput.trim() || isAiTyping) return;
+
+    const userText = chatInput.trim();
+    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setChatMessages((prev) => [...prev, { role: 'user', text: userText, time: timeNow }]);
+    setChatInput('');
+    setIsAiTyping(true);
+
+    const reply = await backendApiService.sendAiChat(userText, {
+      totalInflow: statementResult?.facts.totalInflow,
+      trueSpend: statementResult?.facts.trueEconomicExpense,
+      reconciliation: statementResult?.reconciliation,
+      bank: statementResult?.bankDetected,
+    });
+
+    setIsAiTyping(false);
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        role: 'assistant',
+        text: reply.answer,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      },
+    ]);
+  };
+
   // Filtered Transactions for Table
   const filteredTransactions = (statementResult?.transactions || []).filter((tx) => {
     if (directionFilter === 'DEBIT' && (!tx.debit || tx.debit <= 0)) return false;
@@ -249,9 +390,9 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   });
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-10">
-      {/* ── 1. RENDER BACKEND CONNECTIVITY STATUS BANNER ──────────────── */}
-      <div className={`p-4 rounded-[24px] border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition shadow-sm ${
+    <div className="space-y-4 max-w-5xl mx-auto pb-12">
+      {/* ── 1. MODULE PORTAL SWITCHER & BACKEND STATUS BANNER ─────────── */}
+      <div className={`p-4 sm:p-5 rounded-[24px] border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition shadow-sm ${
         isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900'
       }`}>
         <div className="flex items-center gap-3">
@@ -266,7 +407,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                   ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-emerald-50 text-emerald-800 border-emerald-200')
                   : (isDark ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' : 'bg-amber-50 text-amber-800 border-amber-200')
               }`}>
-                {backendStatus?.isOnline ? `ONLINE (${backendStatus.latencyMs}ms)` : 'READY / COLD START'}
+                {backendStatus?.isOnline ? `ONLINE (${backendStatus.latencyMs}ms)` : 'READY / CONNECTING'}
               </span>
             </div>
             <div className={`text-[10px] font-mono mt-0.5 truncate max-w-xs sm:max-w-md ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -275,8 +416,22 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
           </div>
         </div>
 
-        {/* Environment Selector & Health Ping */}
-        <div className="flex items-center gap-2 self-end sm:self-center">
+        {/* Module Switcher & Env */}
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-center">
+          {onSwitchToSmsModule && (
+            <button
+              onClick={onSwitchToSmsModule}
+              className={`px-3.5 py-1.5 rounded-xl text-[11px] font-black transition border flex items-center gap-1.5 ${
+                isDark 
+                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00F2FE]' 
+                  : 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-900'
+              }`}
+            >
+              <span>📱</span>
+              <span>Switch to SMS Simulator</span>
+            </button>
+          )}
+
           <select
             value={currentEnv}
             onChange={(e) => handleEnvChange(e.target.value as BackendEnvironment)}
@@ -288,135 +443,74 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
           >
             <option value="DEV">Render Cloud (Dev)</option>
             <option value="STAGING">Render Staging</option>
-            <option value="PROD">Render Production</option>
+            <option value="PROD">Render Prod</option>
             <option value="LOCAL">Localhost (3001)</option>
           </select>
 
           <button
             onClick={checkHealth}
             disabled={isCheckingHealth}
-            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border transition ${
-              isDark ? 'bg-[#18242D] border-[#273B49] text-slate-300 hover:bg-[#20303D]' : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
+            className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition border ${
+              isDark 
+                ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00F2FE]' 
+                : 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-800'
             }`}
-            title="Ping Health"
           >
-            {isCheckingHealth ? '⏳ Ping...' : '🔄 Ping'}
+            {isCheckingHealth ? '⏳' : '🔄 Ping'}
           </button>
         </div>
       </div>
 
-      {/* ── 2. BANK STATEMENT UPLOAD DROP ZONE ─────────────────────────── */}
-      {!statementResult && !isProcessing && (
-        <div className={`p-6 sm:p-8 rounded-[28px] sm:rounded-[32px] border text-center space-y-4 transition ${
-          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-        }`}>
-          <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleFileDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`p-8 sm:p-12 rounded-[24px] border-2 border-dashed cursor-pointer transition flex flex-col items-center justify-center gap-3 ${
-              isDragging
-                ? 'border-[#00BFA5] bg-[#00BFA5]/10 scale-[1.01]'
-                : isDark
-                ? 'border-[#273B49] hover:border-[#00BFA5]/60 hover:bg-white/[0.02]'
-                : 'border-slate-300 hover:border-teal-500 hover:bg-slate-50'
-            }`}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.xlsx,.xls,.csv,.txt"
-              onChange={handleFileInput}
-              className="hidden"
-            />
-
-            <div className="w-16 h-16 rounded-3xl bg-[#00BFA5]/15 border border-[#00BFA5]/30 flex items-center justify-center text-3xl text-[#00F2FE]">
-              📄
-            </div>
-
-            <div>
-              <h3 className={`text-base sm:text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Upload Official Bank Statement
-              </h3>
-              <p className={`text-xs font-medium mt-1 max-w-md mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Drag & drop your bank statement file here or click to browse. Supports PDF (password-protected), Excel (.xlsx/.xls), CSV, and TXT statements.
-              </p>
-            </div>
-
-            {/* Supported Banks Strip */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2">
-              {['HDFC Bank', 'SBI', 'ICICI Bank', 'Axis Bank', 'Kotak', 'Airtel Bank', 'All Indian Banks'].map((b) => (
-                <span 
-                  key={b}
-                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                  }`}
-                >
-                  {b}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Error notice if any */}
-          {errorMessage && (
-            <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-bold">
-              ⚠️ {errorMessage}
-            </div>
-          )}
-
-          {/* Quick Demo Loaders */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            <span className={`text-xs font-bold mr-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Try instant demo:
-            </span>
+      {/* ── 2. DEDICATED SUB-NAVIGATION BAR FOR STATEMENT MODULE ─────── */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs font-black">
+        {[
+          { id: 'OVERVIEW', label: '📊 Overview & Audit' },
+          { id: 'UPLOAD', label: '📤 Upload File' },
+          { id: 'LEDGER', label: '📑 Statement Ledger' },
+          { id: 'ACCOUNTS', label: '🏛️ Bank Accounts' },
+          { id: 'LOANS', label: '💳 Loans & EMIs' },
+          { id: 'RECURRING', label: '🔄 Subscriptions' },
+          { id: 'COPILOT', label: '🤖 AI Forensics' },
+        ].map((tab) => {
+          const isActive = activeSection === tab.id;
+          return (
             <button
-              onClick={loadSampleExcelStatement}
-              className={`px-3.5 py-1.5 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
-                isDark 
-                  ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30 text-emerald-300' 
-                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-900'
+              key={tab.id}
+              onClick={() => setActiveSection(tab.id as StatementSection)}
+              className={`px-3.5 py-2 rounded-2xl whitespace-nowrap transition-all border ${
+                isActive
+                  ? isDark
+                    ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5] font-black shadow-md'
+                    : 'bg-[#00BFA5] text-slate-950 border-[#00BFA5] font-black shadow-md'
+                  : isDark
+                  ? 'bg-[#121B22] text-slate-300 border-[#22323D] hover:bg-[#18242D]'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
               }`}
             >
-              <span>📊</span>
-              <span>Load Sample SBI Excel (.xlsx)</span>
+              {tab.label}
             </button>
-            <button
-              onClick={loadSampleStatement}
-              className={`px-3.5 py-1.5 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
-                isDark 
-                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00F2FE]' 
-                  : 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-900'
-              }`}
-            >
-              <span>📄</span>
-              <span>Load Sample HDFC CSV</span>
-            </button>
-          </div>
-        </div>
-      )}
+          );
+        })}
+      </div>
 
       {/* ── 3. LIVE 5-STAGE PROCESSING VISUALIZER ─────────────────────── */}
       {isProcessing && (
-        <div className={`p-8 sm:p-12 rounded-[28px] sm:rounded-[32px] border text-center space-y-6 transition ${
-          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+        <div className={`p-8 sm:p-10 rounded-[28px] border text-center space-y-5 transition ${
+          isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
         }`}>
-          <div className="w-16 h-16 mx-auto rounded-3xl bg-[#00BFA5]/20 border border-[#00BFA5]/40 flex items-center justify-center text-3xl animate-bounce">
-            ⚙️
+          <div className="w-14 h-14 mx-auto rounded-full bg-teal-500/20 text-[#00BFA5] flex items-center justify-center text-2xl animate-spin">
+            ⚡
           </div>
-
-          <div className="space-y-2">
-            <h3 className={`text-base sm:text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              Render Financial Intelligence Engine Processing
+          <div>
+            <h3 className="text-base sm:text-lg font-black tracking-tight">
+              Executing Statement Forensics Pipeline
             </h3>
-            <p className={`text-xs font-mono font-bold ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}>
+            <p className={`text-xs font-mono mt-1 ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}>
               {processingStage}
             </p>
           </div>
 
-          {/* Progress Bar */}
-          <div className="max-w-md mx-auto h-3 rounded-full bg-black/40 border border-white/10 overflow-hidden p-0.5">
+          <div className={`w-full max-w-md mx-auto h-2 rounded-full overflow-hidden ${isDark ? 'bg-[#18242D]' : 'bg-slate-100'}`}>
             <div 
               style={{ width: `${processingProgress}%` }}
               className="h-full rounded-full bg-[#00BFA5] transition-all duration-300 shadow-md shadow-teal-500/50"
@@ -440,16 +534,16 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
         </div>
       )}
 
-      {/* ── 4. STATEMENT FORENSICS & ANALYSIS DASHBOARD ────────────────── */}
-      {statementResult && (
+      {/* ── 4. SUB-PAGE 1: OVERVIEW & RECONCILIATION ─────────────────── */}
+      {activeSection === 'OVERVIEW' && statementResult && !isProcessing && (
         <div className="space-y-4">
           {/* Executive Header Card */}
-          <div className={`p-6 sm:p-7 rounded-[28px] sm:rounded-[32px] text-white shadow-xl space-y-4 border ${
+          <div className={`p-6 sm:p-7 rounded-[28px] text-white shadow-xl space-y-4 border ${
             isDark ? 'bg-[#062420] border-[#00BFA5]/30 shadow-black/40' : 'bg-[#004D40] border-teal-800'
           }`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <MerchantLogoView merchantName={statementResult.bankDetected || 'HDFC Bank'} size={44} isDark={true} shape="circle" />
+                <MerchantLogoView merchantName={statementResult.bankDetected || 'State Bank of India'} size={44} isDark={true} shape="circle" />
                 <div>
                   <div className="flex items-center gap-2">
                     <h2 className="text-base sm:text-lg font-black tracking-tight">
@@ -476,14 +570,14 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
                       : 'bg-[#00BFA5] hover:bg-[#00A892] text-slate-950 border-[#00BFA5]'
                   }`}
                 >
-                  {isMerged ? '✓ Merged into Feed' : '⚡ Merge with Live SMS Feed'}
+                  {isMerged ? '✓ Merged into SMS Timeline' : '⚡ Merge with Live SMS Feed'}
                 </button>
 
                 <button
-                  onClick={() => setStatementResult(null)}
+                  onClick={() => setActiveSection('UPLOAD')}
                   className="px-3 py-2 rounded-2xl text-xs font-black bg-black/40 hover:bg-black/60 text-teal-100 border border-white/20 transition"
                 >
-                  🔄 New File
+                  📤 Upload Another
                 </button>
               </div>
             </div>
@@ -533,7 +627,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
           </div>
 
           {/* ── 4 PILLARS OF SPEND FACTS ──────────────────────────────── */}
-          <div className={`p-5 sm:p-6 rounded-[28px] sm:rounded-[32px] border grid grid-cols-2 sm:grid-cols-4 gap-3 text-left transition ${
+          <div className={`p-5 sm:p-6 rounded-[28px] border grid grid-cols-2 sm:grid-cols-4 gap-3 text-left transition ${
             isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
           }`}>
             <div className={`p-3.5 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
@@ -642,7 +736,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
 
           {/* ── STATEMENT AI INSIGHTS ─────────────────────────────────── */}
           {statementResult.insights && statementResult.insights.length > 0 && (
-            <div className={`p-5 sm:p-6 rounded-[28px] sm:rounded-[32px] border space-y-3 transition ${
+            <div className={`p-5 sm:p-6 rounded-[28px] border space-y-3 transition ${
               isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
             }`}>
               <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-wider ${
@@ -675,157 +769,428 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
 
-          {/* ── STATEMENT TRANSACTIONS TABLE ──────────────────────────── */}
-          <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-4 transition ${
-            isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className={`text-sm sm:text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  Extracted Statement Ledger ({filteredTransactions.length} of {statementResult.transactionCount})
-                </h3>
-                <span className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Raw bank debits, credits, and running balance
-                </span>
-              </div>
+      {/* ── 5. SUB-PAGE 2: UPLOAD & INGESTION ─────────────────────────── */}
+      {activeSection === 'UPLOAD' && (
+        <div className="space-y-4">
+          <div 
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-8 sm:p-12 rounded-[28px] sm:rounded-[32px] border-2 border-dashed text-center transition cursor-pointer space-y-4 ${
+              isDragging 
+                ? 'border-[#00BFA5] bg-teal-500/10' 
+                : isDark 
+                ? 'border-[#273B49] bg-[#121B22] hover:border-[#00BFA5]/60 hover:bg-[#18242D]' 
+                : 'border-slate-300 bg-white hover:border-teal-500 hover:bg-teal-50/40 shadow-sm'
+            }`}
+          >
+            <input 
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.xlsx,.xls,.csv,.txt"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  handleFileSelected(e.target.files[0]);
+                }
+              }}
+            />
 
-              {/* Filters */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search narration..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`text-xs px-3 py-1.5 rounded-xl border font-medium ${
-                    isDark ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-300 text-slate-900'
+            <div className="w-16 h-16 mx-auto rounded-full bg-teal-500/20 text-[#00BFA5] flex items-center justify-center text-3xl">
+              📂
+            </div>
+
+            <div>
+              <h3 className={`text-base sm:text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Upload Official Bank Statement (Excel / PDF / CSV)
+              </h3>
+              <p className={`text-xs font-medium mt-1 max-w-md mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Drag & drop your bank statement file here or click to browse. Supports Excel (.xlsx/.xls), PDF (with password unlock), CSV, and TXT statements.
+              </p>
+            </div>
+
+            {/* Supported Banks Strip */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2">
+              {['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Kotak', 'Airtel Payments Bank', 'All Indian Banks'].map((b) => (
+                <span 
+                  key={b}
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
                   }`}
-                />
-
-                <div className="flex items-center rounded-xl overflow-hidden border">
-                  {(['ALL', 'DEBIT', 'CREDIT'] as const).map((d) => (
-                    <button
-                      key={d}
-                      onClick={() => setDirectionFilter(d)}
-                      className={`px-2.5 py-1.5 text-[10px] font-black transition ${
-                        directionFilter === d
-                          ? isDark ? 'bg-[#00BFA5] text-slate-950' : 'bg-[#0D9488] text-white'
-                          : isDark ? 'bg-[#18242D] text-slate-300' : 'bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      {d}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                >
+                  {b}
+                </span>
+              ))}
             </div>
+          </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto no-scrollbar max-h-96">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className={`border-b text-[10px] uppercase font-black tracking-wider ${
-                    isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'
-                  }`}>
-                    <th className="py-2.5 px-3">Date</th>
-                    <th className="py-2.5 px-3">Narration / Particulars</th>
-                    <th className="py-2.5 px-3">Category</th>
-                    <th className="py-2.5 px-3 text-right">Debit (Dr)</th>
-                    <th className="py-2.5 px-3 text-right">Credit (Cr)</th>
-                    <th className="py-2.5 px-3 text-right">Balance</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {filteredTransactions.map((tx, idx) => (
-                    <tr 
-                      key={idx}
-                      className={`hover:bg-white/[0.02] transition ${
-                        isDark ? 'text-slate-200' : 'text-slate-800'
-                      }`}
-                    >
-                      <td className="py-3 px-3 font-mono text-[11px] whitespace-nowrap text-slate-400">
-                        {tx.date}
-                      </td>
-                      <td className="py-3 px-3 min-w-[200px]">
-                        <div className="font-bold text-xs truncate max-w-xs sm:max-w-md">
-                          {tx.narration}
-                        </div>
-                        {tx.referenceNumber && (
-                          <span className="text-[9px] font-mono text-slate-500">Ref: {tx.referenceNumber}</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-3 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${
-                          isDark ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                        }`}>
-                          {tx.category || 'General'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono font-black text-rose-500 whitespace-nowrap">
-                        {tx.debit ? `₹${tx.debit.toLocaleString('en-IN')}` : '—'}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono font-black text-emerald-400 whitespace-nowrap">
-                        {tx.credit ? `₹${tx.credit.toLocaleString('en-IN')}` : '—'}
-                      </td>
-                      <td className="py-3 px-3 text-right font-mono font-bold text-slate-300 whitespace-nowrap">
-                        {tx.balance !== null ? `₹${tx.balance.toLocaleString('en-IN')}` : '—'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          {/* Quick Demo Loaders */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+            <span className={`text-xs font-bold mr-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              Try instant sample statements:
+            </span>
+            <button
+              onClick={loadSampleExcelStatement}
+              className={`px-3.5 py-2 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
+                isDark 
+                  ? 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30 text-emerald-300' 
+                  : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-900'
+              }`}
+            >
+              <span>📊</span>
+              <span>Load Sample SBI Excel (.xlsx)</span>
+            </button>
+            <button
+              onClick={loadSampleStatement}
+              className={`px-3.5 py-2 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
+                isDark 
+                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-[#00F2FE]' 
+                  : 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-900'
+              }`}
+            >
+              <span>📄</span>
+              <span>Load Sample HDFC CSV</span>
+            </button>
           </div>
         </div>
       )}
 
-      {/* ── 5. PDF PASSWORD MODAL ──────────────────────────────────────── */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className={`w-full max-w-md p-6 rounded-[28px] border space-y-4 shadow-2xl ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-black">
-                <span>🔒</span>
-                <span>Protected PDF Statement</span>
-              </div>
-              <button 
-                onClick={() => { setShowPasswordModal(false); setPendingFile(null); }}
-                className="text-slate-400 hover:text-white text-lg font-bold"
-              >
-                ✕
-              </button>
+      {/* ── 6. SUB-PAGE 3: EXTRACTED STATEMENT LEDGER ────────────────── */}
+      {activeSection === 'LEDGER' && (
+        <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className={`text-sm sm:text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Extracted Statement Ledger ({filteredTransactions.length} of {(statementResult?.transactions || []).length})
+              </h3>
+              <p className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Raw bank debits, credits, and verified running balance
+              </p>
             </div>
 
-            <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-              If your bank statement is password-protected (e.g. DOB DDMMYYYY or PAN + DOB), enter it below. If unencrypted, simply click Continue.
-            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search narration or ref..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`text-xs px-3 py-1.5 rounded-xl border outline-none font-medium w-40 sm:w-56 ${
+                  isDark 
+                    ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500' 
+                    : 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400'
+                }`}
+              />
 
+              <div className="flex items-center gap-1">
+                {(['ALL', 'DEBIT', 'CREDIT'] as const).map((dir) => (
+                  <button
+                    key={dir}
+                    onClick={() => setDirectionFilter(dir)}
+                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase transition border ${
+                      directionFilter === dir
+                        ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5]'
+                        : isDark
+                        ? 'bg-[#18242D] text-slate-400 border-[#273B49]'
+                        : 'bg-slate-100 text-slate-600 border-slate-200'
+                    }`}
+                  >
+                    {dir}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto -mx-2 sm:mx-0">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className={`border-b text-[10px] font-black uppercase tracking-wider ${
+                  isDark ? 'border-[#22323D] text-slate-400' : 'border-slate-200 text-slate-500'
+                }`}>
+                  <th className="py-2.5 px-3">Date</th>
+                  <th className="py-2.5 px-3">Narration / Particulars</th>
+                  <th className="py-2.5 px-3">Category</th>
+                  <th className="py-2.5 px-3 text-right">Debit (Dr)</th>
+                  <th className="py-2.5 px-3 text-right">Credit (Cr)</th>
+                  <th className="py-2.5 px-3 text-right">Balance</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {filteredTransactions.map((tx) => (
+                  <tr key={tx.id} className={`transition ${isDark ? 'hover:bg-[#18242D]' : 'hover:bg-slate-50'}`}>
+                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">
+                      {tx.date}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <div className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {tx.narration}
+                      </div>
+                      {tx.referenceNumber && (
+                        <div className="text-[10px] font-mono text-slate-500">
+                          Ref: {tx.referenceNumber}
+                        </div>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black border ${
+                        tx.category === 'Income'
+                          ? (isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-emerald-50 text-emerald-800 border-emerald-200')
+                          : tx.category === 'EMI / Debt'
+                          ? (isDark ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' : 'bg-amber-50 text-amber-800 border-amber-200')
+                          : (isDark ? 'bg-white/5 text-slate-300 border-white/10' : 'bg-slate-100 text-slate-700 border-slate-200')
+                      }`}>
+                        {tx.category || 'General'}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-rose-500">
+                      {tx.debit ? `₹${tx.debit.toLocaleString('en-IN')}` : '—'}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
+                      {tx.credit ? `₹${tx.credit.toLocaleString('en-IN')}` : '—'}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-300">
+                      {tx.balance ? `₹${tx.balance.toLocaleString('en-IN')}` : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 7. SUB-PAGE 4: BANK ACCOUNTS ─────────────────────────────── */}
+      {activeSection === 'ACCOUNTS' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {accounts.map((acc) => (
+              <div 
+                key={acc.id}
+                className={`p-5 rounded-[24px] border space-y-3 transition ${
+                  isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <MerchantLogoView merchantName={acc.bankName} size={40} isDark={isDark} shape="circle" />
+                    <div>
+                      <div className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {acc.accountName}
+                      </div>
+                      <div className="text-xs font-mono text-slate-400">
+                        {acc.bankName} • {acc.accountNumberMasked}
+                      </div>
+                    </div>
+                  </div>
+                  {acc.isPrimary && (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                      PRIMARY
+                    </span>
+                  )}
+                </div>
+
+                <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                  isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <span className="text-xs font-bold text-slate-400">Current Balance:</span>
+                  <span className={`text-base font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    ₹{acc.currentBalance.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 8. SUB-PAGE 5: LOANS & EMIS ──────────────────────────────── */}
+      {activeSection === 'LOANS' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {loans.map((ln) => (
+              <div 
+                key={ln.id}
+                className={`p-5 rounded-[24px] border space-y-3 transition ${
+                  isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    {ln.lenderName}
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                    ACTIVE EMI
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-left">
+                  <div className={`p-3 rounded-xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Monthly EMI</span>
+                    <div className="text-base font-black font-mono text-amber-500 mt-0.5">
+                      ₹{ln.monthlyEmi.toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                  <div className={`p-3 rounded-xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Next Due</span>
+                    <div className={`text-xs font-black font-mono mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {ln.nextDueDate || '05 Sep 2026'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 9. SUB-PAGE 6: RECURRING SUBSCRIPTIONS ───────────────────── */}
+      {activeSection === 'RECURRING' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {recurring.map((rec) => (
+              <div 
+                key={rec.id}
+                className={`p-5 rounded-[24px] border space-y-3 transition ${
+                  isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <MerchantLogoView merchantName={rec.merchantName} size={38} isDark={isDark} shape="circle" />
+                    <div>
+                      <div className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {rec.merchantName}
+                      </div>
+                      <div className="text-xs text-slate-400">{rec.category} • {rec.frequency}</div>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                    AUTOPAY
+                  </span>
+                </div>
+
+                <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                  isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <span className="text-xs font-bold text-slate-400">Billing Amount:</span>
+                  <span className={`text-base font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    ₹{rec.amount.toLocaleString('en-IN')} / month
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 10. SUB-PAGE 7: STATEMENT AI FORENSICS COPILOT ───────────── */}
+      {activeSection === 'COPILOT' && (
+        <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 transition ${
+          isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
+          <div className="flex items-center justify-between border-b pb-3 border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-[#00BFA5] text-slate-950 flex items-center justify-center font-black">
+                🤖
+              </div>
+              <div>
+                <h3 className={`text-sm font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Statement AI Forensics Copilot
+                </h3>
+                <span className="text-[10px] text-emerald-400 font-bold">● Connected to Statement Context</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Chat Transcript */}
+          <div className={`p-4 rounded-2xl border space-y-3 h-72 overflow-y-auto ${
+            isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'
+          }`}>
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                <div className={`max-w-md p-3 rounded-2xl text-xs ${
+                  msg.role === 'user'
+                    ? 'bg-[#00BFA5] text-slate-950 font-bold rounded-br-none'
+                    : isDark
+                    ? 'bg-[#121B22] border border-[#22323D] text-slate-200 rounded-bl-none'
+                    : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-sm'
+                }`}>
+                  {msg.text}
+                </div>
+                <span className="text-[9px] text-slate-500 mt-1 px-1">{msg.time}</span>
+              </div>
+            ))}
+            {isAiTyping && (
+              <div className="text-xs text-slate-400 animate-pulse font-mono">
+                🤖 AI Copilot is analyzing statement transactions...
+              </div>
+            )}
+          </div>
+
+          {/* Chat Form */}
+          <form onSubmit={handleSendChatMessage} className="flex items-center gap-2">
             <input
-              type="password"
-              placeholder="PDF password (optional)"
-              value={pdfPassword}
-              onChange={(e) => setPdfPassword(e.target.value)}
-              className={`w-full px-4 py-3 rounded-2xl border text-sm font-mono ${
-                isDark ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500' : 'bg-slate-50 border-slate-300 text-slate-900'
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder="Ask about salary, biggest expense, loan EMIs, or anomalies..."
+              className={`flex-1 text-xs px-4 py-2.5 rounded-xl border outline-none font-medium ${
+                isDark 
+                  ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500' 
+                  : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400'
               }`}
             />
+            <button
+              type="submit"
+              disabled={isAiTyping || !chatInput.trim()}
+              className="px-5 py-2.5 rounded-xl text-xs font-black bg-[#00BFA5] hover:bg-[#00A892] text-slate-950 transition border border-[#00BFA5] shadow-sm disabled:opacity-50"
+            >
+              Send
+            </button>
+          </form>
+        </div>
+      )}
 
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className={`p-6 rounded-[28px] border max-w-sm w-full space-y-4 shadow-2xl ${
+            isDark ? 'bg-[#121B22] border-[#273B49] text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🔒</span>
+              <h3 className="text-base font-black">Password Protected PDF</h3>
+            </div>
+            <p className="text-xs text-slate-400">
+              Enter your bank statement PDF password (usually DOB or PAN) to decrypt and parse.
+            </p>
+            <input
+              type="password"
+              placeholder="Enter PDF password"
+              value={pdfPassword}
+              onChange={(e) => setPdfPassword(e.target.value)}
+              className={`w-full p-2.5 rounded-xl text-xs font-mono border outline-none ${
+                isDark ? 'bg-[#18242D] border-[#273B49] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              }`}
+            />
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
-                onClick={() => { setShowPasswordModal(false); setPendingFile(null); }}
-                className="px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-400 hover:text-white"
+                onClick={() => setShowPasswordModal(false)}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
               >
                 Cancel
               </button>
               <button
-                onClick={submitPasswordAndProcess}
-                className={`px-5 py-2.5 rounded-2xl text-xs font-black transition shadow-md ${
-                  isDark ? 'bg-[#00BFA5] hover:bg-[#00A892] text-slate-950' : 'bg-[#0D9488] hover:bg-[#0F766E] text-white'
-                }`}
+                onClick={handleUnlockAndProcess}
+                className="px-4 py-2 rounded-xl text-xs font-black bg-[#00BFA5] text-slate-950"
               >
-                Continue & Analyze →
+                Unlock & Parse
               </button>
             </div>
           </div>
