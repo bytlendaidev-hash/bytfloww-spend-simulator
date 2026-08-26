@@ -45,9 +45,9 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
   const utilizationPct = Math.round((billedAmount / totalLimit) * 100);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className={`w-full max-w-2xl max-h-[90vh] rounded-[36px] border shadow-2xl flex flex-col overflow-hidden transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' : 'bg-white border-slate-200/90 text-slate-900 shadow-xl'
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-emergence">
+      <div className={`w-full max-w-2xl max-h-[90vh] rounded-[36px] border shadow-2xl flex flex-col overflow-hidden transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/95 border-emerald-500/30 text-white shadow-2xl shadow-black/80' : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-2xl'
       }`}>
         {/* Modal Header */}
         <div className={`p-6 sm:p-7 border-b flex items-center justify-between ${

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { parseSmsXml } from './engine/xmlParser';
 import { generateWeeklyDebrief } from './engine/accounting';
+import { SAMPLE_SMS_XML } from './engine/sampleData';
 import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount, ActiveModule } from './types';
 
 // Components
@@ -34,11 +35,25 @@ import { AccountDrilldownModal } from './components/AccountDrilldownModal';
 import { CreditCardDrilldownModal } from './components/CreditCardDrilldownModal';
 
 export const App: React.FC = () => {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const savedTheme = localStorage.getItem('bytfloww_theme');
+    return savedTheme !== 'light';
+  });
   const [activeModule, setActiveModule] = useState<ActiveModule>('SMS_INTELLIGENCE');
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string; phone: string } | null>(() => {
     const saved = localStorage.getItem('bytfloww_user');
-    return saved ? JSON.parse(saved) : null;
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // fallback
+      }
+    }
+    return {
+      name: 'Deepankar Gautam',
+      email: 'deepankar.gautam@bytlend.local',
+      phone: '+91 84008 69600',
+    };
   });
 
   const [activeTab, setActiveTab] = useState<SpendTab>('OVERVIEW');
@@ -48,6 +63,30 @@ export const App: React.FC = () => {
   const [currentXml, setCurrentXml] = useState<string | null>(null);
   const [selectedPeriodKey, setSelectedPeriodKey] = useState<string>('2026-08');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Auto-load the real SMS dataset on initial launch
+  useEffect(() => {
+    if (!currentXml && SAMPLE_SMS_XML) {
+      try {
+        setCurrentXml(SAMPLE_SMS_XML);
+        const result = parseSmsXml(SAMPLE_SMS_XML, selectedPeriodKey);
+        setEvents(result.events);
+        setSnapshot(result.snapshot);
+        setRawCount(result.rawCount);
+      } catch (err) {
+        console.error('Failed to auto-load sample SMS dataset:', err);
+      }
+    }
+  }, []);
+
+  const handleToggleTheme = () => {
+    setIsDark(prev => {
+      const next = !prev;
+      localStorage.setItem('bytfloww_theme', next ? 'dark' : 'light');
+      return next;
+    });
+  };
+
 
   // Filter State
   const [filterState, setFilterState] = useState<FilterState>({
@@ -132,10 +171,14 @@ export const App: React.FC = () => {
   return (
     <AppShell
       isDark={isDark}
-      onToggleTheme={() => setIsDark(!isDark)}
+      onToggleTheme={handleToggleTheme}
       rawCount={rawCount}
       onOpenUpload={() => setShowXmlUpload(true)}
       onOpenDiagnostics={() => setShowDiagnostics(true)}
+      activeModule={activeModule}
+      onSwitchModule={setActiveModule}
+      currentUser={currentUser}
+      onLogout={handleLogout}
     >
       {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ──────────────────────── */}
       {!currentUser ? (
@@ -244,9 +287,10 @@ export const App: React.FC = () => {
             onOpenCopilot={() => setActiveTab('ASSISTANT')}
             onOpenUpload={() => setShowXmlUpload(true)}
             onOpenDiagnostics={() => setShowDiagnostics(true)}
-            onToggleTheme={() => setIsDark(!isDark)}
+            onToggleTheme={handleToggleTheme}
             totalParsedCount={rawCount}
           />
+
 
           <div className="pb-28">
             {activeTab === 'OVERVIEW' && (

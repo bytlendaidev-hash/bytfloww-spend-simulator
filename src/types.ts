@@ -322,6 +322,9 @@ export interface CanonicalTransaction {
   valueDate: string;
   rawNarration: string;
   normalizedNarration: string;
+  narration?: string;
+  type?: string;
+  sourceFiles?: string[];
   debit: number | null;
   credit: number | null;
   amount: number;
@@ -332,7 +335,9 @@ export interface CanonicalTransaction {
   referenceNumber: string | null;
   entityId: string;
   entityName: string;
-  entityType: 'EMPLOYER' | 'LENDER' | 'MERCHANT' | 'PERSON' | 'UTILITY' | 'GOVERNMENT' | 'BANK' | 'UNKNOWN';
+  entityNormalized: string;
+  entityType: 'EMPLOYER' | 'LENDER' | 'MERCHANT' | 'PERSON' | 'UTILITY' | 'GOVERNMENT' | 'BANK' | 'WALLET' | 'SELF' | 'UNKNOWN';
+  upiHandle: string | null;
   financialType: 'INCOME' | 'EXPENSE' | 'TRANSFER' | 'DEBT_REPAYMENT' | 'DEBT_DISBURSEMENT' | 'CASH_WITHDRAWAL' | 'FEE_TAX';
   isEconomicExpense: boolean; // True lifestyle consumption
   isMoneyMovement: boolean;   // Transfers, borrowings, self-sweeps
@@ -513,12 +518,24 @@ export type StatementSection =
   | 'SPENDING'
   | 'INSIGHTS'
   | 'INFLOW'
+  | 'DEBITS'
+  | 'AUDIT'
+  | 'AI_AGENT'
   | 'CATEGORIES'
   | 'VELOCITY'
   | 'MERCHANTS'
   | 'CHANNELS'
   | 'LEDGER'
-  | 'COPILOT';
+  | 'COPILOT'
+  | 'MONEY_FLOW'
+  | 'DEBT_SIMULATOR'
+  | 'ANOMALY_RADAR'
+  | 'PREDICTIVE_RUNWAY'
+  | 'SUBSCRIPTIONS_AUTOPSY'
+  | 'MERCHANT_DNA'
+  | 'FIRE_RUNWAY'
+  | 'VARIANCE_HEATMAP'
+  | 'SPEND_CALENDAR';
 
 export interface BackendFinancialAccount {
   id: string;

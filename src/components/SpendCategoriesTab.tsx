@@ -23,14 +23,14 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
   };
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8 animate-emergence">
       {/* ── 1. SPENDS BY CATEGORY DONUT CHART CARD ──────────────────────── */}
-      <div className={`p-6 sm:p-7 rounded-[32px] border transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
+      <div className={`p-6 sm:p-7 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Spends by Category
             </h3>
             <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -38,8 +38,8 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
             </span>
           </div>
 
-          <button className={`flex items-center gap-1 px-3.5 py-1.5 rounded-2xl text-xs font-black border transition ${
-            isDark ? 'bg-[#142027] border-white/[0.08] text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-700'
+          <button className={`flex items-center gap-1 px-3.5 py-1.5 rounded-2xl text-xs font-black border transition backdrop-blur-md ${
+            isDark ? 'bg-white/[0.05] border-white/[0.08] text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-700'
           }`}>
             <span>📅 August 2026</span>
           </button>
@@ -124,11 +124,11 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
       </div>
 
       {/* ── 2. CATEGORY DIRECTORY ───────────────────────────────────────── */}
-      <div className={`p-6 rounded-[28px] border space-y-4 transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90 shadow-sm'
+      <div className={`p-6 rounded-[28px] border space-y-4 transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-lg shadow-black/40' : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between">
-          <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Category Directory
           </h3>
           <span className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -144,8 +144,8 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
             return (
               <div
                 key={cat.category}
-                className={`p-4 rounded-2xl border transition-all duration-150 ${
-                  isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'
+                className={`p-4 rounded-2xl border transition-all duration-150 backdrop-blur-xl ${
+                  isDark ? 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white'
                 }`}
               >
                 <div 
@@ -161,7 +161,7 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
                         {cat.category.slice(0, 1)}
                       </div>
                       <div>
-                        <div className={`text-xs sm:text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        <div className={`text-xs sm:text-sm font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           {cat.category}
                         </div>
                         <div className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -200,15 +200,15 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
                       <div 
                         key={e.id}
                         onClick={() => onSelectEvent(e)}
-                        className={`p-2.5 rounded-xl flex items-center justify-between cursor-pointer text-xs transition ${
-                          isDark ? 'bg-[#18242D] hover:bg-[#20303D]' : 'bg-white hover:bg-slate-100 border border-slate-200/80 shadow-sm'
+                        className={`p-2.5 rounded-xl flex items-center justify-between cursor-pointer text-xs transition backdrop-blur-md ${
+                          isDark ? 'bg-white/[0.04] hover:bg-white/[0.08]' : 'bg-white hover:bg-slate-100 border border-slate-200/80 shadow-sm'
                         }`}
                       >
                         <div>
                           <div className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{e.merchant}</div>
                           <div className="text-[10px] text-slate-400 font-medium">{e.dateFormatted} • {e.paymentMode}</div>
                         </div>
-                        <div className="font-mono font-black text-rose-600 dark:text-rose-400">
+                        <div className="font-mono font-black text-rose-500 dark:text-rose-400">
                           -₹{e.amount.toLocaleString('en-IN')}
                         </div>
                       </div>
@@ -223,4 +223,5 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
     </div>
   );
 };
+
 

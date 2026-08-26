@@ -15,10 +15,10 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
   const recurringSubs = commitments.filter(c => c.type === 'SUBSCRIPTION' || c.type === 'MANDATE');
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-8">
+    <div className="space-y-6 max-w-4xl mx-auto pb-8 animate-emergence">
       {/* 1. Subscriptions Burn Rate Card */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
+      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
           <div>
@@ -30,7 +30,7 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
               <span className={`text-xs sm:text-sm font-medium ml-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>/ month</span>
             </div>
           </div>
-          <span className={`text-xs font-black px-3.5 py-1.5 rounded-full border ${
+          <span className={`text-xs font-black px-3.5 py-1.5 rounded-full border backdrop-blur-md ${
             isDark 
               ? 'bg-amber-500/15 text-amber-300 border-amber-500/25' 
               : 'bg-amber-50 text-amber-800 border-amber-200 shadow-sm'
@@ -44,10 +44,10 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
       </div>
 
       {/* 2. Detected Subscriptions Grid */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
+      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
-        <h4 className={`text-sm font-black uppercase tracking-wider mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+        <h4 className={`text-sm font-black font-heading uppercase tracking-wider mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           Detected Services & Autopay Mandates
         </h4>
 
@@ -60,8 +60,8 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
             {recurringSubs.map((sub) => (
               <div
                 key={sub.id}
-                className={`p-5 rounded-2xl border transition-all duration-150 ${
-                  isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80 shadow-sm'
+                className={`p-5 rounded-2xl border transition-all duration-150 backdrop-blur-xl ${
+                  isDark ? 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white shadow-sm'
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -72,9 +72,9 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
                       🔄
                     </div>
                     <div className="min-w-0">
-                      <div className={`text-sm font-black tracking-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{sub.name}</div>
+                      <div className={`text-sm font-black font-heading tracking-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{sub.name}</div>
                       <div className={`text-xs font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                        {sub.cadence} • Next: <span className={`font-bold ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>{sub.nextExpectedDate}</span>
+                        {sub.cadence} • Next: <span className={`font-bold ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{sub.nextExpectedDate}</span>
                       </div>
                     </div>
                   </div>
@@ -88,7 +88,7 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
                 </div>
 
                 {sub.umn && (
-                  <div className={`p-2.5 rounded-xl text-[11px] font-mono truncate border ${
+                  <div className={`p-2.5 rounded-xl text-[11px] font-mono truncate border backdrop-blur-md ${
                     isDark ? 'bg-black/40 border-white/[0.06] text-slate-400' : 'bg-white border-slate-200 text-slate-600'
                   }`}>
                     Mandate UMN: {sub.umn}
@@ -102,4 +102,5 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
     </div>
   );
 };
+
 

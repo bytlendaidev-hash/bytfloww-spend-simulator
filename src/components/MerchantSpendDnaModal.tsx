@@ -25,12 +25,12 @@ export const MerchantSpendDnaModal: React.FC<MerchantSpendDnaModalProps> = ({
   const avgTicket = merchantEvents.length > 0 ? Math.round(totalSpent / merchantEvents.length) : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-2xl p-0 sm:p-4 animate-emergence">
       <div 
-        className={`w-full max-w-md rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-7 shadow-2xl border transition-all duration-200 animate-fade-in ${
+        className={`w-full max-w-md rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-7 shadow-2xl border transition-all duration-300 backdrop-blur-2xl ${
           isDark 
-            ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' 
-            : 'bg-white border-slate-200/90 text-slate-900 shadow-xl'
+            ? 'bg-[#0E1720]/95 border-emerald-500/30 text-white shadow-2xl shadow-black/80' 
+            : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-2xl'
         }`}
       >
         <div className={`flex items-center justify-between pb-4 border-b ${

@@ -47,22 +47,22 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
   };
 
   return (
-    <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12">
-      <div className={`w-full max-w-xl p-8 sm:p-10 rounded-[36px] border text-center transition-all duration-200 ${
+    <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
+      <div className={`w-full max-w-xl p-8 sm:p-10 rounded-[36px] border text-center transition-all duration-300 backdrop-blur-2xl ${
         isDark 
-          ? 'bg-[#10181E]/95 border-white/[0.08] text-[#FFFFFF] shadow-2xl shadow-black/80' 
-          : 'bg-white border-slate-200/90 text-slate-900 shadow-xl shadow-slate-900/5'
+          ? 'bg-[#0E1720]/80 border-white/[0.1] text-[#FFFFFF] shadow-2xl shadow-black/80' 
+          : 'bg-white/85 border-slate-200/90 text-slate-900 shadow-2xl shadow-slate-900/10'
       }`}>
         {/* Brand Icon Badge */}
         <div className={`w-16 h-16 rounded-3xl mx-auto mb-4 flex items-center justify-center shadow-lg transition-all ${
           isDark 
-            ? 'bg-brand-viridian text-slate-950 shadow-brand-viridian/25' 
-            : 'bg-brand-600 text-white shadow-brand-600/25'
+            ? 'bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 text-slate-950 shadow-emerald-500/30' 
+            : 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-emerald-600/25'
         }`}>
           <span className="text-2xl">📥</span>
         </div>
 
-        <h2 className={`text-2xl sm:text-3xl font-black tracking-tight mb-2 ${
+        <h2 className={`text-2xl sm:text-3xl font-black font-heading tracking-tight mb-2 ${
           isDark ? 'text-white' : 'text-slate-900'
         }`}>
           Import SMS Backup XML
@@ -79,12 +79,12 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`p-8 sm:p-10 rounded-3xl border-2 border-dashed cursor-pointer transition-all duration-150 active:scale-[0.99] ${
+          className={`p-8 sm:p-10 rounded-3xl border-2 border-dashed cursor-pointer transition-all duration-200 active:scale-[0.99] backdrop-blur-xl ${
             isDragging
-              ? 'border-brand-500 bg-brand-500/10 scale-[1.01]'
+              ? 'border-emerald-400 bg-emerald-500/15 scale-[1.01] shadow-lg shadow-emerald-500/20'
               : isDark
-              ? 'border-white/[0.12] hover:border-brand-viridian/50 bg-[#142027]/70 hover:bg-[#142027]'
-              : 'border-slate-300 hover:border-brand-500 bg-slate-50 hover:bg-slate-100/90'
+              ? 'border-white/[0.14] hover:border-emerald-400/60 bg-[#142028]/60 hover:bg-[#142028]/90'
+              : 'border-slate-300 hover:border-emerald-500/80 bg-slate-50/80 hover:bg-slate-100/90 shadow-inner'
           }`}
         >
           <input
@@ -116,7 +116,7 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
         )}
 
         {isProcessing && (
-          <div className="mt-5 flex items-center justify-center gap-3 text-xs font-black text-brand-600 dark:text-brand-viridian animate-pulse">
+          <div className="mt-5 flex items-center justify-center gap-3 text-xs font-black text-emerald-600 dark:text-emerald-400 animate-pulse">
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             <span>Parsing Real Indian Bank Messages...</span>
           </div>
@@ -126,7 +126,7 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
         <div className="relative my-6">
           <div className={`absolute inset-0 flex items-center ${isDark ? 'border-t border-white/[0.08]' : 'border-t border-slate-200'}`} />
           <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
-            <span className={`px-3 font-bold ${isDark ? 'bg-[#10181E] text-slate-400' : 'bg-white text-slate-500'}`}>
+            <span className={`px-3 font-bold backdrop-blur-md ${isDark ? 'bg-[#0E1720] text-slate-400' : 'bg-white text-slate-500'}`}>
               or test with pre-loaded dataset
             </span>
           </div>
@@ -134,19 +134,19 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
 
         <button
           onClick={() => onXmlLoaded(SAMPLE_SMS_XML)}
-          className={`w-full py-3.5 px-4 rounded-2xl border text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 active:scale-95 shadow-sm ${
+          className={`w-full py-3.5 px-4 rounded-2xl border text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 active:scale-95 shadow-sm backdrop-blur-xl ${
             isDark
-              ? 'bg-[#18242D] hover:bg-[#20303D] text-white border-white/[0.08]'
-              : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-200/90'
+              ? 'bg-white/[0.06] hover:bg-white/[0.12] text-white border-white/[0.1]'
+              : 'bg-white hover:bg-slate-100 text-slate-900 border-slate-200/90'
           }`}
         >
-          <span className="text-amber-500">⚡</span>
+          <span className="text-amber-400">⚡</span>
           <span>Load 3,979 Real SMS Dataset (sms_20260804131919.xml)</span>
         </button>
 
         {/* Privacy Note */}
         <div className={`mt-6 pt-4 border-t text-[11px] flex items-center justify-center gap-1.5 ${
-          isDark ? 'border-white/[0.06] text-slate-500' : 'border-slate-100 text-slate-500'
+          isDark ? 'border-white/[0.06] text-slate-500' : 'border-slate-200/80 text-slate-500'
         }`}>
           <span>🔒</span>
           <span>100% Client-Side Privacy: SMS parsed locally in browser memory. No data is stored or uploaded to any server.</span>
@@ -155,4 +155,5 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
     </div>
   );
 };
+
 

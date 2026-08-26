@@ -25,10 +25,10 @@ export const CreditCardAdvisorCard: React.FC<CreditCardAdvisorCardProps> = ({
   if (daysRemaining < 0) daysRemaining += daysInMonth;
 
   return (
-    <div className={`p-6 sm:p-7 rounded-[30px] border transition relative overflow-hidden ${
+    <div className={`p-6 sm:p-7 rounded-[30px] border transition-all duration-300 relative overflow-hidden backdrop-blur-2xl ${
       isDark 
-        ? 'bg-gradient-to-br from-[#181C26] via-[#101A24] to-[#0A1218] border-amber-500/25 shadow-xl shadow-amber-950/20' 
-        : 'bg-gradient-to-br from-amber-50/50 to-orange-50/30 border-amber-200 shadow-sm'
+        ? 'bg-gradient-to-br from-[#181C26]/80 via-[#101A24]/80 to-[#0A1218]/80 border-amber-500/25 shadow-2xl shadow-black/60' 
+        : 'bg-gradient-to-br from-amber-50/80 to-orange-50/50 border-amber-200 shadow-sm'
     }`}>
       {/* Ambient gold glow */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />

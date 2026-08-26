@@ -968,7 +968,7 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
         category: t.category || 'General' || 'General',
         subcategory: isFood ? (t.narration.toLowerCase().includes('swiggy') ? 'Food Delivery (Swiggy)' : t.narration.toLowerCase().includes('zomato') ? 'Food Delivery (Zomato)' : 'Dining & Restaurants') : (t.category || 'General'),
         categoryConfidence: 0.98,
-        classificationMethod: 'RULE',
+        classificationMethod: 'RULE', entityNormalized: '', upiHandle: null,
       };
     });
 
@@ -1047,158 +1047,75 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       }))
       .sort((a, b) => (b.totalSent + b.totalReceived) - (a.totalSent + a.totalReceived));
 
-    const evidenceInsights: EvidenceBackedInsight[] = [
-      {
+        const evidenceInsights: EvidenceBackedInsight[] = [];
+    const debtRatioVal = salaryInflowTotal > 0 ? (debtPayments / salaryInflowTotal) * 100 : 0;
+    if (debtRatioVal > 25) {
+      evidenceInsights.push({
         id: 'ins_risk_debt',
         type: 'RISK',
-        severity: 'HIGH',
-        title: 'Debt Obligations & Revolving Credit Burden',
-        summary: 'Total debt servicing (₹1,22,097) consumes ~15.2% of corporate salary ($41.2%$ when including revolving cycles).',
-        whyItMatters: 'Frequent micro-repayments and overlapping credit lines reduce financial liquidity buffer and increase long-term financing costs.',
+        severity: debtRatioVal > 40 ? 'HIGH' : 'MEDIUM',
+        title: 'Debt Servicing Load vs Income',
+        summary: `Debt repayments (₹${debtPayments.toLocaleString('en-IN')}) consume ~${debtRatioVal.toFixed(1)}% of detected salary credits.`,
+        whyItMatters: 'Frequent micro-repayments and overlapping credit lines reduce financial liquidity buffer.',
         evidence: [
-          { metric: 'Debt Repayments Serviced', currentValue: `₹${debtPayments.toLocaleString('en-IN')}`, baselineValue: '₹0.00' },
-          { metric: 'Annual Corporate Salary', currentValue: `₹${salaryInflowTotal.toLocaleString('en-IN')}` },
-          { metric: 'Active Lenders Identified', currentValue: '4 Lenders (mPokket, Vivifi FlexPay, Bajaj, Navi)' },
+          { metric: 'Debt Repayments Serviced', currentValue: `₹${debtPayments.toLocaleString('en-IN')}` },
+          { metric: 'Detected Salary Inflow', currentValue: `₹${salaryInflowTotal.toLocaleString('en-IN')}` },
         ],
-        recommendedAction: 'Consolidate multiple short-term lines into a single lower-cost amortizing loan and eliminate overlapping disbursements.',
+        recommendedAction: 'Consolidate multiple short-term lines into a single lower-cost amortizing loan.',
         confidence: 0.98,
-      },
-      {
+      });
+    }
+
+    const atmDebits = categoryAgg['ATM Cash Withdrawals']?.debit || 0;
+    if (atmDebits > 5000) {
+      evidenceInsights.push({
         id: 'ins_warn_cash',
         type: 'WARNING',
         severity: 'MEDIUM',
         title: 'Unclassified Cash & ATM Withdrawals',
-        summary: '₹54,000 withdrawn via ATM cannot be economically itemized or audited.',
-        whyItMatters: 'Cash leakages obscure actual discretionary burn rates and bypass automated budget tracking.',
+        summary: `₹${atmDebits.toLocaleString('en-IN')} withdrawn via ATM cannot be automatically itemized.`,
+        whyItMatters: 'Cash leakages obscure actual discretionary burn rates.',
         evidence: [
-          { metric: 'ATM Cash Volume', currentValue: '₹54,000.00', baselineValue: '< ₹15,000.00' },
-          { metric: 'Withdrawal Transactions', currentValue: '8 ATM Withdrawals' },
+          { metric: 'ATM Cash Volume', currentValue: `₹${atmDebits.toLocaleString('en-IN')}` },
         ],
-        recommendedAction: 'Transition cash purchases to UPI QR scanning for automated categorized itemization.',
+        recommendedAction: 'Transition cash purchases to digital QR scanning for automated categorized itemization.',
         confidence: 0.95,
-      },
-      {
-        id: 'ins_obs_food',
-        type: 'OBSERVATION',
-        severity: 'INFO',
-        title: 'Food Delivery Channel Concentration',
-        summary: 'Swiggy and online food platforms represent 82% of identifiable restaurant dining spend.',
-        whyItMatters: 'Delivery premiums, surge fees, and platform surcharges increase monthly food ticket costs by an estimated 15-20%.',
-        evidence: [
-          { metric: 'Food & Dining Outflows', currentValue: `₹${categoryAgg['Food & Dining']?.debit.toLocaleString('en-IN') || '27,979'}` },
-          { metric: 'Platform Concentration', currentValue: '82.0% (Swiggy Dominant)' },
-        ],
-        recommendedAction: 'Consolidate meal orders or leverage direct merchant ordering during peak dining hours.',
-        confidence: 0.96,
-      },
-      {
-        id: 'ins_pos_repay',
-        type: 'POSITIVE',
-        severity: 'LOW',
-        title: 'Disciplined Debt Repayment Record',
-        summary: 'Repaid ₹96,074 across 63 repayments against ₹1.11L borrowed with 0 default penalties.',
-        whyItMatters: 'Zero missed dates maintain strong bureau standing and prevent punitive default interest rates.',
-        evidence: [
-          { metric: 'Total Repayments Serviced', currentValue: '₹95,813.77 (63 debits)' },
-          { metric: 'Total Disbursed', currentValue: '₹1,11,133.14 (25 credits)' },
-          { metric: 'Net Active Delta', currentValue: '+₹15,319.37' },
-        ],
-        recommendedAction: 'Continue timely auto-debit payments and avoid taking new disbursals within 48 hours of servicing an EMI.',
-        confidence: 0.99,
-      },
-      {
-        id: 'ins_opp_transfers',
-        type: 'OPPORTUNITY',
-        severity: 'LOW',
-        title: 'Discretionary Peer Transfer Budgeting',
-        summary: 'Peer transfers (P2P) total ₹7,18,865 across 1,170 transactions (59.6% of total outflows).',
-        whyItMatters: 'Peer transfers represent the largest single cash outflow channel, with top 5 counterparties taking over 50% of transfer volume.',
-        evidence: [
-          { metric: 'Total P2P Transfers', currentValue: '₹7,18,864.73', baselineValue: '59.6% of outflows' },
-          { metric: 'Top Counterparty (Boby Tandan)', currentValue: '₹1,73,132.00 (24 txns)' },
-        ],
-        recommendedAction: 'Establish a structured monthly peer transfer budget to preserve cash reserves.',
-        confidence: 0.94,
-      },
-    ];
+      });
+    }
 
-    const recurringMandates: RecurringMandate[] = [
-      {
-        id: 'mandate_salary',
-        merchantName: 'Newgen Software Technologies Payroll',
-        entityName: 'Newgen Software Technologies Ltd',
-        amount: 61722,
-        frequency: 'MONTHLY',
-        category: 'Salary & Professional Income',
-        confidence: 0.997,
-        lastBilledDate: '31 Mar 2026',
-        nextExpectedDate: '30 Apr 2026',
-        status: 'ACTIVE',
-      },
-      {
-        id: 'mandate_lic',
-        merchantName: 'Life Insurance Corporation (LIC)',
-        entityName: 'Life Insurance Corporation of India',
-        amount: 16182,
-        frequency: 'QUARTERLY',
-        category: 'Insurance & Policies',
-        confidence: 0.99,
-        lastBilledDate: '28 Mar 2026',
-        nextExpectedDate: '28 Jun 2026',
-        status: 'ACTIVE',
-      },
-      {
-        id: 'mandate_netflix',
-        merchantName: 'Netflix India Entertainment',
-        entityName: 'Netflix Entertainment Services India',
-        amount: 649,
-        frequency: 'MONTHLY',
-        category: 'Digital Subscriptions',
-        confidence: 0.99,
-        lastBilledDate: '20 Mar 2026',
-        nextExpectedDate: '20 Apr 2026',
-        status: 'ACTIVE',
-      },
-      {
-        id: 'mandate_google',
-        merchantName: 'Google India Digital Services',
-        entityName: 'Google India Cloud / Services',
-        amount: 149,
-        frequency: 'MONTHLY',
-        category: 'Utilities & Cloud',
-        confidence: 0.98,
-        lastBilledDate: '15 Mar 2026',
-        nextExpectedDate: '15 Apr 2026',
-        status: 'ACTIVE',
-      },
-      {
-        id: 'mandate_mpokket',
-        merchantName: 'mPokket Micro-Credit Line',
-        entityName: 'mPokket Financial Services',
-        amount: 3731,
-        frequency: 'MONTHLY',
-        category: 'Loans & EMIs',
-        confidence: 0.96,
-        lastBilledDate: '25 Mar 2026',
-        nextExpectedDate: '25 Apr 2026',
-        status: 'ACTIVE',
-      },
-      {
-        id: 'mandate_vivifi',
-        merchantName: 'Vivifi India FlexPay Credit Line',
-        entityName: 'Vivifi India Finance Pvt Ltd',
-        amount: 9619,
-        frequency: 'MONTHLY',
-        category: 'Loans & EMIs',
-        confidence: 0.96,
-        lastBilledDate: '20 Mar 2026',
-        nextExpectedDate: '20 Apr 2026',
-        status: 'ACTIVE',
-      },
-    ];
+    const recurringMandates: RecurringMandate[] = [];
+    // Dynamic detection from transactions
+    const recurringMap = new Map<string, { name: string; amounts: number[]; lastDate: string; cat: string }>();
+    transactions.forEach(t => {
+      if ((t.debit || 0) > 0) {
+        const key = (t.narration || '').slice(0, 20).toUpperCase();
+        if (!recurringMap.has(key)) {
+          recurringMap.set(key, { name: t.narration.slice(0, 30), amounts: [], lastDate: t.date, cat: t.category || 'Subscription' });
+        }
+        recurringMap.get(key)!.amounts.push(t.debit || 0);
+        recurringMap.get(key)!.lastDate = t.date;
+      }
+    });
 
+    Array.from(recurringMap.entries()).forEach(([k, v], idx) => {
+      if (v.amounts.length >= 3) {
+        const avg = v.amounts.reduce((s, a) => s + a, 0) / v.amounts.length;
+        recurringMandates.push({
+          id: `mandate_${idx + 1}`,
+          merchantName: v.name,
+          entityName: v.name,
+          amount: Math.round(avg),
+          frequency: 'MONTHLY',
+          category: v.cat,
+          confidence: 0.95,
+          lastBilledDate: v.lastDate,
+          nextExpectedDate: 'Next Month',
+          status: 'ACTIVE',
+        });
+      }
+    });
 
-    // ── ANOMALY DETECTION ENGINE ──────────────────────────────────────────
+// ── ANOMALY DETECTION ENGINE ──────────────────────────────────────────
     // Compute per-category averages and flag statistical outliers
     const catAmountMap: Record<string, number[]> = {};
     transactions.forEach(t => {
@@ -1395,10 +1312,10 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       },
       file: { id: `f_${Date.now()}`, fileName: file.name },
       bankDetected: detectedBank,
-      accountHolder: accountHolder || 'MR. DEEPANKAR GAUTAM',
-      accountNo: accountNo || '50100428839082',
-      ifsc: 'HDFC0001915',
-      branch: 'PRATAPGARH UTTAR PRADESH',
+      accountHolder: accountHolder || 'Account Holder',
+      accountNo: accountNo || 'Bank Account',
+      ifsc: 'N/A',
+      branch: 'N/A',
       periodStart: periodStart || '01/04/2025',
       periodEnd: periodEnd || '31/03/2026',
       transactionCount: transactions.length,

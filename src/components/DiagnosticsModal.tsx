@@ -16,9 +16,9 @@ export const DiagnosticsModal: React.FC<DiagnosticsModalProps> = ({
   const dq = snapshot.dataQuality;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-      <div className={`w-full max-w-md rounded-[32px] border p-6 sm:p-7 flex flex-col gap-4 shadow-2xl transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' : 'bg-white border-slate-200/90 text-slate-900 shadow-xl'
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-emergence">
+      <div className={`w-full max-w-md rounded-[32px] border p-6 sm:p-7 flex flex-col gap-4 shadow-2xl transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/95 border-emerald-500/30 text-white shadow-2xl shadow-black/80' : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-2xl'
       }`}>
         
         {/* Header */}

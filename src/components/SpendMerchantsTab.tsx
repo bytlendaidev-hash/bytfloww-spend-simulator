@@ -32,7 +32,7 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
   const colors = ['#059669', '#4F46E5', '#D97706', '#E11D48', '#2563EB', '#0284C7', '#7C3AED'];
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8 animate-emergence">
       {/* ── 1. SEARCH & FILTER BAR ─────────────────────────────────────── */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -41,10 +41,10 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search merchants, brands, platforms..."
-            className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-150 ${
+            className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-200 backdrop-blur-xl ${
               isDark 
-                ? 'bg-[#10181E] border-white/[0.08] text-white placeholder-slate-500 focus:border-brand-viridian focus:ring-2 focus:ring-brand-viridian/20' 
-                : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 shadow-sm'
+                ? 'bg-[#0E1720]/80 border-white/[0.1] text-white placeholder-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-inner' 
+                : 'bg-white/90 border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 shadow-sm'
             }`}
           />
           <span className="absolute left-4 top-3.5 text-xs text-slate-400">🔍</span>
@@ -72,14 +72,14 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
             <button
               key={chip.key}
               onClick={() => setFilterType(chip.key as any)}
-              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
+              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
                 isSelected
                   ? isDark
-                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-md shadow-brand-viridian/25'
-                    : 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-600/20'
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25'
+                    : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
                   : isDark
-                  ? 'border-white/[0.08] text-slate-300 bg-[#142027] hover:bg-[#1a2832] hover:text-white'
-                  : 'border-slate-200/90 text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                  ? 'border-white/[0.08] text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] hover:text-white'
+                  : 'border-slate-200/90 text-slate-700 bg-white/80 hover:bg-white hover:text-slate-900 shadow-sm'
               }`}
             >
               {chip.label}
@@ -91,8 +91,8 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
       {/* ── 2. MERCHANT DIRECTORY HEADER ───────────────────────────────── */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className={`text-base ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>🏪</span>
-          <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <span className="text-base text-emerald-400">🏪</span>
+          <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Merchant Directory & Spend DNA
           </h3>
         </div>
@@ -112,16 +112,16 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
               key={m.name}
               onClick={() => onSelectMerchant(m.name)}
               style={{ borderLeftColor: accentColor, borderLeftWidth: '4px' }}
-              className={`p-4 rounded-[24px] border transition-all duration-150 cursor-pointer flex items-center justify-between hover:scale-[1.005] active:scale-[0.99] group ${
+              className={`p-4 rounded-[24px] border transition-all duration-200 cursor-pointer flex items-center justify-between hover:scale-[1.005] active:scale-[0.99] group backdrop-blur-xl ${
                 isDark 
-                  ? 'bg-[#10181E] border-white/[0.06] hover:border-brand-viridian/40 hover:bg-[#142027]' 
-                  : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/80 shadow-sm'
+                  ? 'bg-white/[0.03] border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06] shadow-sm' 
+                  : 'bg-white/85 border-slate-200/80 hover:border-slate-300 hover:bg-white shadow-sm'
               }`}
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <MerchantLogoView merchantName={m.name} size={42} isDark={isDark} />
                 <div className="min-w-0">
-                  <div className={`text-xs sm:text-sm font-black tracking-tight truncate max-w-[180px] sm:max-w-xs ${
+                  <div className={`text-xs sm:text-sm font-black font-heading tracking-tight truncate max-w-[180px] sm:max-w-xs ${
                     isDark ? 'text-white' : 'text-slate-900'
                   }`}>
                     {m.name}
@@ -152,4 +152,5 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
     </div>
   );
 };
+
 

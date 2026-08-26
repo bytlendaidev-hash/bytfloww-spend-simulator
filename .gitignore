@@ -10,3 +10,7 @@ credentials.env
 credentials.json
 *.log
 scratch/
+*.xls
+*.xlsx
+*.csv
+

@@ -51,19 +51,19 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
   ];
 
   return (
-    <div className="space-y-3 sm:space-y-4 mb-5 sm:mb-6">
+    <div className="space-y-3 sm:space-y-4 mb-5 sm:mb-6 animate-emergence">
       {/* ── TOP MODULE SELECTOR BAR (SMS INTELLIGENCE vs BANK STATEMENTS) ── */}
       {onSelectModule && (
-        <div className={`p-1.5 rounded-2xl border flex items-center justify-between gap-2 transition-all ${
-          isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-slate-200/80 border-slate-300/80'
+        <div className={`p-1.5 rounded-2xl border flex items-center justify-between gap-2 transition-all backdrop-blur-xl ${
+          isDark ? 'bg-[#0E1720]/80 border-white/[0.08]' : 'bg-slate-200/70 border-slate-300/70'
         }`}>
           <button
             onClick={() => onSelectModule('SMS_INTELLIGENCE')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 border ${
               activeModule === 'SMS_INTELLIGENCE'
                 ? isDark
-                  ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-sm shadow-brand-viridian/20'
-                  : 'bg-white text-slate-900 border-slate-300 shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/20'
+                  : 'bg-white text-slate-900 border-slate-200 shadow-sm'
                 : isDark
                 ? 'text-slate-400 border-transparent hover:text-white'
                 : 'text-slate-600 border-transparent hover:text-slate-900'
@@ -73,7 +73,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             <span>SMS Spend Intelligence</span>
             <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono ${
               activeModule === 'SMS_INTELLIGENCE'
-                ? isDark ? 'bg-black/20 text-slate-950 font-bold' : 'bg-slate-100 text-slate-900 font-bold'
+                ? isDark ? 'bg-black/25 text-slate-950 font-bold' : 'bg-slate-100 text-slate-900 font-bold'
                 : isDark ? 'bg-white/10 text-slate-400' : 'bg-slate-300/60 text-slate-700'
             }`}>
               {totalParsedCount.toLocaleString('en-IN')} SMS
@@ -85,8 +85,8 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 border ${
               activeModule === 'BANK_STATEMENTS'
                 ? isDark
-                  ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-sm shadow-brand-viridian/20'
-                  : 'bg-white text-slate-900 border-slate-300 shadow-sm'
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/20'
+                  : 'bg-white text-slate-900 border-slate-200 shadow-sm'
                 : isDark
                 ? 'text-slate-400 border-transparent hover:text-white'
                 : 'text-slate-600 border-transparent hover:text-slate-900'
@@ -107,10 +107,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button 
             onClick={() => onSelectTab('OVERVIEW')}
-            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border font-black text-base transition-all duration-150 flex-shrink-0 active:scale-95 ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border font-black text-base transition-all duration-150 flex-shrink-0 active:scale-95 backdrop-blur-xl ${
               isDark 
-                ? 'bg-[#142027] border-white/[0.08] text-slate-200 hover:bg-[#1a2832]' 
-                : 'bg-white border-slate-200/90 text-slate-800 hover:bg-slate-100 shadow-sm'
+                ? 'bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.08] text-slate-200' 
+                : 'bg-white/80 border-slate-200/90 text-slate-800 hover:bg-white shadow-sm'
             }`}
             title="Back to Overview"
           >
@@ -120,24 +120,24 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             {/* Solid BytFloww Logo */}
             <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center shadow-md flex-shrink-0 ${
-              isDark ? 'bg-brand-viridian text-slate-950' : 'bg-brand-600 text-white'
+              isDark 
+                ? 'bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 text-slate-950 shadow-emerald-500/25' 
+                : 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-emerald-600/20'
             }`}>
               <span className="font-black text-sm">▷</span>
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className={`text-sm sm:text-lg font-black tracking-tight truncate ${
+                <h1 className={`text-sm sm:text-lg font-black font-heading tracking-tight truncate ${
                   isDark ? 'text-white' : 'text-slate-900'
                 }`}>
                   Spend Intelligence
                 </h1>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px]">
-                <span className={`w-2 h-2 rounded-full animate-pulse flex-shrink-0 ${
-                  isDark ? 'bg-brand-viridian' : 'bg-brand-500'
-                }`} />
-                <span className={`font-black truncate ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                <span className={`font-black truncate ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
                   {totalParsedCount.toLocaleString('en-IN')} SMS (Live Dataset)
                 </span>
               </div>
@@ -150,10 +150,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {onSelectModule && (
             <button
               onClick={() => onSelectModule('BANK_STATEMENTS')}
-              className={`px-3 h-9 sm:h-10 rounded-2xl flex items-center gap-1.5 border font-black text-xs transition-all duration-150 active:scale-95 ${
+              className={`px-3 h-9 sm:h-10 rounded-2xl flex items-center gap-1.5 border font-black text-xs transition-all duration-150 active:scale-95 backdrop-blur-xl ${
                 isDark 
-                  ? 'bg-brand-viridian/10 border-brand-viridian/30 text-brand-viridian hover:bg-brand-viridian/20' 
-                  : 'bg-emerald-50 border-brand-200 text-brand-700 hover:bg-emerald-100 shadow-sm'
+                  ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300 hover:bg-emerald-500/20' 
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100 shadow-sm'
               }`}
             >
               <span>🏛️</span>
@@ -164,10 +164,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Ask AI Copilot Bubble Button */}
           <button
             onClick={onOpenCopilot}
-            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border transition-all duration-150 active:scale-95 text-sm ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border transition-all duration-150 active:scale-95 text-sm backdrop-blur-xl ${
               isDark 
-                ? 'bg-selvex-500/15 border-selvex-500/30 text-selvex-400 hover:bg-selvex-500/25' 
-                : 'bg-indigo-50 border-selvex-200 text-selvex-600 hover:bg-indigo-100 shadow-sm'
+                ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/25' 
+                : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 shadow-sm'
             }`}
             title="Ask AI Copilot"
           >
@@ -177,10 +177,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Security Shield / Diagnostics */}
           <button
             onClick={onOpenDiagnostics}
-            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border transition-all duration-150 active:scale-95 text-sm ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border transition-all duration-150 active:scale-95 text-sm backdrop-blur-xl ${
               isDark 
-                ? 'bg-white/[0.06] border-white/[0.08] text-brand-viridian hover:bg-white/[0.12]' 
-                : 'bg-white border-slate-200/90 text-brand-700 hover:bg-slate-100 shadow-sm'
+                ? 'bg-white/[0.05] border-white/[0.08] text-emerald-400 hover:bg-white/[0.1]' 
+                : 'bg-white/80 border-slate-200/90 text-emerald-700 hover:bg-white shadow-sm'
             }`}
             title="Security Shield & Diagnostics"
           >
@@ -190,10 +190,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Theme Toggle */}
           <button
             onClick={onToggleTheme}
-            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border transition-all duration-150 active:scale-95 text-xs sm:text-sm ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center border transition-all duration-150 active:scale-95 text-xs sm:text-sm backdrop-blur-xl ${
               isDark 
-                ? 'bg-white/[0.06] border-white/[0.08] text-slate-200 hover:bg-white/[0.12]' 
-                : 'bg-white border-slate-200/90 text-slate-800 hover:bg-slate-100 shadow-sm'
+                ? 'bg-white/[0.05] border-white/[0.08] text-amber-300 hover:bg-white/[0.1]' 
+                : 'bg-white/80 border-slate-200/90 text-slate-800 hover:bg-white shadow-sm'
             }`}
             title="Theme Toggle"
           >
@@ -201,8 +201,8 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           </button>
 
           {/* Profile TU Avatar */}
-          <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border flex items-center justify-center font-black text-xs shadow-sm ${
-            isDark ? 'bg-[#18242D] border-white/[0.12] text-white' : 'bg-slate-900 border-slate-900 text-white'
+          <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border flex items-center justify-center font-black text-xs shadow-sm backdrop-blur-xl ${
+            isDark ? 'bg-white/[0.08] border-white/[0.12] text-white' : 'bg-slate-900 border-slate-900 text-white'
           }`}>
             TU
           </div>
@@ -217,14 +217,14 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             <button
               key={range.key}
               onClick={() => onSelectPeriod(range.key)}
-              className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
+              className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
                 isSelected
                   ? isDark 
-                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-md shadow-brand-viridian/25 font-black' 
-                    : 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-600/20 font-black'
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25 font-black' 
+                    : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 font-black'
                   : isDark
-                  ? 'bg-[#142027] text-slate-300 border-white/[0.08] hover:bg-[#1a2832] hover:text-white'
-                  : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                  ? 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white'
+                  : 'bg-white/80 text-slate-700 border-slate-200/90 hover:bg-white hover:text-slate-900 shadow-sm'
               }`}
             >
               {range.label}
@@ -235,10 +235,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
         {/* Filters Button */}
         <button
           onClick={onOpenFilter}
-          className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap border transition-all duration-150 flex-shrink-0 active:scale-95 ${
+          className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap border transition-all duration-150 flex-shrink-0 active:scale-95 backdrop-blur-xl ${
             isDark 
-              ? 'bg-[#142027] text-slate-300 border-white/[0.08] hover:bg-[#1a2832]' 
-              : 'bg-white text-slate-800 border-slate-200/90 hover:bg-slate-100 shadow-sm'
+              ? 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08]' 
+              : 'bg-white/80 text-slate-800 border-slate-200/90 hover:bg-white shadow-sm'
           }`}
         >
           <span>⚡</span>
@@ -254,14 +254,14 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
                 isActive
                   ? isDark 
-                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-md shadow-brand-viridian/25' 
-                    : 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-600/20'
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25' 
+                    : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
                   : isDark
-                  ? 'bg-[#142027] text-slate-300 border-white/[0.08] hover:bg-[#1a2832] hover:text-white'
-                  : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                  ? 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white'
+                  : 'bg-white/80 text-slate-700 border-slate-200/90 hover:bg-white hover:text-slate-900 shadow-sm'
               }`}
             >
               <span>{tab.icon}</span>
@@ -274,4 +274,5 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
     </div>
   );
 };
+
 

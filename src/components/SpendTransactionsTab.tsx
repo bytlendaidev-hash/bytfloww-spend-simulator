@@ -62,7 +62,7 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
   const displayedEvents = filteredEvents.slice(0, page * pageSize);
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8 animate-emergence">
       {/* ── 1. SEARCH INPUT ─────────────────────────────────────────────── */}
       <div className="relative">
         <input
@@ -70,10 +70,10 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
           value={searchQuery}
           onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
           placeholder="Search merchant, amount, UPI ID, Reference No..."
-          className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-150 ${
+          className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-200 backdrop-blur-xl ${
             isDark 
-              ? 'bg-[#10181E] border-white/[0.08] text-white placeholder-slate-500 focus:border-brand-viridian focus:ring-2 focus:ring-brand-viridian/20' 
-              : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 shadow-sm'
+              ? 'bg-[#0E1720]/80 border-white/[0.1] text-white placeholder-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-inner' 
+              : 'bg-white/90 border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 shadow-sm'
           }`}
         />
         <span className="absolute left-4 top-3.5 text-xs text-slate-400">🔍</span>
@@ -102,14 +102,14 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
             <button
               key={chip.key}
               onClick={() => { setActiveFilter(chip.key as any); setPage(1); }}
-              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
+              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
                 isSelected
                   ? isDark
-                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-md shadow-brand-viridian/25'
-                    : 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-600/20'
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25'
+                    : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
                   : isDark
-                  ? 'border-white/[0.08] text-slate-300 bg-[#142027] hover:bg-[#1a2832] hover:text-white'
-                  : 'border-slate-200/90 text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                  ? 'border-white/[0.08] text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] hover:text-white'
+                  : 'border-slate-200/90 text-slate-700 bg-white/80 hover:bg-white hover:text-slate-900 shadow-sm'
               }`}
             >
               {chip.label}
@@ -124,11 +124,13 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
       </div>
 
       {/* ── 3. MONTH SUMMARY BANNER ─────────────────────────────────────── */}
-      <div className={`p-5 rounded-[28px] border flex items-center justify-between shadow-sm transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90'
+      <div className={`p-5 rounded-[28px] border flex items-center justify-between shadow-sm transition-all duration-300 backdrop-blur-2xl ${
+        isDark 
+          ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-lg shadow-black/40' 
+          : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
         <div>
-          <h4 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <h4 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             August 2026 Live Ledger
           </h4>
           <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
@@ -139,11 +141,11 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         <div className="flex items-center gap-4 text-xs font-bold font-mono">
           <div className="text-right">
             <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Spend</span>
-            <span className="text-rose-600 dark:text-rose-400 font-black text-sm">₹{Math.round(totalFilteredSpend).toLocaleString('en-IN')}</span>
+            <span className="text-rose-500 dark:text-rose-400 font-black text-sm">₹{Math.round(totalFilteredSpend).toLocaleString('en-IN')}</span>
           </div>
           <div className="text-right">
             <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Income</span>
-            <span className={`font-black text-sm ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>₹{Math.round(totalFilteredIncome).toLocaleString('en-IN')}</span>
+            <span className={`font-black text-sm ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>₹{Math.round(totalFilteredIncome).toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
@@ -157,10 +159,10 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
             <div
               key={ev.id}
               onClick={() => onSelectEvent(ev)}
-              className={`p-4 rounded-[24px] border cursor-pointer flex items-center justify-between transition-all duration-150 active:scale-[0.99] group ${
+              className={`p-4 rounded-[24px] border cursor-pointer flex items-center justify-between transition-all duration-200 active:scale-[0.99] group backdrop-blur-xl ${
                 isDark 
-                  ? 'bg-[#10181E] border-white/[0.06] hover:border-brand-viridian/40 hover:bg-[#142027]' 
-                  : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/80 shadow-sm'
+                  ? 'bg-white/[0.03] border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06] shadow-sm' 
+                  : 'bg-white/85 border-slate-200/80 hover:border-slate-300 hover:bg-white shadow-sm'
               }`}
             >
               <div className="flex items-center gap-3.5 min-w-0">
@@ -174,7 +176,7 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
                 </div>
 
                 <div className="min-w-0">
-                  <div className={`text-xs sm:text-sm font-black tracking-tight truncate max-w-[170px] sm:max-w-xs ${
+                  <div className={`text-xs sm:text-sm font-black font-heading tracking-tight truncate max-w-[170px] sm:max-w-xs ${
                     isDark ? 'text-white' : 'text-slate-900'
                   }`}>
                     {ev.merchant}
@@ -192,7 +194,7 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
                     e.stopPropagation();
                     onSplitBill(ev);
                   }}
-                  className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition ${
+                  className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition backdrop-blur-md ${
                     isDark
                       ? 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:bg-white/[0.1]'
                       : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
@@ -205,7 +207,7 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
 
                 <div className="text-right">
                   <div className={`text-xs sm:text-sm font-black font-mono ${
-                    isCredit ? (isDark ? 'text-brand-viridian' : 'text-brand-700') : 'text-rose-600 dark:text-rose-400'
+                    isCredit ? (isDark ? 'text-emerald-400' : 'text-emerald-700') : 'text-rose-500 dark:text-rose-400'
                   }`}>
                     {isCredit ? '+' : '-'}₹{ev.amount.toLocaleString('en-IN')}
                   </div>
@@ -224,10 +226,10 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         <div className="pt-2 text-center">
           <button
             onClick={() => setPage(p => p + 1)}
-            className={`w-full py-3.5 rounded-2xl border text-xs font-black transition-all duration-150 active:scale-[0.99] ${
+            className={`w-full py-3.5 rounded-2xl border text-xs font-black transition-all duration-150 active:scale-[0.99] backdrop-blur-xl ${
               isDark 
-                ? 'bg-[#142027] border-white/[0.08] text-slate-200 hover:bg-[#1a2832]' 
-                : 'bg-white border-slate-200/90 text-slate-800 hover:bg-slate-100 shadow-sm'
+                ? 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-slate-200' 
+                : 'bg-white/80 border-slate-200/90 text-slate-800 hover:bg-white shadow-sm'
             }`}
           >
             Load More Transactions ({filteredEvents.length - page * pageSize} remaining)
@@ -237,4 +239,5 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
     </div>
   );
 };
+
 

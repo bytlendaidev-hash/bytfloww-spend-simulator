@@ -4,8 +4,8 @@ import {
   ForensicLenderItem,
   ForensicRecipientItem,
   ComprehensiveForensicDataset,
-  MASTER_FORENSIC_DATA,
-  getForensicDataForPeriod,
+  EMPTY_FORENSIC_DATA,
+  generateForensicDataFromTransactions,
 } from '../engine/statementForensicsData';
 import { 
   FinancialEvent,
@@ -16,7 +16,34 @@ import {
   BACKEND_ENVIRONMENTS,
   BackendEnvironment,
 } from '../services/backendApi';
+import { 
+  processMultipleStatementFiles, 
+  MultiStatementSession, 
+  StatementFileSource,
+  LiveAnalyticsResult,
+  LiveLenderItem,
+  LiveRecipientItem
+} from '../engine/analyticsEngine';
 import { MerchantLogoView } from './MerchantLogoView';
+import { Where100WentChart } from './forensics/Where100WentChart';
+import { TransactionExplorer } from './forensics/TransactionExplorer';
+import { DebtFreedomSimulator } from './forensics/DebtFreedomSimulator';
+import { MoneyFlowGraph } from './forensics/MoneyFlowGraph';
+import { AnomalyRadarView } from './forensics/AnomalyRadarView';
+import { PredictiveRunwayChart } from './forensics/PredictiveRunwayChart';
+import { ForensicReportModal } from './forensics/ForensicReportModal';
+import { RecurringAutopsyView } from './forensics/RecurringAutopsyView';
+import { MerchantDnaView } from './forensics/MerchantDnaView';
+import { FireRunwayTracker } from './forensics/FireRunwayTracker';
+import { BrandLogoBadge } from './forensics/BrandLogoBadge';
+import { VarianceHeatmapView } from './forensics/VarianceHeatmapView';
+import { MasterLedgerCalendar } from './forensics/MasterLedgerCalendar';
+import { P2PSocialGraphView } from './forensics/P2PSocialGraphView';
+import { 
+  sendForensicQueryToGemini, 
+  DEFAULT_GEMINI_API_KEY, 
+  ChatMessage 
+} from '../services/aiCopilotService';
 
 interface BankStatementModuleProps {
   isDark: boolean;
@@ -24,6 +51,72 @@ interface BankStatementModuleProps {
   onSelectEvent?: (event: FinancialEvent) => void;
   onSwitchToSmsModule?: () => void;
 }
+
+
+// Micro-sparkline SVG paths for hero cards
+const EmeraldSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+  <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
+    <path
+      d="M0 20 Q 20 5, 40 18 T 80 8 T 100 3"
+      fill="none"
+      stroke={isDark ? '#10B981' : '#059669'}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0 20 Q 20 5, 40 18 T 80 8 T 100 3 L 100 25 L 0 25 Z"
+      fill={isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(5, 150, 105, 0.10)'}
+    />
+  </svg>
+);
+
+const RoseSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+  <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
+    <path
+      d="M0 8 Q 25 22, 50 10 T 80 20 T 100 15"
+      fill="none"
+      stroke={isDark ? '#F43F5E' : '#E11D48'}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0 8 Q 25 22, 50 10 T 80 20 T 100 15 L 100 25 L 0 25 Z"
+      fill={isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(225, 29, 72, 0.10)'}
+    />
+  </svg>
+);
+
+const PurpleSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+  <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
+    <path
+      d="M0 18 Q 30 22, 60 8 T 100 4"
+      fill="none"
+      stroke={isDark ? '#A855F7' : '#7E22CE'}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0 18 Q 30 22, 60 8 T 100 4 L 100 25 L 0 25 Z"
+      fill={isDark ? 'rgba(168, 85, 247, 0.15)' : 'rgba(126, 34, 206, 0.10)'}
+    />
+  </svg>
+);
+
+const CyanSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+  <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
+    <path
+      d="M0 16 Q 30 18, 60 7 T 100 2"
+      fill="none"
+      stroke={isDark ? '#00F2FE' : '#0284C7'}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0 16 Q 30 18, 60 7 T 100 2 L 100 25 L 0 25 Z"
+      fill={isDark ? 'rgba(0, 242, 254, 0.15)' : 'rgba(2, 132, 199, 0.10)'}
+    />
+  </svg>
+);
 
 export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   isDark,
@@ -33,13 +126,13 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   // Navigation Section
   const [activeSection, setActiveSection] = useState<StatementSection>('OVERVIEW');
 
-  // Financial Year Filter ('ALL_TIME' | 'FY_2025_26' | 'FY_2026_27')
-  const [periodFilter, setPeriodFilter] = useState<StatementPeriodFilter>('ALL_TIME');
+  // Multi-Statement Session & File State
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [session, setSession] = useState<MultiStatementSession | null>(null);
 
-  // Master Forensic Data corresponding to selected period filter
-  const forensicData = useMemo<ComprehensiveForensicDataset>(() => {
-    return getForensicDataForPeriod(periodFilter);
-  }, [periodFilter]);
+  // Period Filter ('ALL_TIME' | 'CURRENT_FY' | 'FY_2025_26' | etc.)
+  const [periodFilter, setPeriodFilter] = useState<StatementPeriodFilter>('ALL_TIME');
+  const [accountFilter, setAccountFilter] = useState<string>('ALL');
 
   // Environment & Health
   const [currentEnv, setCurrentEnv] = useState<BackendEnvironment>(backendApiService.getEnvironment());
@@ -53,32 +146,36 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   const [processingProgress, setProcessingProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Search & Filter State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [directionFilter, setDirectionFilter] = useState<'ALL' | 'DEBIT' | 'CREDIT'>('ALL');
-  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
-  const [ledgerVisibleCount, setLedgerVisibleCount] = useState(50);
-  const [isMerged, setIsMerged] = useState(false);
-
-  // Drilldown Modals
+  // Drilldown Modals & Export Dossier
   const [selectedLender, setSelectedLender] = useState<ForensicLenderItem | null>(null);
   const [selectedRecipient, setSelectedRecipient] = useState<ForensicRecipientItem | null>(null);
-  const [showSingleYearComparisonModal, setShowSingleYearComparisonModal] = useState(false);
+  const [showCoverageModal, setShowCoverageModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [calendarSelectedDate, setCalendarSelectedDate] = useState<string | null>(null);
 
-  // AI Copilot Chat State
-  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; text: string; time: string }>>([
+  // AI Copilot Chat State (Powered by Gemini 2.5 Flash)
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
+    return localStorage.getItem('bytfloww_gemini_api_key') || DEFAULT_GEMINI_API_KEY || '';
+  });
+  const [showApiKeyModal, setShowApiKeyModal] = useState<boolean>(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
+      id: 'init_1',
       role: 'assistant',
-      text: `Hello Deepankar! I am your 17-Part Bank Statement Forensic AI Copilot.
+      text: `👋 **Welcome to your BytFloww AI Forensic Copilot!**
 
-I have analyzed all 2,587 transactions across your statements (01-Apr-2025 → 12-Aug-2026):
-• **Total Credits**: ₹20.02 Lakh (Salary: ₹10.85L, Loans: ₹3.83L, EPFO: ₹1.10L)
-• **Total Debits**: ₹20.33 Lakh (Loans Repaid: ₹4.45L, UPI Transfers: ₹8.22L, Wallets: ₹2.46L)
-• **True Lifestyle Spending**: Only ₹1.85 Lakh (9.1% of debits)
-• **Debt-to-Salary Burden**: 41.0% (Repaid ₹4.45L against ₹10.85L salary)
+I have direct, mathematical access to your multi-statement master ledger (reconciled across all imported accounts).
 
-Ask me anything about your salary timeline, 15 lenders, Boby Tandan transfers, Swiggy vs Instamart split, or single financial year breakdown!`,
-      time: 'Just now',
+**Here are some analytical questions you can ask me right now:**
+• *"Where is my money going most in a single month?"*
+• *"How much interest/extra have I paid till now for loans?"*
+• *"How much do I spend in daily spend across each month?"*
+• *"What is my overall loan credits received till now?"*
+• *"Explain the ₹80,000 EPFO withdrawal details"*
+• *"Show corporate salary vs loan borrowings breakdown"*
+
+You can also ask about specific dates, merchants, UTRs, or counterparties.`,
+      timestamp: 'Just now',
     },
   ]);
   const [chatInput, setChatInput] = useState('');
@@ -86,6 +183,7 @@ Ask me anything about your salary timeline, 15 lenders, Boby Tandan transfers, S
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Health check on env change
   useEffect(() => {
     checkHealth();
   }, [currentEnv]);
@@ -103,1866 +201,1558 @@ Ask me anything about your salary timeline, 15 lenders, Boby Tandan transfers, S
     setTimeout(() => checkHealth(), 100);
   };
 
-  const handleProcessFile = async (file: File) => {
+  // Master multi-file processor
+  const handleProcessFiles = async (filesToAdd: File[]) => {
+    if (!filesToAdd || filesToAdd.length === 0) return;
+
+    // Combine with already uploaded files (filtering by name+size for initial uniqueness)
+    const existingKeys = new Set(uploadedFiles.map(f => `${f.name}_${f.size}`));
+    const newDistinct = filesToAdd.filter(f => !existingKeys.has(`${f.name}_${f.size}`));
+    const allFiles = [...uploadedFiles, ...newDistinct];
+
+    if (allFiles.length === 0) return;
+
+    setUploadedFiles(allFiles);
     setIsProcessing(true);
     setErrorMessage(null);
-    setProcessingProgress(15);
-    setProcessingStage('1/5 Parsing 2,587 statement rows, dates, and amounts...');
+    setProcessingProgress(10);
+    setProcessingStage(`Ingesting ${allFiles.length} bank statement files...`);
 
     try {
-      setTimeout(() => {
-        setProcessingProgress(45);
-        setProcessingStage('2/5 Running multi-lender debt matrix & entity resolution heuristics...');
-      }, 300);
+      const resultSession = await processMultipleStatementFiles(allFiles, (stage, pct) => {
+        setProcessingStage(stage);
+        setProcessingProgress(pct);
+      });
 
-      setTimeout(() => {
-        setProcessingProgress(75);
-        setProcessingStage('3/5 Computing mathematical ledger reconciliation equation...');
-      }, 600);
-
-      setTimeout(() => {
-        setProcessingProgress(90);
-        setProcessingStage('4/5 Executing 17-dimensional forensic analysis & lifestyle separation...');
-      }, 900);
-
-      setTimeout(() => {
-        setProcessingProgress(100);
-        setProcessingStage('5/5 Forensic Statement Intelligence Complete!');
-        setIsProcessing(false);
-        setActiveSection('OVERVIEW');
-      }, 1200);
-    } catch (err: any) {
+      setSession(resultSession);
       setIsProcessing(false);
-      setErrorMessage('Statement upload error. Switched to high-precision local forensic engine.');
+
+      // Add AI welcome message with actual metrics
+      if (resultSession.uniqueTransactions.length > 0) {
+        const earliest = resultSession.coverage.earliestDate;
+        const latest = resultSession.coverage.latestDate;
+        const totalTxns = resultSession.uniqueTransactions.length;
+        const credits = (resultSession.reconciliation.totalCredits / 100000).toFixed(2);
+        const debits = (resultSession.reconciliation.totalDebits / 100000).toFixed(2);
+        const salary = (resultSession.forensicDataset.salaryTotal / 100000).toFixed(2);
+
+        setChatMessages(prev => [
+          ...prev,
+          {
+            id: `msg_welcome_${Date.now()}`,
+            role: 'assistant',
+            text: `Processed ${allFiles.length} statement files: **${totalTxns} unique transactions** (${earliest} → ${latest}).\n• **Total Credits**: ₹${credits} Lakh (Salary: ₹${salary}L)\n• **Total Debits**: ₹${debits} Lakh\n• **Duplicates Filtered**: ${resultSession.duplicateTransactionsRemoved}\n\nAsk me anything about your salary, lenders, peer transfers, interest costs, or daily spend velocity!`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }
+        ]);
+      }
+    } catch (err: any) {
+      console.error('Multi-statement processing failed:', err);
+      setIsProcessing(false);
+      setErrorMessage(err?.message || 'Error processing bank statement files.');
     }
+  };
+
+  const handleRemoveFile = async (fileIndex: number) => {
+    const remainingFiles = uploadedFiles.filter((_, idx) => idx !== fileIndex);
+    setUploadedFiles(remainingFiles);
+
+    if (remainingFiles.length === 0) {
+      setSession(null);
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const resultSession = await processMultipleStatementFiles(remainingFiles);
+      setSession(resultSession);
+    } catch (err: any) {
+      setErrorMessage('Error reprocessing remaining statements.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleClearAll = () => {
+    setUploadedFiles([]);
+    setSession(null);
+    setPeriodFilter('ALL_TIME');
+    setAccountFilter('ALL');
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleProcessFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleProcessFiles(Array.from(e.dataTransfer.files));
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleProcessFile(e.target.files[0]);
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleProcessFiles(Array.from(e.target.files));
     }
   };
 
-  const handleMergeToSmsSimulator = () => {
-    if (!onMergeTransactions) return;
-    const events: FinancialEvent[] = forensicData.debitBreakdown.map((d, idx) => ({
-      id: `stmt_forensic_ev_${idx}_${Date.now()}`,
-      amount: d.amount,
-      direction: 'OUTFLOW',
-      eventType: d.category.includes('Loan') ? 'EMI_PAYMENT' : 'UPI_DEBIT',
-      merchant: d.category,
-      rawMerchant: d.category,
-      category: d.category,
-      economicType: d.isLifestyle ? 'OUTFLOW' : 'TRANSFER_OUT',
-      financialSubtype: d.category,
-      timestamp: Date.now() - idx * 86400000,
-      dateFormatted: '12 Aug 2026',
-      timeFormatted: '12:00 PM',
-      accountHint: '9082',
-      resolvedInstitution: 'HDFC Bank',
-      referenceNumber: `STMT-FORENSIC-${idx}`,
-      paymentMode: 'UPI',
-      transactionFingerprint: `stmt_forensic_${idx}_${d.amount}`,
-      confidence: 0.99,
-      notes: 'Imported from verified 2-statement master ledger',
-      rawSmsBody: `[BANK STATEMENT AUDIT] HDFC Bank A/c 9082: ${d.category} Outflow ₹${d.amount.toLocaleString('en-IN')}`,
-      sender: 'HDFC Bank',
-      balanceAfter: 1003.55,
-      isRecurring: d.category.includes('Loan') || d.category.includes('Insurance'),
-    }));
+  const hasData = session && session.uniqueTransactions.length > 0;
 
-    onMergeTransactions(events);
-    setIsMerged(true);
-  };
+  // Filtered forensic dataset
+  const forensicData = useMemo(() => {
+    if (!session || session.uniqueTransactions.length === 0) {
+      return EMPTY_FORENSIC_DATA;
+    }
+    let txns = session.uniqueTransactions;
+    if (accountFilter !== 'ALL') {
+      txns = txns.filter(t => (t.entityNormalized || '').includes(accountFilter) || (t.referenceNumber || '').includes(accountFilter));
+    }
+    return generateForensicDataFromTransactions(txns, periodFilter);
+  }, [session, periodFilter, accountFilter]);
 
-  const handleSendMessage = async () => {
-    if (!chatInput.trim()) return;
-    const userMsg = chatInput.trim();
+  // AI Copilot query handler powered by Google Gemini 2.5 Flash
+  const handleSendChatMessage = async (presetText?: string) => {
+    const textToSend = (presetText || chatInput).trim();
+    if (!textToSend) return;
     setChatInput('');
 
-    const newMessages = [
-      ...chatMessages,
-      { role: 'user' as const, text: userMsg, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
-    ];
-    setChatMessages(newMessages);
+    const userMsg: ChatMessage = {
+      id: `msg_u_${Date.now()}`,
+      role: 'user',
+      text: textToSend,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setChatMessages(prev => [...prev, userMsg]);
     setIsAiTyping(true);
 
-    setTimeout(() => {
-      const q = userMsg.toLowerCase();
-      let reply = '';
-
-      if (q.includes('single year') || q.includes('fy 2025') || q.includes('current year') || q.includes('credited and debited')) {
-        reply = `📊 **Single Financial Year vs Current FY Breakdown**:
-
-1. **FY 2025-26 (Single Full Year: 01-Apr-2025 → 31-Mar-2026)**:
-• **Total Credited**: **₹11,89,297.96** (Salary: ₹7.54L, Loans: ₹2.65L)
-• **Total Debited**: **₹12,05,995.80** (Loans Repaid: ₹2.71L, UPI Transfers: ₹4.87L)
-• **Net Cash Flow**: **-₹16,697.84** (Deficit)
-• **Opening Balance**: ₹31,424.61 | **Closing Balance**: ₹14,771.77
-
-2. **Current FY 2026-27 (01-Apr-2026 → 12-Aug-2026 / YTD)**:
-• **Total Credited**: **₹8,12,825.42** (Salary: ₹3.31L, Loans: ₹1.18L)
-• **Total Debited**: **₹8,26,593.64** (Loans Repaid: ₹1.73L, UPI Transfers: ₹3.35L)
-• **Net Cash Flow**: **-₹13,768.22**
-• **Opening Balance**: ₹14,771.77 | **Closing Balance**: ₹1,003.55
-
-3. **Combined 16-Month Total**:
-• **Total Credited**: **₹20,02,123.38**
-• **Total Debited**: **₹20,32,589.44**
-• **Net Deficit**: **-₹30,466.06**`;
-      } else if (q.includes('loan') || q.includes('lender') || q.includes('debt') || q.includes('mpokket') || q.includes('borrow')) {
-        reply = `🔴 **Debt & Loan Intelligence Matrix (15 Lenders)**:
-• **Total Borrowed**: **₹3,83,100.09** across 11 digital lenders
-• **Total Repaid**: **₹4,44,503.80** across 15 lenders
-• **Net Debt Reduction**: **+₹61,403.71 more repaid than borrowed**!
-• **Debt-to-Salary Ratio**: **41.0%** of your Newgen salary (₹10.85L) went straight to loan servicing.
-
-**Top 5 Lenders**:
-1. **MPOKKET**: Borrowed ₹1,22,913.20 | Repaid ₹1,08,004.96 (Active Line)
-2. **Meghdoot Mercantile**: Borrowed ₹50,640.00 | Repaid ₹69,774.09 (+₹19.1K repaid)
-3. **Grow Money Capital**: Borrowed ₹43,973.00 | Repaid ₹53,530.00 (+₹9.6K repaid)
-4. **VIVIFI (FlexPay)**: Borrowed ₹44,885.94 | Repaid ₹40,170.95 (Active Line)
-5. **SalaryOnTime**: Borrowed ₹22,000.00 | Repaid ₹26,929.05 (Settled)`;
-      } else if (q.includes('boby') || q.includes('piyush') || q.includes('transfer') || q.includes('people') || q.includes('8.22')) {
-        reply = `👤 **Personal / UPI Transfer Intelligence (The ₹8.22L Mystery)**:
-• **Total Personal Transfers**: **₹8,22,478.36** (40.46% of all bank outflows!)
-
-**Top 5 Identified Recipients**:
-1. **Boby Tandan (BBOBY3580OKAXIS)**: **₹2,42,501.00** sent (Received back: ₹1,30,132.00 | Net Deficit: **-₹1,12,369.00**) 🚨 *Flagged for manual review!*
-2. **Piyush Srivastava**: ₹72,218.00 sent across 19 transactions
-3. **Barsati Ram**: ₹45,000.00 (Family support)
-4. **Veenu Tandan**: ₹42,000.00 (Related to Boby Tandan channel)
-5. **Abhishek Bahadur**: ₹34,500.00`;
-      } else if (q.includes('lifestyle') || q.includes('food') || q.includes('swiggy') || q.includes('grocery') || q.includes('instamart')) {
-        reply = `🍔 **True Lifestyle Spending vs Money Movement**:
-• **True Lifestyle Spend**: **₹1,84,994.40** (**only 9.10%** of all debits!)
-• **Money Movement / Debt / Transfers**: **₹18,47,595.04** (90.90%)
-
-**Exact Lifestyle Category Breakdown**:
-• **Food & Dining**: **₹36,093.49** (Swiggy Food: ₹29,686.49, Zomato: ₹1,313.19, Other: ₹5,093.81). *Swiggy Instamart is cleanly placed into Groceries.*
-• **Groceries**: **₹26,510.66** (Instamart: ₹6,407, Blinkit: ₹6,074, Zepto: ₹5,368, Smart Bazaar: ₹3,186).
-  *(Combined Food + Groceries = ₹62,604 across 16 months = ~₹3,913/month avg!)*
-• **Transport**: **₹36,146.73** (IRCTC: ₹29,751.64, Rapido: ₹3,042, Uber: ₹2,458.84). *Cabs only ₹5.5K total.*
-• **Shopping**: **₹46,185.76** (Sakeena Suit: ₹11,000, Amazon: ₹14,437, Pankaj Textiles: ₹7,690, Zudio: ₹5,591).
-• **Utilities / Telecom**: **₹37,254.14** | **Subscriptions**: **₹2,803.62**.`;
-      } else if (q.includes('where every') || q.includes('100') || q.includes('rupee')) {
-        reply = `🎯 **"Where Every ₹100 Went" (Out of ₹20.33 Lakh Debits)**:
-• **₹40.46** → UPI / Personal Transfers
-• **₹21.87** → Loan / Finance Repayments
-• **₹12.09** → Wallet / Payment-Bank Movement
-• **₹6.42** → Cash Withdrawals (ATM)
-• **₹5.59** → Credit Card / CRED Payments
-• **₹3.24** → Insurance Policies (LIC)
-• **₹2.27** → Shopping & E-Commerce
-• **₹1.83** → Utilities, Telecom & Cloud
-• **₹1.78** → Transport & Travel
-• **₹1.78** → Food & Dining
-• **₹1.30** → Groceries & Quick Commerce
-• **₹1.19** → Other / Unclassified
-• **₹0.14** → Digital Subscriptions
-• **₹0.05** → Bank Charges`;
-      } else {
-        reply = `💡 **Forensic Overview for Deepankar Gautam**:
-• **Account**: HDFC Bank Ltd. • 50100428839082 (Pratapgarh)
-• **Period**: 01-Apr-2025 to 12-Aug-2026 (2,587 transactions)
-• **Credits**: ₹20,02,123.38 | **Debits**: ₹20,32,589.44 | **Net**: -₹30,466.06
-• **Primary Finding**: Food, groceries, and cabs are NOT your problem (~9.1% of spend). Debt servicing (41% of salary) and peer transfers (40.5% of debits) are where 82% of your money goes.
-
-*Try asking about: "Single year credits and debits", "Lender recycling ratio", "Boby Tandan transfers", "Where every 100 went", or "Top 5 action steps".*`;
+    try {
+      if (!session || session.uniqueTransactions.length === 0) {
+        setChatMessages(prev => [
+          ...prev,
+          {
+            id: `msg_a_${Date.now()}`,
+            role: 'assistant',
+            text: 'Please upload your bank statement files first so I can compute real analytical answers from your financial ledger.',
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ]);
+        setIsAiTyping(false);
+        return;
       }
 
-      setChatMessages([
-        ...newMessages,
-        { role: 'assistant', text: reply, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+      const replyText = await sendForensicQueryToGemini(
+        textToSend,
+        forensicData,
+        session.uniqueTransactions,
+        chatMessages,
+        geminiApiKey
+      );
+
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: `msg_a_${Date.now()}`,
+          role: 'assistant',
+          text: replyText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
       ]);
+    } catch (err) {
+      console.error('Error generating copilot reply:', err);
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: `msg_a_${Date.now()}`,
+          role: 'assistant',
+          text: 'An error occurred while analyzing your ledger. Please verify your connection or Gemini API key.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
+    } finally {
       setIsAiTyping(false);
-    }, 600);
+    }
   };
 
-  // Filtered Canonical Ledger Table Rows
-  const filteredLedgerRows = useMemo(() => {
-    return forensicData.debitBreakdown.filter(d => {
-      const matchesSearch = d.category.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesDirection = directionFilter === 'ALL' || (directionFilter === 'DEBIT');
-      const matchesCat = categoryFilter === 'ALL' || (categoryFilter === 'LIFESTYLE' ? d.isLifestyle : !d.isLifestyle);
-      return matchesSearch && matchesDirection && matchesCat;
-    });
-  }, [forensicData, searchQuery, directionFilter, categoryFilter]);
+  const cardCls = `rounded-[28px] border transition-all duration-300 ${
+    isDark 
+      ? 'bg-[#0E1720]/80 border-white/[0.08] text-white shadow-2xl shadow-black/40 backdrop-blur-2xl' 
+      : 'bg-white/85 border-slate-200/90 text-slate-900 shadow-sm backdrop-blur-2xl'
+  }`;
+
+  const availableFYs = useMemo(() => {
+    return session?.coverage?.financialYearsCovered || [];
+  }, [session]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      
-      {/* ── 1. TOP FORENSIC HEADER & PERIOD SWITCHER ──────────────────── */}
-      <div className={`p-5 sm:p-6 rounded-[28px] border transition-all duration-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] text-white shadow-xl shadow-black/40' : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
-      }`}>
-        <div className="flex items-center gap-3.5">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm ${
-            isDark ? 'bg-brand-viridian/15 text-brand-viridian border border-brand-viridian/30' : 'bg-brand-50 text-brand-700 border border-brand-200'
-          }`}>
-            🏦
-          </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-base sm:text-lg font-black tracking-tight">
-                Bank Statement Forensics Engine
-              </h1>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30' : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-              }`}>
-                2-STATEMENT RECONCILED (2,587 TXNS)
-              </span>
+    <div className="space-y-6 animate-emergence">
+      {/* ── TOP MULTI-FILE UPLOAD WORKSPACE & DROPZONE ─────────────────────── */}
+      <div 
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        className={`p-6 sm:p-8 rounded-[32px] border-2 border-dashed transition-all relative overflow-hidden text-center ${
+          isDragging 
+            ? (isDark ? 'border-emerald-400 bg-emerald-950/30' : 'border-emerald-500 bg-emerald-50')
+            : hasData 
+            ? (isDark ? 'border-white/[0.12] bg-[#0E171E]/70' : 'border-slate-300 bg-slate-50/80')
+            : (isDark ? 'border-emerald-500/40 bg-gradient-to-b from-[#0E171E] to-[#080D11]' : 'border-slate-300 bg-gradient-to-b from-white to-slate-50')
+        }`}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".xls,.xlsx,.csv"
+          onChange={handleFileInputChange}
+          className="hidden"
+        />
+
+        <div className="max-w-2xl mx-auto space-y-4">
+          <div className="flex items-center justify-center">
+            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center text-3xl shadow-xl transition-transform duration-200 ${
+              isDragging ? 'scale-110' : ''
+            } ${
+              isDark 
+                ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10 text-emerald-400 border border-emerald-500/30 shadow-emerald-500/10' 
+                : 'bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-emerald-600/10'
+            }`}>
+              📑
             </div>
-            <p className={`text-[11px] font-medium font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              HDFC Bank • A/c 50100428839082 • {forensicData.periodSpan}
+          </div>
+
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black font-heading tracking-tight">
+              Multi-Statement Financial Forensics Workspace
+            </h1>
+            <p className={`text-xs sm:text-sm mt-1 max-w-lg mx-auto ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Drag & drop bank statement files (XLS, XLSX, CSV) to analyze multi-month timelines, loan recycling, salary cycles, and P2P transfers.
             </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-center gap-3 pt-1 flex-wrap">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isProcessing}
+              className={`px-6 py-3 rounded-2xl text-xs font-black transition flex items-center gap-2 shadow-lg active:scale-95 ${
+                isDark 
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:brightness-110 shadow-emerald-500/20' 
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105 shadow-emerald-600/20'
+              }`}
+            >
+              <span>📥</span>
+              <span>{hasData ? 'Add More Statement Files' : 'Select Bank Statements'}</span>
+            </button>
+
+            {hasData && (
+              <button
+                onClick={handleClearAll}
+                className={`px-4 py-3 rounded-2xl text-xs font-bold border transition ${
+                  isDark ? 'border-white/10 text-rose-400 hover:bg-rose-950/20' : 'border-slate-200 text-rose-600 hover:bg-rose-50'
+                }`}
+              >
+                Clear All Files
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Financial Year Filter Switcher (Single Year vs Full Coverage) */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className={`p-1 rounded-2xl border flex items-center gap-1 ${
-            isDark ? 'bg-[#142027] border-white/[0.08]' : 'bg-slate-100 border-slate-200'
-          }`}>
-            {[
-              { id: 'ALL_TIME', label: '16-Mo All Time' },
-              { id: 'FY_2025_26', label: 'FY 2025-26 (Single Year)' },
-              { id: 'FY_2026_27', label: 'FY 2026-27 (Current YTD)' },
-            ].map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setPeriodFilter(f.id as StatementPeriodFilter)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all duration-150 active:scale-95 ${
-                  periodFilter === f.id
-                    ? (isDark ? 'bg-brand-viridian text-slate-950 shadow-sm' : 'bg-brand-600 text-white shadow-sm')
-                    : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
+        {/* Processing Progress Bar */}
+        {isProcessing && (
+          <div className="max-w-md mx-auto mt-6 space-y-2 animate-fade-in">
+            <div className="flex items-center justify-between text-xs font-bold">
+              <span className="text-emerald-400">{processingStage}</span>
+              <span className="font-mono text-slate-400">{processingProgress}%</span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-black/40 overflow-hidden border border-white/10">
+              <div 
+                className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-300 rounded-full"
+                style={{ width: `${processingProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Error Message Alert */}
+        {errorMessage && (
+          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-bold text-center">
+            ⚠️ {errorMessage}
+          </div>
+        )}
+      </div>
+
+      {/* ── UPLOADED FILES WORKSPACE & COVERAGE STATUS (WHEN DATA LOADED) ── */}
+      {hasData && (
+        <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📑</span>
+              <h2 className="text-sm font-black uppercase tracking-wider font-heading">Statement Source Files ({session.files.length})</h2>
+            </div>
+            <div className="flex items-center gap-2 text-xs flex-wrap">
+              <span className={`px-2.5 py-1 rounded-xl font-bold border ${
+                session.coverage.status === 'COMPLETE_CONTINUOUS' 
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : session.coverage.status === 'GAPS_DETECTED'
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+              }`}>
+                Coverage: {session.coverage.status.replace(/_/g, ' ')} ({session.coverage.continuityScore}% Quality)
+              </span>
+              <span className={`px-2.5 py-1 rounded-xl font-bold border ${
+                session.coverage.balanceContinuityStatus === 'BALANCE_CONTINUITY_VERIFIED'
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+              }`}>
+                {session.coverage.balanceContinuityStatus.replace(/_/g, ' ')}
+              </span>
+            </div>
+          </div>
+
+          {/* Files Badges Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {session.files.map((file, idx) => (
+              <div 
+                key={file.fileId || idx}
+                className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
+                  file.duplicateStatus === 'EXACT_FILE_DUPLICATE'
+                    ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
+                    : file.parseStatus === 'FAILED'
+                    ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
+                    : (isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200')
                 }`}
               >
-                {f.label}
+                <div className="min-w-0 space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs">📄</span>
+                    <span className="text-xs font-bold truncate max-w-[180px]">{file.fileName}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                    <span className="font-semibold text-slate-300">{file.detectedBank}</span>
+                    <span>•</span>
+                    <span>{file.transactionCount} rows</span>
+                    {file.duplicateTransactionCount > 0 && (
+                      <span className="text-amber-400 font-semibold">({file.duplicateTransactionCount} dupes)</span>
+                    )}
+                  </div>
+                  {file.statementStartDate && file.statementEndDate && (
+                    <div className="text-[9px] font-mono opacity-70">
+                      {file.statementStartDate} → {file.statementEndDate}
+                    </div>
+                  )}
+                  {file.duplicateStatus === 'EXACT_FILE_DUPLICATE' && (
+                    <div className="text-[10px] font-bold text-amber-400">⚠️ Exact Duplicate (Skipped)</div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => handleRemoveFile(idx)}
+                  className={`p-1.5 rounded-lg border text-xs opacity-70 hover:opacity-100 transition ${
+                    isDark ? 'border-white/10 hover:bg-white/10 text-slate-300' : 'border-slate-300 hover:bg-slate-200 text-slate-700'
+                  }`}
+                  title="Remove this statement"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Session Overview Stats Banner */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Unique Valid Txns</div>
+              <div className="text-lg font-black font-mono mt-0.5 text-emerald-400">{session.uniqueTransactions.length.toLocaleString('en-IN')}</div>
+            </div>
+            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Dupes Excluded</div>
+              <div className="text-lg font-black font-mono mt-0.5 text-amber-400">{session.duplicateTransactionsRemoved}</div>
+            </div>
+            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Months Covered</div>
+              <div className="text-lg font-black font-mono mt-0.5 text-indigo-400">{session.coverage.totalMonths} mos</div>
+            </div>
+            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Date Span</div>
+              <div className="text-[11px] font-bold font-mono mt-1 text-slate-300 truncate">{session.coverage.earliestDate} → {session.coverage.latestDate}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── FILTER & NAVIGATION BAR ──────────────────────────────────────── */}
+      {hasData && (
+        <div className={`p-3 sm:p-4 ${cardCls} flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sticky top-16 z-30`}>
+          {/* Section Navigation Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+            {[
+              { id: 'OVERVIEW', label: '📊 Overview' },
+              { id: 'WHERE_100_WENT', label: '🎯 Where ₹100 Went' },
+              { id: 'MONEY_FLOW', label: '🕸️ Money Flow' },
+              { id: 'DEBT_SIMULATOR', label: '🧮 Debt Simulator' },
+              { id: 'ANOMALY_RADAR', label: '🚨 Anomaly Radar' },
+              { id: 'PREDICTIVE_RUNWAY', label: '📉 Cash Runway' },
+              { id: 'SUBSCRIPTIONS_AUTOPSY', label: '🔄 Subscriptions' },
+              { id: 'MERCHANT_DNA', label: '🛍️ Merchant DNA' },
+              { id: 'FIRE_RUNWAY', label: '🎯 Emergency & FIRE' },
+              { id: 'LOANS', label: '🏦 Loan Forensics' },
+              { id: 'INFLOW', label: '💰 Income & Salary' },
+              { id: 'DEBITS', label: '💳 14-Cat Debits' },
+              { id: 'PEOPLE', label: '👥 P2P Transfers' },
+              { id: 'VELOCITY', label: '📈 16-Mo Velocity' },
+              { id: 'VARIANCE_HEATMAP', label: '📊 MoM Variance' },
+              { id: 'RATIOS', label: '⚖️ 7 Health Ratios' },
+              { id: 'AUDIT', label: '🛡️ Audit Notes' },
+              { id: 'SPEND_CALENDAR', label: '📅 Spend Calendar' },
+              { id: 'LEDGER', label: '📋 Master Ledger' },
+              { id: 'AI_AGENT', label: '🤖 AI Copilot', badge: 'Gemini' },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSection(tab.id as StatementSection)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition flex items-center gap-1.5 ${
+                  activeSection === tab.id
+                    ? (isDark ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20')
+                    : (isDark ? 'text-slate-400 hover:text-white hover:bg-white/5' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase bg-emerald-400/20 text-emerald-400">
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             ))}
           </div>
 
-          <button
-            onClick={() => setShowSingleYearComparisonModal(true)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all border active:scale-95 ${
-              isDark 
-                ? 'bg-[#142027] hover:bg-[#1a2832] border-white/[0.08] text-brand-viridian' 
-                : 'bg-brand-50 hover:bg-brand-100 border-brand-200 text-brand-700 shadow-sm'
-            }`}
-          >
-            📊 Compare FY Years
-          </button>
-        </div>
-      </div>
-
-      {/* ── 2. 17 FORENSIC MODULE NAVIGATION TABS ─────────────────────── */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 no-scrollbar text-xs font-black">
-        {[
-          { id: 'OVERVIEW', label: '🏛️ Executive Dashboard' },
-          { id: 'INCOME', label: '💰 Income & Salary' },
-          { id: 'LOANS', label: '🔴 Loans & Debt Matrix' },
-          { id: 'PEOPLE', label: '👤 Personal Transfers (₹8.22L)' },
-          { id: 'LIFESTYLE', label: '🍔 Lifestyle Spending (9.1%)' },
-          { id: 'CASH_FLOW', label: '📅 16-Mo Cash Flow' },
-          { id: 'RECURRING', label: '🔁 Recurring & Burn Rate' },
-          { id: 'ANOMALIES', label: '🚨 Anomaly Detection' },
-          { id: 'FLOW_MAP', label: '🔄 Money Flow Map' },
-          { id: 'CREDIT_CARDS', label: '💳 Credit Cards & CRED' },
-          { id: 'CASH_ATM', label: '🏧 Cash Withdrawals' },
-          { id: 'WALLETS', label: '📱 Wallets & Intermediaries' },
-          { id: 'RATIOS', label: '📊 7 Health Ratios' },
-          { id: 'WHERE_100_WENT', label: '🎯 Where Every ₹100 Went' },
-          { id: 'RISK_SCORE', label: '🧠 Risk Score & Action Plan' },
-          { id: 'TRANSACTIONS', label: '📑 Master Ledger' },
-          { id: 'AI_ANALYST', label: '🤖 Statement AI Copilot' },
-          { id: 'UPLOAD', label: '📤 Upload Statement' },
-        ].map((tab) => {
-          const isActive = 
-            activeSection === tab.id ||
-            (tab.id === 'INCOME' && activeSection === 'INFLOW') ||
-            (tab.id === 'LIFESTYLE' && (activeSection === 'SPENDING' || activeSection === 'CATEGORIES')) ||
-            (tab.id === 'CASH_FLOW' && activeSection === 'VELOCITY') ||
-            (tab.id === 'PEOPLE' && activeSection === 'MERCHANTS') ||
-            (tab.id === 'TRANSACTIONS' && activeSection === 'LEDGER') ||
-            (tab.id === 'AI_ANALYST' && activeSection === 'COPILOT');
-
-          return (
+          {/* Dynamic Period Selector & Export Dossier Action Button */}
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
-              key={tab.id}
-              onClick={() => setActiveSection(tab.id as StatementSection)}
-              className={`px-3.5 py-2 rounded-2xl whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
-                isActive
-                  ? isDark
-                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian font-black shadow-md shadow-brand-viridian/25'
-                    : 'bg-brand-600 text-white border-brand-600 font-black shadow-md shadow-brand-600/20'
-                  : isDark
-                  ? 'bg-[#10181E] text-slate-300 border-white/[0.08] hover:bg-[#142027]'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 shadow-sm'
+              onClick={() => setShowReportModal(true)}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-indigo-500 to-violet-600 text-white hover:brightness-110 transition flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+              title="Open Boardroom PDF Dossier & Export CSV"
+            >
+              <span>📄</span>
+              <span>Export Dossier</span>
+            </button>
+            <span className="text-[11px] font-bold text-slate-400 hidden sm:inline">Period:</span>
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
+              className={`text-xs font-bold px-3 py-1.5 rounded-xl border outline-none cursor-pointer ${
+                isDark ? 'bg-[#142028] border-white/[0.1] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
               }`}
             >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+              <option value="ALL_TIME">All Imported Data ({session.coverage.totalMonths} Mos)</option>
+              <option value="CURRENT_FY">Current Financial Year (FY)</option>
+              {availableFYs.map(fy => (
+                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`}>{fy}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
 
-      {/* ── 3. LIVE PROCESSING VISUALIZER ─────────────────────────────── */}
-      {isProcessing && (
-        <div className={`p-6 sm:p-8 rounded-[28px] border space-y-4 transition ${
-          isDark ? 'bg-[#10181E] border-white/[0.08] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-        }`}>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-brand-500/20 text-brand-600 dark:text-brand-viridian flex items-center justify-center text-2xl animate-spin shrink-0">
-              ⚡
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between text-xs font-black text-brand-600 dark:text-brand-viridian mb-1.5">
-                <span>{processingStage}</span>
-                <span>{processingProgress}%</span>
+      {/* ── 1. SECTION: EXECUTIVE SUMMARY (OVERVIEW) ────────────────────── */}
+      {hasData && activeSection === 'OVERVIEW' && (
+        <div className="space-y-6">
+          {/* Reconciled Executive KPI Command Center Grid with Dynamic Sparklines */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {/* 1. Total Inflow */}
+            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
+              isDark 
+                ? 'bg-gradient-to-b from-emerald-950/30 to-[#0E171E] border-emerald-500/30 shadow-lg shadow-emerald-950/20' 
+                : 'bg-gradient-to-b from-emerald-50 to-white border-emerald-200 shadow-sm'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Total Inflow</span>
+                <span className="text-xs">↗️</span>
               </div>
-              <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-brand-600 to-brand-viridian transition-all duration-500 ease-out"
-                  style={{ width: `${processingProgress}%` }}
-                />
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400 tracking-tight">
+                ₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              {/* Sparkline Wave */}
+              <div className="my-1.5 h-6 w-full opacity-80">
+                <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <path d="M0 18 Q 20 8, 40 16 T 80 6 T 100 4" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="text-[10px] font-semibold text-slate-400 flex items-center justify-between">
+                <span>{forensicData.totalTransactions} total txns</span>
+                <span className="text-emerald-400 font-bold">+100%</span>
+              </div>
+            </div>
+
+            {/* 2. Total Outflow */}
+            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
+              isDark 
+                ? 'bg-gradient-to-b from-rose-950/30 to-[#0E171E] border-rose-500/30 shadow-lg shadow-rose-950/20' 
+                : 'bg-gradient-to-b from-rose-50 to-white border-rose-200 shadow-sm'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase text-rose-400 tracking-wider">Total Outflow</span>
+                <span className="text-xs">↘️</span>
+              </div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400 tracking-tight">
+                ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              {/* Sparkline Wave */}
+              <div className="my-1.5 h-6 w-full opacity-80">
+                <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <path d="M0 6 Q 20 18, 40 10 T 80 20 T 100 16" fill="none" stroke="#F43F5E" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="text-[10px] font-semibold text-slate-400 flex items-center justify-between">
+                <span>Outflow Reconciled</span>
+                <span className="text-rose-400 font-bold">-100%</span>
+              </div>
+            </div>
+
+            {/* 3. True Lifestyle Spend */}
+            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
+              isDark 
+                ? 'bg-gradient-to-b from-teal-950/30 to-[#0E171E] border-teal-500/30 shadow-lg shadow-teal-950/20' 
+                : 'bg-gradient-to-b from-teal-50 to-white border-teal-200 shadow-sm'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase text-teal-400 tracking-wider">Lifestyle Spend</span>
+                <span className="text-xs">🛍️</span>
+              </div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-teal-400 tracking-tight">
+                ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              {/* Sparkline Wave */}
+              <div className="my-1.5 h-6 w-full opacity-80">
+                <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <path d="M0 14 Q 25 20, 50 10 T 75 14 T 100 8" fill="none" stroke="#14B8A6" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="text-[10px] font-semibold text-teal-400/80 flex items-center justify-between">
+                <span>Food & Retail</span>
+                <span className="font-black text-teal-400">{forensicData.trueLifestyleShare.toFixed(1)}%</span>
+              </div>
+            </div>
+
+            {/* 4. Money Movement & Debt */}
+            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
+              isDark 
+                ? 'bg-gradient-to-b from-indigo-950/30 to-[#0E171E] border-indigo-500/30 shadow-lg shadow-indigo-950/20' 
+                : 'bg-gradient-to-b from-indigo-50 to-white border-indigo-200 shadow-sm'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Money Movement</span>
+                <span className="text-xs">🔄</span>
+              </div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-indigo-400 tracking-tight">
+                ₹{forensicData.moneyMovementTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              {/* Sparkline Wave */}
+              <div className="my-1.5 h-6 w-full opacity-80">
+                <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <path d="M0 10 Q 30 4, 60 16 T 90 8 T 100 12" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="text-[10px] font-semibold text-indigo-400/80 flex items-center justify-between">
+                <span>Transfers & Debt</span>
+                <span className="font-black text-indigo-400">{forensicData.moneyMovementShare.toFixed(1)}%</span>
+              </div>
+            </div>
+
+            {/* 5. Corporate Earned Salary */}
+            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
+              isDark 
+                ? 'bg-gradient-to-b from-cyan-950/30 to-[#0E171E] border-cyan-500/30 shadow-lg shadow-cyan-950/20' 
+                : 'bg-gradient-to-b from-cyan-50 to-white border-cyan-200 shadow-sm'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase text-cyan-400 tracking-wider">Corporate Salary</span>
+                <span className="text-xs">💼</span>
+              </div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-cyan-300 tracking-tight">
+                ₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              {/* Sparkline Wave */}
+              <div className="my-1.5 h-6 w-full opacity-80">
+                <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <path d="M0 16 Q 20 6, 40 14 T 80 4 T 100 2" fill="none" stroke="#00F2FE" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="text-[10px] font-semibold text-slate-400 flex items-center justify-between">
+                <span>Verified Payroll</span>
+                <span className="text-cyan-400 font-bold">17 Cycles</span>
+              </div>
+            </div>
+
+            {/* 6. Period Net Cash Flow */}
+            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
+              isDark 
+                ? (forensicData.netCashFlow >= 0 ? 'bg-gradient-to-b from-emerald-950/30 to-[#0E171E] border-emerald-500/30' : 'bg-gradient-to-b from-rose-950/30 to-[#0E171E] border-rose-500/30')
+                : (forensicData.netCashFlow >= 0 ? 'bg-gradient-to-b from-emerald-50 to-white border-emerald-200' : 'bg-gradient-to-b from-rose-50 to-white border-rose-200')
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Net Cash Flow</span>
+                <span className="text-xs">{forensicData.netCashFlow >= 0 ? '📈' : '📉'}</span>
+              </div>
+              <div className={`text-lg sm:text-xl font-black font-mono mt-1 tracking-tight ${forensicData.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {forensicData.netCashFlow >= 0 ? '+' : ''}₹{forensicData.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              {/* Sparkline Wave */}
+              <div className="my-1.5 h-6 w-full opacity-80">
+                <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <path d="M0 12 Q 30 18, 50 8 T 80 14 T 100 16" fill="none" stroke={forensicData.netCashFlow >= 0 ? '#10B981' : '#F43F5E'} strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="text-[10px] font-semibold flex items-center justify-between">
+                <span className="text-slate-400">Period Net Delta</span>
+                <span className={`font-black px-1.5 py-0.2 rounded ${forensicData.netCashFlow >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                  {forensicData.netCashFlow >= 0 ? 'SURPLUS' : 'DEFICIT'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Where ₹100 Went Preview */}
+          <Where100WentChart liveResult={session.analytics} isDark={isDark} />
+
+          {/* Top Problems and Immediate Action Plan */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+              <h3 className="text-sm font-black uppercase text-rose-400 flex items-center gap-2 font-heading">
+                <span>⚠️</span>
+                <span>Top Forensic Vulnerabilities</span>
+              </h3>
+              <div className="space-y-2">
+                {forensicData.topProblems.map((prob, idx) => (
+                  <div key={idx} className={`p-3.5 rounded-2xl border text-xs font-semibold flex items-start gap-2.5 ${
+                    isDark ? 'bg-rose-950/20 border-rose-500/20 text-rose-200' : 'bg-rose-50 border-rose-200 text-rose-900'
+                  }`}>
+                    <span className="font-mono text-rose-400 font-bold">{idx + 1}.</span>
+                    <span>{prob}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+              <h3 className="text-sm font-black uppercase text-emerald-400 flex items-center gap-2 font-heading">
+                <span>🎯</span>
+                <span>Prioritized Action Plan</span>
+              </h3>
+              <div className="space-y-2">
+                {forensicData.topActions.map((act, idx) => (
+                  <div key={idx} className={`p-3.5 rounded-2xl border text-xs font-semibold flex items-start gap-2.5 ${
+                    isDark ? 'bg-emerald-950/20 border-emerald-500/20 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                  }`}>
+                    <span className="font-mono text-emerald-400 font-bold">{idx + 1}.</span>
+                    <span>{act}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── 4. SECTION 01: EXECUTIVE FINANCIAL DASHBOARD ──────────────── */}
-      {activeSection === 'OVERVIEW' && (
+            {/* ── 2B. SECTION: INTERACTIVE MONEY FLOW NETWORK ────────────────── */}
+      {hasData && activeSection === 'MONEY_FLOW' && (
+        <MoneyFlowGraph dataset={forensicData} isDark={isDark} />
+      )}
+
+      {/* ── 2C. SECTION: DEBT FREEDOM & HIDDEN APR SIMULATOR ─────────────── */}
+      {hasData && activeSection === 'DEBT_SIMULATOR' && (
+        <DebtFreedomSimulator
+          dataset={forensicData}
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+      {/* ── 2D. SECTION: AUTOMATED ANOMALY & RED-FLAG RADAR ──────────────── */}
+      {hasData && activeSection === 'ANOMALY_RADAR' && (
+        <AnomalyRadarView
+          dataset={forensicData}
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+            {/* ── 2F. SECTION: RECURRING SUBSCRIPTIONS AUTOPSY ───────────────── */}
+      {hasData && activeSection === 'SUBSCRIPTIONS_AUTOPSY' && (
+        <RecurringAutopsyView
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+      {/* ── 2G. SECTION: MERCHANT DNA PROFILE & CONVENIENCE BURN ─────────── */}
+      {hasData && activeSection === 'MERCHANT_DNA' && (
+        <MerchantDnaView
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+            {/* ── 2I. SECTION: MULTI-MONTH COMPARATIVE VARIANCE HEATMAP ──────── */}
+      {hasData && activeSection === 'VARIANCE_HEATMAP' && (
+        <VarianceHeatmapView
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+      {/* ── 2H. SECTION: EMERGENCY FUND & FIRE RUNWAY TRACKER ───────────── */}
+      {hasData && activeSection === 'FIRE_RUNWAY' && (
+        <FireRunwayTracker
+          dataset={forensicData}
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+      {/* ── 2E. SECTION: DAILY BALANCE & 90-DAY PREDICTIVE RUNWAY ────────── */}
+      {hasData && activeSection === 'PREDICTIVE_RUNWAY' && (
+        <PredictiveRunwayChart
+          dataset={forensicData}
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+      {/* ── 2. SECTION: WHERE EVERY ₹100 WENT ──────────────────────────── */}
+      {hasData && activeSection === 'WHERE_100_WENT' && (
+        <Where100WentChart liveResult={session.analytics} isDark={isDark} />
+      )}
+
+      {/* ── 3. SECTION: LOAN & DEBT FORENSICS ──────────────────────────── */}
+      {hasData && activeSection === 'LOANS' && (
         <div className="space-y-6">
-          {/* Executive One-Page Banner */}
-          <div className={`p-6 sm:p-7 rounded-[28px] border relative overflow-hidden transition ${
-            isDark ? 'bg-gradient-to-br from-[#0D1F23] to-[#12272E] border-[#1D3E45] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <MerchantLogoView merchantName="HDFC Bank" size={54} isDark={isDark} shape="rounded" />
+          {/* Summary Cards for Loans */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total Borrowed (Credits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400">
+                ₹{forensicData.lenders.reduce((s, l) => s + l.totalBorrowed, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.borrowCount, 0)} disbursal txns</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total Repaid (Debits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+                ₹{forensicData.lenders.reduce((s, l) => s + l.totalRepaid, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.repayCount, 0)} repayment txns</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Net Debt Delta</div>
+              <div className={`text-lg sm:text-xl font-black font-mono mt-1 ${forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? '+' : ''}₹{forensicData.lenders.reduce((s, l) => s + l.netDelta, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Borrowed minus Repaid</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Serviced Lenders</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-amber-400">
+                {forensicData.lenders.length} Entities
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Active / Serviced</div>
+            </div>
+          </div>
+
+          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 className="text-base font-black flex items-center gap-2 font-heading">
+                  <span>🏦</span>
+                  <span>Lender & Debt Servicing Matrix ({forensicData.lenders.length} Lenders)</span>
+                </h2>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Tracking loan credits vs repayments and revolving loan recycling ratios.
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                    <th className="p-3">Lender / Facility</th>
+                    <th className="p-3 text-right">Total Borrowed</th>
+                    <th className="p-3 text-right">Total Repaid</th>
+                    <th className="p-3 text-right">Net Delta</th>
+                    <th className="p-3 text-center">Txns (B/R)</th>
+                    <th className="p-3 text-center">Recycling Risk</th>
+                    <th className="p-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.06]">
+                  {forensicData.lenders.map((l) => (
+                    <tr key={l.id} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
+                      <td className="p-3 font-semibold">
+                        <div className="flex items-center gap-2.5">
+                          <BrandLogoBadge entityName={l.name} size="sm" />
+                          <div>
+                            <div className="font-bold">{l.name}</div>
+                            <div className="text-[10px] text-slate-400">{l.productType}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3 text-right font-mono font-bold text-emerald-400">
+                        ₹{l.totalBorrowed.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="p-3 text-right font-mono font-bold text-rose-400">
+                        ₹{l.totalRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className={`p-3 text-right font-mono font-bold ${l.netDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {l.netDelta >= 0 ? '+' : ''}₹{l.netDelta.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="p-3 text-center font-mono text-[11px]">
+                        {l.borrowCount} / {l.repayCount}
+                      </td>
+                      <td className="p-3 text-center">
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+                          l.recyclingRisk === 'HIGH' ? 'bg-rose-500/20 text-rose-400' : l.recyclingRisk === 'MODERATE' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'
+                        }`}>
+                          {l.recyclingRisk}
+                        </span>
+                      </td>
+                      <td className="p-3 text-center font-mono text-[10px] text-slate-400">
+                        {l.status}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+            {/* ── 2J. SECTION: REAL-TIME SPEND & INFLOW FINANCIAL CALENDAR ───── */}
+      {hasData && activeSection === 'SPEND_CALENDAR' && (
+        <MasterLedgerCalendar
+          transactions={session.uniqueTransactions}
+          selectedDate={calendarSelectedDate}
+          onSelectDate={setCalendarSelectedDate}
+          isDark={isDark}
+          onFilterLedgerToDate={(date) => {
+            setCalendarSelectedDate(date);
+            setActiveSection('LEDGER');
+          }}
+        />
+      )}
+
+      {/* ── 4. SECTION: MASTER TRANSACTION LEDGER ──────────────────────── */}
+      {hasData && activeSection === 'LEDGER' && (
+        <TransactionExplorer 
+          liveResult={session.analytics} 
+          isDark={isDark} 
+          initialDate={calendarSelectedDate}
+          onDateChange={setCalendarSelectedDate}
+        />
+      )}
+
+      {/* ── 5. SECTION: P2P RECIPIENT INTELLIGENCE & RECIPROCAL MATRIX ─── */}
+      {hasData && activeSection === 'PEOPLE' && (
+        <P2PSocialGraphView
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+      {false && hasData && activeSection === 'PEOPLE' && (
+        <div className="space-y-6">
+          {/* Summary Cards for P2P */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total P2P Sent (Debits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+                ₹{forensicData.recipients.reduce((s, r) => s + r.totalSent, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Outward Peer Transfers</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total P2P Received (Credits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400">
+                ₹{forensicData.recipients.reduce((s, r) => s + r.totalReceived, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Inward Peer Transfers</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Net P2P Drain (Net Outflow)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-slate-300">
+                ₹{forensicData.recipients.reduce((s, r) => s + r.netOutflow, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Sent minus Received</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Counterparties</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-violet-400">
+                {forensicData.recipients.length} People
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">{forensicData.recipients.reduce((s, r) => s + r.txnCount, 0)} total transfers</div>
+            </div>
+          </div>
+
+          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+            <h2 className="text-base font-black flex items-center gap-2 font-heading">
+              <span>👥</span>
+              <span>Peer-to-Peer (P2P) Recipient Ledger ({forensicData.recipients.length} Counterparties)</span>
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                    <th className="p-3">Counterparty</th>
+                    <th className="p-3 text-right">Total Sent</th>
+                    <th className="p-3 text-right">Total Received</th>
+                    <th className="p-3 text-right">Net Outflow</th>
+                    <th className="p-3 text-center">Txns</th>
+                    <th className="p-3 text-center">Priority</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.06]">
+                  {forensicData.recipients.map((rec) => (
+                    <tr key={rec.id} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
+                      <td className="p-3">
+                        <div className="font-bold">{rec.name}</div>
+                        {rec.upiHandle && <div className="text-[10px] font-mono text-slate-400">{rec.upiHandle}</div>}
+                      </td>
+                      <td className="p-3 text-right font-mono font-bold text-rose-400">
+                        ₹{rec.totalSent.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="p-3 text-right font-mono font-bold text-emerald-400">
+                        ₹{rec.totalReceived.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="p-3 text-right font-mono font-bold text-slate-300">
+                        ₹{rec.netOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="p-3 text-center font-mono">{rec.txnCount}</td>
+                      <td className="p-3 text-center">
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+                          rec.flaggedPriority === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400' : rec.flaggedPriority === 'HIGH' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
+                        }`}>
+                          {rec.flaggedPriority}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 6. SECTION: 16-MONTH VELOCITY ───────────────────────────────── */}
+      {hasData && activeSection === 'VELOCITY' && (
+        <div className="space-y-6">
+          {/* Summary Cards for Velocity */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total Period Inflow (Credits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400">
+                ₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Avg: ₹{Math.round(forensicData.totalCredits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total Period Outflow (Debits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+                ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Avg: ₹{Math.round(forensicData.totalDebits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Net Period Cash Flow</div>
+              <div className={`text-lg sm:text-xl font-black font-mono mt-1 ${forensicData.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {forensicData.netCashFlow >= 0 ? '+' : ''}₹{forensicData.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Overall Surplus/Deficit</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Monthly Balance Health</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-indigo-400">
+                {forensicData.monthlyCashFlow.filter(m => !m.isDeficit).length} Surplus / {forensicData.monthlyCashFlow.filter(m => m.isDeficit).length} Deficit
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Across {forensicData.monthlyCashFlow.length} recorded months</div>
+            </div>
+          </div>
+
+          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+            <h2 className="text-base font-black flex items-center gap-2 font-heading">
+              <span>📈</span>
+              <span>Monthly Cash Flow Velocity Table</span>
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                    <th className="p-3">Month</th>
+                    <th className="p-3">FY</th>
+                    <th className="p-3 text-right">Credits</th>
+                    <th className="p-3 text-right">Debits</th>
+                    <th className="p-3 text-right">Net Flow</th>
+                    <th className="p-3 text-right">Salary</th>
+                    <th className="p-3 text-right">Debt Repaid</th>
+                    <th className="p-3 text-right">Lifestyle</th>
+                    <th className="p-3 text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.06]">
+                  {forensicData.monthlyCashFlow.map((m) => (
+                    <tr key={m.monthKey} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
+                      <td className="p-3 font-bold">{m.monthName}</td>
+                      <td className="p-3 font-mono text-[10px] text-slate-400">{m.financialYear}</td>
+                      <td className="p-3 text-right font-mono text-emerald-400">₹{m.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3 text-right font-mono text-rose-400">₹{m.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className={`p-3 text-right font-mono font-bold ${m.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        ₹{m.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="p-3 text-right font-mono text-slate-300">₹{m.salary.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3 text-right font-mono text-rose-300">₹{m.loanRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3 text-right font-mono text-teal-300">₹{m.lifestyleSpend.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3 text-center">
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
+                          m.isDeficit ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
+                        }`}>
+                          {m.isDeficit ? 'DEFICIT' : 'SURPLUS'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 7. SECTION: 7 FINANCIAL HEALTH RATIOS ────────────────────────── */}
+      {hasData && activeSection === 'RATIOS' && (
+        <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+          <h2 className="text-base font-black flex items-center gap-2 font-heading">
+            <span>⚖️</span>
+            <span>7 Financial Health & Risk Ratios</span>
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {forensicData.ratios.map((r, idx) => (
+              <div key={idx} className={`p-4 rounded-2xl border space-y-2 ${
+                r.status === 'CRITICAL' ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200') : (isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200')
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold">{r.ratioName}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${
+                    r.status === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400' : r.status === 'MODERATE' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'
+                  }`}>
+                    {r.status}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-black font-mono">{r.currentValue}%</span>
+                  <span className="text-[10px] text-slate-400">Benchmark: {r.benchmark}</span>
+                </div>
+                <div className="text-[10px] text-slate-400">{r.formula}</div>
+                <div className="text-xs leading-relaxed opacity-90">{r.assessment}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 8. SECTION: 14-CATEGORY DEBIT BREAKDOWN ─────────────────────── */}
+      {hasData && activeSection === 'DEBITS' && (
+        <div className="space-y-6">
+          {/* Summary Cards for Debits */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Total Outflow (Debits)</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+                ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">100% of Reconciled Outflow</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-teal-500/10 border-teal-500/30' : 'bg-teal-50 border-teal-200'}`}>
+              <div className={`text-[10px] font-bold uppercase ${isDark ? 'text-teal-400' : 'text-teal-700'}`}>True Lifestyle Spend</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-teal-500">
+                ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className={`text-[10px] ${isDark ? 'text-teal-400/80' : 'text-teal-600'} mt-0.5`}>{forensicData.trueLifestyleShare.toFixed(1)}% of Debits</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'}`}>
+              <div className={`text-[10px] font-bold uppercase ${isDark ? 'text-indigo-400' : 'text-indigo-700'}`}>Money Movement</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-indigo-400">
+                ₹{forensicData.moneyMovementTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className={`text-[10px] ${isDark ? 'text-indigo-400/80' : 'text-indigo-600'} mt-0.5`}>{forensicData.moneyMovementShare.toFixed(1)}% (Transfers & Debt)</div>
+            </div>
+            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="text-[10px] font-bold uppercase text-slate-400">Categories Tracked</div>
+              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-slate-200">
+                {forensicData.debitBreakdown.length} Categories
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Ranked by volume</div>
+            </div>
+          </div>
+
+          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+            <h2 className="text-base font-black flex items-center gap-2 font-heading">
+              <span>💳</span>
+              <span>14-Category Debit Breakdown</span>
+            </h2>
+            <div className="space-y-3">
+              {forensicData.debitBreakdown.map((d) => (
+                <div key={d.rank} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold flex items-center gap-2">
+                      <span>{d.icon}</span>
+                      <span>{d.category}</span>
+                      {d.isLifestyle && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-400 font-bold">LIFESTYLE</span>}
+                    </span>
+                    <span className="font-mono font-bold">₹{d.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({d.percentage.toFixed(1)}%)</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-slate-800/20 overflow-hidden">
+                    <div className="h-full rounded-full bg-indigo-500" style={{ width: `${Math.max(1, d.percentage)}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 9. SECTION: INCOME & SALARY DECOMPOSITION ───────────────────── */}
+      {hasData && activeSection === 'INFLOW' && (
+        <div className="space-y-6">
+          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h2 className="text-base font-black flex items-center gap-2 font-heading">
+                  <span>💰</span>
+                  <span>Inflow & Ingress Decomposition</span>
+                </h2>
+                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Strict segregation of Earned Corporate Salary, EPFO / PF Capital Withdrawals, and Borrowed Debt Disbursals.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Earned Salary</div>
+                <div className="text-lg font-black font-mono mt-1 text-emerald-400">₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">17 Payroll Cycles</div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-sky-950/20 border-sky-500/30' : 'bg-sky-50 border-sky-200'}`}>
+                <div className="text-[10px] font-bold uppercase text-sky-400">EPFO / PF Claims</div>
+                <div className="text-lg font-black font-mono mt-1 text-sky-400">₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-sky-400/80 mt-0.5">Statutory Inflow</div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'}`}>
+                <div className="text-[10px] font-bold uppercase text-emerald-400">Savings Bank Interest</div>
+                <div className="text-lg font-black font-mono mt-1 text-emerald-400">₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div className="text-[10px] text-emerald-400/80 mt-0.5">{forensicData.bankInterestCredits.length} Quarterly Credits</div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200'}`}>
+                <div className="text-[10px] font-bold uppercase text-rose-400">Bank Fees & Charges</div>
+                <div className="text-lg font-black font-mono mt-1 text-rose-400">₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div className="text-[10px] text-rose-400/80 mt-0.5">{forensicData.bankChargesCount} Deductions</div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
+                <div className="text-[10px] font-bold uppercase text-amber-400">Loan Disbursals</div>
+                <div className="text-lg font-black font-mono mt-1 text-amber-400">₹{forensicData.loanCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-amber-400/80 mt-0.5">Borrowed Debt</div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Refunds & Reversals</div>
+                <div className="text-lg font-black font-mono mt-1 text-slate-200">₹{forensicData.refundsReversalsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">Non-operating Inflow</div>
+              </div>
+            </div>
+
+            {/* Dedicated EPFO / PF Ledger Table */}
+            <div className="mt-6 pt-4 border-t border-white/[0.08] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🏛️</span>
+                  <h3 className="text-sm font-black text-sky-400 font-heading">Provident Fund (EPFO) Claims & Capital Withdrawals</h3>
+                </div>
+                <span className="text-xs font-mono font-bold text-sky-400">
+                  Total: ₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN')}
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Narration / Claim Reference</th>
+                      <th className="p-3 text-right">Amount</th>
+                      <th className="p-3 text-right">Balance After</th>
+                      <th className="p-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.06]">
+                    {session.uniqueTransactions.filter(t => t.category === 'EPFO_PF').map((epfTx) => (
+                      <tr key={epfTx.id} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
+                        <td className="p-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">{epfTx.transactionDate}</td>
+                        <td className="p-3 font-semibold max-w-[300px]">
+                          <div className="truncate text-sky-300">{epfTx.rawNarration}</div>
+                          {epfTx.referenceNumber && (
+                            <div className="text-[10px] font-mono text-slate-500">Ref / UTR: {epfTx.referenceNumber}</div>
+                          )}
+                        </td>
+                        <td className="p-3 text-right font-mono font-bold text-sky-400 text-sm">
+                          +₹{epfTx.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="p-3 text-right font-mono text-slate-400">
+                          {epfTx.balanceAfter != null ? `₹${epfTx.balanceAfter.toLocaleString('en-IN')}` : '—'}
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                            SETTLED
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      
+            {/* Dedicated Bank Savings Interest Audit Table */}
+            <div className="mt-6 pt-4 border-t border-white/[0.08] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">💰</span>
+                  <h3 className="text-sm font-black text-emerald-400 font-heading">Bank Savings Account Interest Added by Bank</h3>
+                </div>
+                <span className="text-xs font-mono font-bold text-emerald-400">
+                  Total Interest Earned: ₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                      <th className="p-3">Payout Date</th>
+                      <th className="p-3">Quarter Period</th>
+                      <th className="p-3">Bank Narration</th>
+                      <th className="p-3 text-right">Interest Credited</th>
+                      <th className="p-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.06]">
+                    {forensicData.bankInterestCredits.map((intTx, idx) => (
+                      <tr key={idx} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
+                        <td className="p-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">{intTx.date}</td>
+                        <td className="p-3 font-bold text-emerald-300">{intTx.quarterLabel}</td>
+                        <td className="p-3 font-mono text-[10px] text-slate-400">{intTx.narration}</td>
+                        <td className="p-3 text-right font-mono font-bold text-emerald-400 text-sm">
+                          +₹{intTx.amount.toFixed(2)}
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            CREDITED
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Dedicated Bank Fees & Charges Deducted Audit Table */}
+            <div className="mt-6 pt-4 border-t border-white/[0.08] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🏦</span>
+                  <h3 className="text-sm font-black text-rose-400 font-heading">Bank Service Charges, Penalty Fees & Taxes Deducted</h3>
+                </div>
+                <span className="text-xs font-mono font-bold text-rose-400">
+                  Total Bank Charges: ₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
+                      <th className="p-3">Deduction Date</th>
+                      <th className="p-3">Fee / Charge Classification</th>
+                      <th className="p-3">Bank Narration</th>
+                      <th className="p-3 text-right">Fee Deducted</th>
+                      <th className="p-3 text-center">Impact</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.06]">
+                    {forensicData.bankChargesList.map((chgTx, idx) => (
+                      <tr key={idx} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
+                        <td className="p-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">{chgTx.date}</td>
+                        <td className="p-3 font-bold text-rose-300">{chgTx.chargeType}</td>
+                        <td className="p-3 font-mono text-[10px] text-slate-400">{chgTx.narration}</td>
+                        <td className="p-3 text-right font-mono font-bold text-rose-400 text-sm">
+                          -₹{chgTx.amount.toFixed(2)}
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                            chgTx.amount >= 500 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          }`}>
+                            {chgTx.amount >= 500 ? 'HIGH PENALTY' : 'NOMINAL FEE'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+      {/* ── 10. SECTION: RECONCILIATION AUDIT NOTES ───────────────────────── */}
+      {hasData && activeSection === 'AUDIT' && (
+        <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+          <h2 className="text-base font-black flex items-center gap-2 font-heading">
+            <span>🛡️</span>
+            <span>Forensic Ledger Audit & Integrity Notes</span>
+          </h2>
+          <div className="space-y-3">
+            <div className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-1 ${isDark ? 'bg-black/20 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="font-bold text-emerald-400">1. Cryptographic File Fingerprinting (SHA-256)</div>
+              <p className="opacity-80">
+                All uploaded statement files are cryptographically fingerprinted using client-side SHA-256. Exact duplicate files uploaded concurrently or in separate sessions are rejected with zero double-counting.
+              </p>
+            </div>
+            <div className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-1 ${isDark ? 'bg-black/20 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="font-bold text-indigo-400">2. Single Source of Truth Ledger Reconciliation</div>
+              <p className="opacity-80">
+                Opening Balance (₹{forensicData.openingBalance?.toFixed(2) || '0.00'}) + Total Inflow (₹{forensicData.totalCredits.toFixed(2)}) - Total Outflow (₹{forensicData.totalDebits.toFixed(2)}) = Closing Balance (₹{forensicData.closingBalance?.toFixed(2) || '0.00'}).
+              </p>
+            </div>
+            <div className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-1 ${isDark ? 'bg-black/20 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="font-bold text-emerald-400">3. Cross-File Lineage & Provenance</div>
+              <p className="opacity-80">
+                Every transaction retains exact file origin tracking. Overlapping statements generated zero artificial duplicate transactions in master aggregates.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 11. SECTION: AI FORENSIC COPILOT ────────────────────────────── */}
+      {hasData && activeSection === 'AI_AGENT' && (
+        <div className="space-y-4">
+          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+            {/* Header with Engine Status & API Key Toggle */}
+            <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-white/[0.08]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-brand-viridian flex items-center justify-center text-xl shadow-lg shadow-indigo-500/20">
+                  🤖
+                </div>
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-xl sm:text-2xl font-black">HDFC Bank Salary Account</h2>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-500 border border-emerald-400/30">
-                      AUDITED MASTER LEDGER
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono border ${isDark ? 'text-slate-400 border-white/10' : 'text-slate-600 border-slate-200'}`}>
-                      {forensicData.totalTransactions.toLocaleString('en-IN')} Transactions
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-black font-heading">AI Forensic Copilot</h2>
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Gemini 2.5 Flash Active
                     </span>
                   </div>
-                  <div className={`text-xs font-mono mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Holder: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{forensicData.accountHolder}</strong> • A/c: {forensicData.accountNo} • IFSC: {forensicData.ifsc}
-                  </div>
-                  <div className={`text-[11px] font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Scope: <strong className="text-brand-viridian font-bold">{forensicData.periodLabel}</strong> ({forensicData.periodSpan})
-                  </div>
+                  <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Real-data personal financial auditor querying {session.uniqueTransactions.length.toLocaleString('en-IN')} ledger transactions
+                  </p>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 flex-wrap">
-                {onMergeTransactions && (
-                  <button
-                    onClick={handleMergeToSmsSimulator}
-                    disabled={isMerged}
-                    className={`px-4 py-2.5 rounded-2xl text-xs font-black transition border shadow-sm flex items-center gap-1.5 ${
-                      isMerged 
-                        ? 'bg-emerald-500/20 text-emerald-700 border-emerald-500/40 cursor-default' 
-                        : 'bg-brand-600 hover:bg-brand-700 text-white border-brand-600'
-                    }`}
-                  >
-                    <span>{isMerged ? '✓ Merged' : '⚡'}</span>
-                    <span>{isMerged ? 'Merged with Live Feed' : 'Merge with Live Feed'}</span>
-                  </button>
-                )}
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setActiveSection('UPLOAD')}
-                  className={`px-3.5 py-2.5 rounded-2xl text-xs font-bold transition border ${
-                    isDark ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-200' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800'
+                  onClick={() => setShowApiKeyModal(!showApiKeyModal)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${
+                    isDark ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
+                  }`}
+                  title="Configure Gemini API Key"
+                >
+                  <span>🔑</span>
+                  <span>API Key Config</span>
+                </button>
+                <button
+                  onClick={() => setChatMessages([
+                    {
+                      id: `clear_${Date.now()}`,
+                      role: 'assistant',
+                      text: 'Chat history cleared. How can I assist with your financial ledger analysis today?',
+                      timestamp: 'Just now',
+                    }
+                  ])}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                    isDark ? 'border-white/10 text-slate-400 hover:text-white hover:bg-white/5' : 'border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
-                  📥 Upload Statement
+                  Clear History
                 </button>
               </div>
             </div>
 
-            {/* Reconciliation Proof Equation */}
-            <div className={`mt-6 p-4 sm:p-5 rounded-2xl border ${
-              isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'
-            }`}>
-              <div className="flex items-center justify-between gap-2 mb-3">
+            {/* API Key Modal / Drawer */}
+            {showApiKeyModal && (
+              <div className={`p-4 rounded-2xl border space-y-3 ${isDark ? 'bg-black/40 border-indigo-500/30' : 'bg-slate-50 border-indigo-200'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-black flex items-center gap-2 text-indigo-400">
+                    <span>⚡</span>
+                    <span>Google Gemini API Key Configuration</span>
+                  </div>
+                  <button onClick={() => setShowApiKeyModal(false)} className="text-xs text-slate-400 hover:text-white">✕</button>
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-base">⚖️</span>
-                  <span className={`text-xs font-black uppercase tracking-wider ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    Mathematical Ledger Reconciliation Proof (Opening + Inflows − Outflows = Closing)
-                  </span>
+                  <input
+                    type="password"
+                    value={geminiApiKey}
+                    onChange={(e) => setGeminiApiKey(e.target.value)}
+                    placeholder="Enter your Gemini API key..."
+                    className={`flex-1 px-3 py-2 rounded-xl text-xs font-mono border outline-none ${
+                      isDark ? 'bg-[#142028] border-white/10 text-white focus:border-indigo-400' : 'bg-white border-slate-300 text-slate-900 focus:border-indigo-500'
+                    }`}
+                  />
+                  <button
+                    onClick={() => {
+                      if (geminiApiKey) {
+                        localStorage.setItem('bytfloww_gemini_api_key', geminiApiKey.trim());
+                      } else {
+                        localStorage.removeItem('bytfloww_gemini_api_key');
+                      }
+                      setShowApiKeyModal(false);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white transition"
+                  >
+                    Save Key
+                  </button>
                 </div>
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-                  isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40' : 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                }`}>
-                  ● 100.0000% EXACT RECONCILIATION
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center sm:text-left">
-                <div>
-                  <div className={`text-[10px] font-black uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Opening Cash Balance</div>
-                  <div className={`text-base sm:text-lg font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    ₹{forensicData.openingBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </div>
+                <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Your API key is kept securely in your browser session for live forensic analysis.
                 </div>
-                <div>
-                  <div className={`text-[10px] font-black uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>+ Total Credits (Inflow)</div>
-                  <div className="text-base sm:text-lg font-black font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
-                    +₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                <div>
-                  <div className={`text-[10px] font-black uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>- Total Debits (Outflow)</div>
-                  <div className="text-base sm:text-lg font-black font-mono text-rose-600 dark:text-rose-400 mt-0.5">
-                    -₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                <div>
-                  <div className={`text-[10px] font-black uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>= Closing Cash Balance</div>
-                  <div className="text-base sm:text-lg font-black font-mono text-brand-viridian mt-0.5">
-                    ₹{forensicData.closingBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 🌟 The Key Forensic Finding Banner */}
-          <div className={`p-5 rounded-[24px] border ${
-            isDark ? 'bg-gradient-to-r from-[#1E1412] to-[#2A1816] border-rose-800/40 text-white' : 'bg-rose-50/90 border-rose-200 text-slate-900'
-          }`}>
-            <div className="flex items-start gap-3">
-              <span className="text-2xl shrink-0">🚨</span>
-              <div className="space-y-1">
-                <h3 className="text-sm font-black text-rose-600 dark:text-rose-400 uppercase tracking-wide">
-                  The Key Financial Forensic Finding
-                </h3>
-                <p className="text-xs leading-relaxed font-medium">
-                  Your corporate salary from Newgen was <strong>₹10.85 Lakh</strong>, but loan repayments consumed <strong>₹4.45 Lakh</strong> (~<strong>41.0% of salary</strong>). Additionally, you received <strong>₹3.83 Lakh</strong> of digital loan borrowings.
-                  Meanwhile, your <strong>True Lifestyle Spending</strong> (food, groceries, cabs, shopping) was only <strong>₹1.85 Lakh (9.1% of debits)</strong>. 
-                  Your financial pressure is not lifestyle consumption — it is <strong>debt servicing and personal transfers (₹8.22 Lakh)</strong>.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* KPI Dashboard Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-emerald-500">Corporate Salary</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                ₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Newgen Software Technologies</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-amber-500">Loan Money Received</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                ₹{forensicData.loanCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Borrowed digital credit</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-rose-500">Loan Repayments</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono text-rose-500`}>
-                ₹{MASTER_FORENSIC_DATA.debitBreakdown.find(d => d.category.includes('Loan'))?.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>41.0% of salary burden</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-indigo-500">Personal Transfers</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                ₹{MASTER_FORENSIC_DATA.debitBreakdown.find(d => d.category.includes('UPI'))?.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>40.46% of all debits</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-teal-500">True Lifestyle Spend</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono text-brand-viridian`}>
-                ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Only 9.1% of outflows</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Cash Withdrawals</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                ₹{MASTER_FORENSIC_DATA.debitBreakdown.find(d => d.category.includes('Cash'))?.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Untraceable ATM cash</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-cyan-500">Wallet Movement</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                ₹{MASTER_FORENSIC_DATA.debitBreakdown.find(d => d.category.includes('Wallet'))?.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Airtel Payments Bank / Wallets</div>
-            </div>
-
-            <div className={`p-4 sm:p-5 rounded-[24px] border space-y-1 transition ${
-              isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-            }`}>
-              <div className="text-[10px] font-black uppercase tracking-wider text-rose-500">Net Cash Flow</div>
-              <div className={`text-xl sm:text-2xl font-black font-mono ${forensicData.netCashFlow < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
-                {forensicData.netCashFlow < 0 ? '-' : '+'}₹{Math.abs(forensicData.netCashFlow).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </div>
-              <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Inflow minus outflow delta</div>
-            </div>
-          </div>
-
-          {/* Quick Action Navigation Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <button
-              onClick={() => setActiveSection('LOANS')}
-              className={`p-4 rounded-2xl border text-left flex items-center justify-between transition hover:border-brand-viridian ${
-                isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black text-amber-500">🔴 Debt Matrix & Recycling</div>
-                <div className={`text-sm font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>15 Lenders Serviced</div>
-              </div>
-              <span className="text-lg">→</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSection('PEOPLE')}
-              className={`p-4 rounded-2xl border text-left flex items-center justify-between transition hover:border-brand-viridian ${
-                isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black text-indigo-500">👥 Personal Transfers Ledger</div>
-                <div className={`text-sm font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Boby Tandan (₹2.43L)</div>
-              </div>
-              <span className="text-lg">→</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSection('LIFESTYLE')}
-              className={`p-4 rounded-2xl border text-left flex items-center justify-between transition hover:border-brand-viridian ${
-                isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black text-teal-500">🍔 Lifestyle Decomposition</div>
-                <div className={`text-sm font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>Swiggy vs Instamart</div>
-              </div>
-              <span className="text-lg">→</span>
-            </button>
-
-            <button
-              onClick={() => setActiveSection('WHERE_100_WENT')}
-              className={`p-4 rounded-2xl border text-left flex items-center justify-between transition hover:border-brand-viridian ${
-                isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
-              }`}
-            >
-              <div>
-                <div className="text-xs font-black text-rose-500">🎯 Where Every ₹100 Went</div>
-                <div className={`text-sm font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>14-Pillar Breakdown</div>
-              </div>
-              <span className="text-lg">→</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── 5. SECTION 02: INCOME & SALARY ANALYSIS ───────────────────── */}
-      {activeSection === 'INCOME' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>💰</span>
-                <span>Income & Cash Inflow Classification</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Separating Real Employment Income from Borrowed Digital Debt, Statutory EPFO, and Reversals
-              </p>
-            </div>
-
-            {/* Crucial Insight Card */}
-            <div className={`p-4 rounded-2xl border ${
-              isDark ? 'bg-amber-950/20 border-amber-500/30 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-900'
-            }`}>
-              <div className="flex items-start gap-2.5">
-                <span className="text-xl">⚠️</span>
-                <div>
-                  <h4 className="text-xs font-black">Financial Intelligence Rule: Borrowed Money is NOT Income!</h4>
-                  <p className="text-[11px] mt-0.5 leading-relaxed opacity-90">
-                    A common financial mistake is assuming <strong>₹20 Lakh Credited = ₹20 Lakh Earned</strong>. 
-                    Your real employment earnings were <strong>₹10.85 Lakh</strong>. The remaining inflows were borrowed digital credit (₹3.83L), statutory PF (₹1.10L), and peer receipts.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Income Streams Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className={`p-5 rounded-2xl border space-y-2 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase text-emerald-500">💼 Employment Salary</span>
-                  <span className="text-[10px] font-mono font-bold text-slate-400">16 Credits</span>
-                </div>
-                <div className={`text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  ₹{forensicData.salaryTotal.toLocaleString('en-IN')}
-                </div>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  Newgen Software Technologies Ltd (Monthly avg ~₹67,836)
-                </p>
-              </div>
-
-              <div className={`p-5 rounded-2xl border space-y-2 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase text-amber-500">🏦 Borrowed Digital Loans</span>
-                  <span className="text-[10px] font-mono font-bold text-slate-400">11 Lenders</span>
-                </div>
-                <div className={`text-2xl font-black font-mono text-amber-500`}>
-                  ₹{forensicData.loanCreditsTotal.toLocaleString('en-IN')}
-                </div>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  mPokket, Vivifi, Meghdoot, Grow Money, Zed Leafin
-                </p>
-              </div>
-
-              <div className={`p-5 rounded-2xl border space-y-2 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black uppercase text-cyan-500">🛡️ Statutory EPFO / PF</span>
-                  <span className="text-[10px] font-mono font-bold text-slate-400">3 Receipts</span>
-                </div>
-                <div className={`text-2xl font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                  ₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN')}
-                </div>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  Employee Provident Fund Organisation transfers
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 6. SECTION 03: 🔴 DEBT & LOAN INTELLIGENCE (MOST IMPORTANT) ─ */}
-      {activeSection === 'LOANS' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-black flex items-center gap-2">
-                  <span className="text-rose-500">🔴</span>
-                  <span>Debt & Loan Intelligence Matrix (15 Lenders)</span>
-                </h2>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                  Complete lender-by-lender ledger: Borrowed vs Repaid, Recycling Ratios, and Active Balances
-                </p>
-              </div>
-
-              <div className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold ${
-                isDark ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-400' : 'bg-emerald-50 border-emerald-300 text-emerald-800'
-              }`}>
-                Net Debt Reduction: +₹61,403.71 Repaid
-              </div>
-            </div>
-
-            {/* Debt Recycling Ratio Hero */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
-                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-amber-400' : 'text-amber-700'}`}>Total Borrowed</div>
-                <div className={`text-xl font-black font-mono mt-1 ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>
-                  ₹{forensicData.lenders.reduce((s, l) => s + l.totalBorrowed, 0).toLocaleString('en-IN')}
-                </div>
-                <div className={`text-[10px] mt-0.5 ${isDark ? 'text-amber-500' : 'text-amber-600'}`}>
-                  {forensicData.lenders.reduce((s, l) => s + l.borrowCount, 0)} Disbursals
-                </div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200'}`}>
-                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-rose-400' : 'text-rose-700'}`}>Total Repaid</div>
-                <div className={`text-xl font-black font-mono mt-1 ${isDark ? 'text-rose-300' : 'text-rose-800'}`}>
-                  ₹{forensicData.lenders.reduce((s, l) => s + l.totalRepaid, 0).toLocaleString('en-IN')}
-                </div>
-                <div className={`text-[10px] mt-0.5 ${isDark ? 'text-rose-500' : 'text-rose-600'}`}>
-                  {forensicData.lenders.reduce((s, l) => s + l.repayCount, 0)} Repayment debits
-                </div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'}`}>
-                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>Net Debt Delta</div>
-                <div className={`text-xl font-black font-mono mt-1 ${isDark ? 'text-emerald-300' : 'text-emerald-800'}`}>
-                  +₹61,403.71
-                </div>
-                <div className={`text-[10px] mt-0.5 ${isDark ? 'text-emerald-500' : 'text-emerald-600'}`}>
-                  More repaid than borrowed
-                </div>
-              </div>
-            </div>
-
-            {/* Lender Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
-                <thead>
-                  <tr className={`border-b ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                    <th className="py-2.5 px-3">LENDER NAME</th>
-                    <th className="py-2.5 px-3">PRODUCT TYPE</th>
-                    <th className="py-2.5 px-3 text-right">BORROWED</th>
-                    <th className="py-2.5 px-3 text-right">REPAID</th>
-                    <th className="py-2.5 px-3 text-right">NET DELTA</th>
-                    <th className="py-2.5 px-3 text-center">STATUS</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {forensicData.lenders.map((len) => (
-                    <tr 
-                      key={len.id}
-                      onClick={() => setSelectedLender(len)}
-                      className={`hover:${isDark ? 'bg-white/5' : 'bg-slate-50'} transition cursor-pointer`}
-                    >
-                      <td className={`py-2.5 px-3 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                        {len.name}
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-400 text-[11px]">{len.productType}</td>
-                      <td className="py-2.5 px-3 text-right font-black text-amber-500">
-                        {len.totalBorrowed > 0 ? `₹${len.totalBorrowed.toLocaleString('en-IN')}` : '—'}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-black text-rose-500">
-                        ₹{len.totalRepaid.toLocaleString('en-IN')}
-                      </td>
-                      <td className={`py-2.5 px-3 text-right font-black ${len.netDelta >= 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                        {len.netDelta >= 0 ? `+₹${len.netDelta.toLocaleString('en-IN')}` : `-₹${Math.abs(len.netDelta).toLocaleString('en-IN')}`}
-                      </td>
-                      <td className="py-2.5 px-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                          len.status === 'ACTIVE_LINE'
-                            ? 'bg-rose-500/20 text-rose-400'
-                            : 'bg-emerald-500/20 text-emerald-400'
-                        }`}>
-                          {len.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 7. SECTION 04: 👤 PERSONAL / RECIPIENT TRANSFERS ──────────── */}
-      {activeSection === 'PEOPLE' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>👥</span>
-                <span>Personal Transfer Intelligence (₹8.22 Lakh Unclassified UPI)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Recipient forensics uncovering who received your money and net personal cash flow
-              </p>
-            </div>
-
-            {/* Recipient Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {forensicData.recipients.map((rec) => (
-                <div
-                  key={rec.id}
-                  onClick={() => setSelectedRecipient(rec)}
-                  className={`p-4 rounded-[22px] border space-y-2.5 cursor-pointer hover:border-brand-viridian transition ${
-                    isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200 shadow-sm'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-9 h-9 rounded-full font-black flex items-center justify-center text-xs ${
-                        rec.flaggedPriority === 'CRITICAL' 
-                          ? 'bg-rose-500/20 text-rose-400' 
-                          : 'bg-indigo-500/20 text-indigo-400'
-                      }`}>
-                        {rec.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="font-black text-xs">{rec.name}</div>
-                        <div className="text-[10px] text-slate-400">{rec.txnCount} txns • {rec.relationshipTag}</div>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-bold text-brand-viridian">Inspect →</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono pt-1">
-                    <div className="p-2 rounded-xl bg-slate-900/50">
-                      <div className="text-[9px] text-slate-400">TOTAL SENT</div>
-                      <div className="font-black text-rose-400">₹{rec.totalSent.toLocaleString('en-IN')}</div>
-                    </div>
-                    <div className="p-2 rounded-xl bg-slate-900/50">
-                      <div className="text-[9px] text-slate-400">NET OUTFLOW</div>
-                      <div className="font-black text-amber-400">₹{rec.netOutflow.toLocaleString('en-IN')}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 8. SECTION 05: 🍔 LIFESTYLE SPENDING (9.1%) ───────────────── */}
-      {(activeSection === 'LIFESTYLE' || activeSection === 'SPENDING') && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🍔</span>
-                <span>True Lifestyle Spending (₹1.85 Lakh • 9.10% of Total Debits)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Food, Groceries, Cabs, Shopping & Subscriptions itemized by exact merchant
-              </p>
-            </div>
-
-            {/* 4 Core Lifestyle Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Food Card */}
-              <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🍔</span>
-                    <div>
-                      <h3 className="text-sm font-black">Food & Dining</h3>
-                      <span className="text-[10px] text-slate-400">Instamart excluded and placed in Groceries</span>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono font-black text-rose-500">
-                    ₹{forensicData.lifestyleDetails.food.totalAmount.toLocaleString('en-IN')}
-                  </div>
-                </div>
-                <div className="space-y-1.5 pt-2 border-t border-white/10">
-                  {forensicData.lifestyleDetails.food.merchants.map((m, i) => (
-                    <div key={i} className="flex justify-between text-xs font-mono">
-                      <span className="text-slate-300">{m.name} ({m.count} orders)</span>
-                      <span className="font-bold">₹{m.amount.toLocaleString('en-IN')}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Grocery Card */}
-              <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🛒</span>
-                    <div>
-                      <h3 className="text-sm font-black">Groceries & Quick Commerce</h3>
-                      <span className="text-[10px] text-slate-400">Swiggy Instamart, Blinkit, Zepto, Smart Bazaar</span>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono font-black text-rose-500">
-                    ₹{forensicData.lifestyleDetails.grocery.totalAmount.toLocaleString('en-IN')}
-                  </div>
-                </div>
-                <div className="space-y-1.5 pt-2 border-t border-white/10">
-                  {forensicData.lifestyleDetails.grocery.merchants.map((m, i) => (
-                    <div key={i} className="flex justify-between text-xs font-mono">
-                      <span className="text-slate-300">{m.name}</span>
-                      <span className="font-bold">₹{m.amount.toLocaleString('en-IN')}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Transport Card */}
-              <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🚕</span>
-                    <div>
-                      <h3 className="text-sm font-black">Transport & Travel</h3>
-                      <span className="text-[10px] text-slate-400">IRCTC Railway (₹29.7K), Rapido (₹3.0K), Uber (₹2.4K)</span>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono font-black text-rose-500">
-                    ₹{forensicData.lifestyleDetails.transport.totalAmount.toLocaleString('en-IN')}
-                  </div>
-                </div>
-                <div className="space-y-1.5 pt-2 border-t border-white/10">
-                  {forensicData.lifestyleDetails.transport.merchants.map((m, i) => (
-                    <div key={i} className="flex justify-between text-xs font-mono">
-                      <span className="text-slate-300">{m.name}</span>
-                      <span className="font-bold">₹{m.amount.toLocaleString('en-IN')}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Shopping Card */}
-              <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🛍️</span>
-                    <div>
-                      <h3 className="text-sm font-black">Shopping & E-Commerce</h3>
-                      <span className="text-[10px] text-slate-400">Amazon, Sakeena Suit Collection, Pankaj Textiles, Zudio</span>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono font-black text-rose-500">
-                    ₹{forensicData.lifestyleDetails.shopping.totalAmount.toLocaleString('en-IN')}
-                  </div>
-                </div>
-                <div className="space-y-1.5 pt-2 border-t border-white/10">
-                  {forensicData.lifestyleDetails.shopping.merchants.map((m, i) => (
-                    <div key={i} className="flex justify-between text-xs font-mono">
-                      <span className="text-slate-300">{m.name}</span>
-                      <span className="font-bold">₹{m.amount.toLocaleString('en-IN')}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 9. SECTION 06: 📅 16-MONTH CASH FLOW VELOCITY ─────────────── */}
-      {activeSection === 'CASH_FLOW' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>📅</span>
-                <span>16-Month Cash Flow & Velocity Timeline</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Month-by-month trajectory tracking Salary, Loan Credits, Loan Repayments, Transfers, and Net Cash Delta
-              </p>
-            </div>
-
-            {/* Velocity Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
-                <thead>
-                  <tr className={`border-b ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                    <th className="py-2.5 px-3">MONTH</th>
-                    <th className="py-2.5 px-3 text-right">SALARY</th>
-                    <th className="py-2.5 px-3 text-right">LOANS IN</th>
-                    <th className="py-2.5 px-3 text-right">LOANS PAID</th>
-                    <th className="py-2.5 px-3 text-right">TRANSFERS</th>
-                    <th className="py-2.5 px-3 text-right">NET CASH FLOW</th>
-                    <th className="py-2.5 px-3 text-center">STATUS</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {forensicData.monthlyCashFlow.map((m) => (
-                    <tr key={m.monthKey} className={`hover:${isDark ? 'bg-white/5' : 'bg-slate-50'} transition`}>
-                      <td className={`py-2.5 px-3 font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{m.monthName}</td>
-                      <td className="py-2.5 px-3 text-right text-emerald-500 font-bold">₹{m.salary.toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-3 text-right text-amber-500 font-bold">₹{m.loansReceived.toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-3 text-right text-rose-500 font-bold">₹{m.loanRepaid.toLocaleString('en-IN')}</td>
-                      <td className="py-2.5 px-3 text-right text-indigo-400 font-bold">₹{m.personalTransfers.toLocaleString('en-IN')}</td>
-                      <td className={`py-2.5 px-3 text-right font-black ${m.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {m.netCashFlow >= 0 ? `+₹${m.netCashFlow.toLocaleString('en-IN')}` : `₹${m.netCashFlow.toLocaleString('en-IN')}`}
-                      </td>
-                      <td className="py-2.5 px-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                          m.netCashFlow >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
-                        }`}>
-                          {m.netCashFlow >= 0 ? 'SURPLUS' : 'DEFICIT'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 10. SECTION 07: 🔁 RECURRING MANDATES & TRUE MONTHLY BURN RATE ─ */}
-      {activeSection === 'RECURRING' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🔁</span>
-                <span>Recurring Mandates & Monthly Burn Rate Decomposition</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Fixed obligations (Rent, EMIs, Mandates, Insurance) vs Variable Discretionary Outflows
-              </p>
-            </div>
-
-            {/* Burn Rate Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black uppercase text-amber-500">Debt & EMI Servicing</div>
-                <div className="text-2xl font-black font-mono mt-1 text-rose-500">₹27,781/mo</div>
-                <div className="text-[10px] text-slate-400">mPokket + Vivifi + Meghdoot + GrowMoney</div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black uppercase text-cyan-500">Fixed Monthly Obligations</div>
-                <div className={`text-2xl font-black font-mono mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>₹9,530/mo</div>
-                <div className="text-[10px] text-slate-400">LIC (amortized) + Broadband + Utilities + Cloud</div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black uppercase text-emerald-500">Variable Lifestyle Burn</div>
-                <div className="text-2xl font-black font-mono mt-1 text-brand-viridian">₹11,562/mo</div>
-                <div className="text-[10px] text-slate-400">Food + Groceries + Cabs + Shopping</div>
-              </div>
-            </div>
-
-            {/* Detected Recurring Mandates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
-              {[
-                { name: 'mPokket AutoPay Mandate', amount: 3731, cadence: 'Monthly Active Line', icon: '🏦', category: 'Debt / Loan EMI' },
-                { name: 'Vivifi India FlexPay Mandate', amount: 9619, cadence: 'Monthly Revolving Credit', icon: '🏦', category: 'Debt / Loan EMI' },
-                { name: 'Life Insurance Corporation (LIC)', amount: 16182, cadence: 'Quarterly Policy', icon: '🛡️', category: 'Life Insurance' },
-                { name: 'Airtel Broadband & Fiber', amount: 1245, cadence: 'Monthly Telecom', icon: '⚡', category: 'Utilities' },
-                { name: 'Netflix Premium AutoPay', amount: 199, cadence: 'Monthly Subscription', icon: '🎬', category: 'Digital Stream' },
-                { name: 'Google Play & One Storage', amount: 149, cadence: 'Monthly Cloud Mandate', icon: '☁️', category: 'Cloud Storage' },
-              ].map((mandate, idx) => (
-                <div key={idx} className={`p-4 rounded-2xl border space-y-2 ${isDark ? 'bg-[#142027] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{mandate.icon}</span>
-                      <div>
-                        <div className="font-bold text-xs">{mandate.name}</div>
-                        <div className="text-[10px] text-slate-400">{mandate.category}</div>
-                      </div>
-                    </div>
-                    <span className="text-xs font-black font-mono text-rose-400">₹{mandate.amount.toLocaleString('en-IN')}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/5">
-                    <span>Cadence: {mandate.cadence}</span>
-                    <span className="text-emerald-400 font-bold">● Active AutoPay</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 11. SECTION 08: 🚨 ANOMALY DETECTION & RAPID MONEY CYCLING ─ */}
-      {activeSection === 'ANOMALIES' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🚨</span>
-                <span>Anomaly Detection & Rapid Money Cycling Forensics</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Automated detection of large spikes, duplicate transactions, and rapid debt cycling
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {forensicData.anomalies.map((anom) => (
-                <div key={anom.id} className={`p-5 rounded-2xl border space-y-2.5 ${
-                  anom.severity === 'HIGH'
-                    ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
-                    : (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                      anom.severity === 'HIGH' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'
-                    }`}>
-                      {anom.type.replace(/_/g, ' ')}
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">{anom.date}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between font-mono">
-                    <span className="font-bold text-xs truncate max-w-[200px]">{anom.counterparty}</span>
-                    <span className="text-base font-black text-rose-500">₹{anom.amount.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                    {anom.explanation}
-                  </p>
-
-                  <div className="text-[10px] font-mono text-slate-400 pt-1 border-t border-white/5">
-                    Narration: {anom.narration}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 12. SECTION 09: 🔄 MONEY FLOW MAP & CASH PIPELINE ─────────── */}
-      {activeSection === 'FLOW_MAP' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-5 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🔄</span>
-                <span>Visual Money Flow Architecture (Where Money Arrived & Went)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Reconstructed full-system cash flow map separating Employment, Borrowings, Debt, and Transfers
-              </p>
-            </div>
-
-            {/* Visual Money Pipeline Diagram */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
-              {/* Inflow Box */}
-              <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#142027] border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-xs font-black uppercase text-emerald-400">1. Total Inflows (₹20.02 Lakh)</div>
-                <div className="space-y-2 text-xs font-mono">
-                  <div className="flex justify-between p-2 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold">
-                    <span>💼 Salary (Newgen)</span>
-                    <span>₹10.85L (54.2%)</span>
-                  </div>
-                  <div className="flex justify-between p-2 rounded-xl bg-amber-500/10 text-amber-400 font-bold">
-                    <span>🏦 Loan Disbursals</span>
-                    <span>₹3.83L (19.1%)</span>
-                  </div>
-                  <div className="flex justify-between p-2 rounded-xl bg-cyan-500/10 text-cyan-400 font-bold">
-                    <span>🛡️ EPFO Statutory</span>
-                    <span>₹1.10L (5.5%)</span>
-                  </div>
-                  <div className="flex justify-between p-2 rounded-xl bg-indigo-500/10 text-indigo-400 font-bold">
-                    <span>👥 P2P UPI Inflows</span>
-                    <span>₹4.24L (21.2%)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Central Hub Account */}
-              <div className={`p-5 rounded-2xl border text-center space-y-2 relative ${
-                isDark ? 'bg-gradient-to-br from-[#0D1F23] to-[#12272E] border-[#1D3E45]' : 'bg-teal-50 border-teal-200'
-              }`}>
-                <div className="text-3xl">🏛️</div>
-                <h3 className="text-sm font-black">HDFC Bank Salary Account</h3>
-                <div className="text-xs font-mono text-brand-viridian font-bold">A/c •••• 9082</div>
-                <div className="text-[11px] text-slate-400">
-                  Opening: ₹31.4K ➔ Closing: ₹1,003.55
-                </div>
-                <div className="text-[10px] font-mono text-rose-400">
-                  Net Flow Delta: -₹30,466.06
-                </div>
-              </div>
-
-              {/* Outflow Box */}
-              <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#142027] border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-xs font-black uppercase text-rose-400">2. Total Outflows (₹20.33 Lakh)</div>
-                <div className="space-y-2 text-xs font-mono">
-                  <div className="flex justify-between p-2 rounded-xl bg-indigo-500/10 text-indigo-400 font-bold">
-                    <span>👥 UPI Transfers</span>
-                    <span>₹8.22L (40.5%)</span>
-                  </div>
-                  <div className="flex justify-between p-2 rounded-xl bg-rose-500/10 text-rose-400 font-bold">
-                    <span>🏦 Loan Repayments</span>
-                    <span>₹4.45L (21.9%)</span>
-                  </div>
-                  <div className="flex justify-between p-2 rounded-xl bg-amber-500/10 text-amber-400 font-bold">
-                    <span>📱 Wallet Movements</span>
-                    <span>₹2.46L (12.1%)</span>
-                  </div>
-                  <div className="flex justify-between p-2 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold">
-                    <span>🍔 True Lifestyle</span>
-                    <span>₹1.85L (9.1%)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 13. SECTION 10: 💳 CREDIT CARDS & CRED ANALYSIS ────────────── */}
-      {activeSection === 'CREDIT_CARDS' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>💳</span>
-                <span>Credit Card & CRED Payments Forensics (₹1.14 Lakh)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                CRED app payments, GPay Credit Card bills, Snapmint, and Nahar Credits
-              </p>
-            </div>
-
-            {/* Educational Warning */}
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-              <h4 className="text-xs font-black text-amber-400">Important Accounting Distinction: Debt Movement vs Double Counting</h4>
-              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                If you made a purchase on a credit card and later repaid the bill through CRED, counting both would double-count your economic spend.
-                Therefore, <strong>₹1,13,571.84</strong> is classified strictly as <strong>Debt / Settlement Movement</strong>.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className={`p-4 rounded-2xl border space-y-2 ${isDark ? 'bg-[#142027] border-white/5' : 'bg-white border-slate-200'}`}>
-                <div className="text-xs font-bold text-slate-400">CRED & GPay Credit Card Bill Payments</div>
-                <div className="text-xl font-black font-mono text-rose-500">₹93,531.84</div>
-                <div className="text-[11px] text-slate-400">Axis Bank Credit Card (A/c 2261) and card settlements</div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border space-y-2 ${isDark ? 'bg-[#142027] border-white/5' : 'bg-white border-slate-200'}`}>
-                <div className="text-xs font-bold text-slate-400">Snapmint & Consumer Durable Finance</div>
-                <div className="text-xl font-black font-mono text-rose-500">₹20,040.00</div>
-                <div className="text-[11px] text-slate-400">0% EMI consumer electronic purchases and settlements</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 14. SECTION 11: 🏧 CASH WITHDRAWAL ANALYSIS ───────────────── */}
-      {activeSection === 'CASH_ATM' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🏧</span>
-                <span>Cash Withdrawal & Untraceable Outflow Analysis</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                ₹1,30,500.00 withdrawn in physical cash across 18 ATM transactions (6.42% of total debits)
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black uppercase text-slate-400">Total Cash Withdrawn</div>
-                <div className="text-2xl font-black font-mono mt-1 text-slate-300">₹1,30,500.00</div>
-                <div className="text-[10px] text-slate-500">6.42% of total outflows</div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black uppercase text-slate-400">Average ATM Ticket</div>
-                <div className="text-2xl font-black font-mono mt-1 text-slate-300">₹7,250.00</div>
-                <div className="text-[10px] text-slate-500">18 total ATM withdrawals</div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black uppercase text-slate-400">Monthly Cash Usage</div>
-                <div className="text-2xl font-black font-mono mt-1 text-slate-300">~₹8,156/mo</div>
-                <div className="text-[10px] text-slate-500">Untraceable spending</div>
-              </div>
-            </div>
-
-            <div className={`p-4 rounded-2xl border text-xs text-slate-400 leading-relaxed ${isDark ? 'bg-black/20' : 'bg-slate-50'}`}>
-              <strong>Audit Note:</strong> We classify ATM withdrawals as <em>Untraceable Spending</em> because the bank statement cannot trace whether physical cash was used for food, family support, or travel. Transitioning cash purchases to UPI QR scanning creates automatic itemization.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 15. SECTION 12: 📱 WALLET & INTERMEDIARY MOVEMENT ──────────── */}
-      {activeSection === 'WALLETS' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>📱</span>
-                <span>Wallet & Payment-Bank Movements (₹2.46 Lakh)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Airtel Payments Bank (•••• 9600), Airtel Money, and payment wallets representing 12.09% of debits
-              </p>
-            </div>
-
-            <div className={`p-5 rounded-2xl border space-y-3 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-black">Airtel Payments Bank & Telecom Sweeps</h3>
-                  <span className="text-[11px] text-slate-400">Funds transferred into secondary Airtel account</span>
-                </div>
-                <span className="text-xl font-black font-mono text-amber-500">₹2,45,672.15</span>
-              </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                This represents internal liquidity movement across banking apps rather than direct final consumption.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 10. SECTION 14: 🎯 WHERE EVERY ₹100 WENT ───────────────────── */}
-      {activeSection === 'WHERE_100_WENT' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🎯</span>
-                <span>Where Every ₹100 Went (Out of ₹20.33 Lakh Total Debits)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Visual breakdown of each 100 Rupees spent across financial movements vs lifestyle consumption
-              </p>
-            </div>
-
-            {/* Breakdown Bars & Cards */}
-            <div className="space-y-3">
-              {forensicData.where100Went.map((item, idx) => (
-                <div key={idx} className={`p-4 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-                  <div className="flex items-center justify-between text-xs font-black mb-1.5">
-                    <span className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span>{item.category}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                        item.isLifestyle 
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' 
-                          : 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20'
-                      }`}>
-                        {item.isLifestyle ? 'Lifestyle Spend' : 'Money Movement'}
-                      </span>
-                    </span>
-                    <span className="font-mono text-sm">₹{item.percentage.toFixed(2)} per ₹100 (₹{item.amount.toLocaleString('en-IN')})</span>
-                  </div>
-
-                  <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                    <div 
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{ width: `${Math.max(2, item.percentage)}%`, backgroundColor: item.color }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 11. SECTION 13: 📊 7 FINANCIAL HEALTH RATIOS ──────────────── */}
-      {activeSection === 'RATIOS' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>📊</span>
-                <span>Financial Health Ratios & Benchmark Scorecards</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                7 quantitative ratios measuring debt burden, liquidity leakages, and savings efficiency
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {forensicData.ratios.map((r, i) => (
-                <div key={i} className={`p-5 rounded-2xl border space-y-2 ${
-                  r.status === 'CRITICAL'
-                    ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
-                    : r.status === 'MODERATE'
-                    ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
-                    : (isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200')
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className="font-black text-sm">{r.ratioName}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                      r.status === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400' :
-                      r.status === 'MODERATE' ? 'bg-amber-500/20 text-amber-400' :
-                      'bg-emerald-500/20 text-emerald-400'
-                    }`}>
-                      {r.status}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black font-mono">{r.currentValue}{r.unit}</span>
-                    <span className="text-[11px] text-slate-400 font-mono">Target: {r.benchmark}</span>
-                  </div>
-                  <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>{r.assessment}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 12. SECTION 15: 🧠 RISK SCORE & TOP 5 ACTIONS ────────────── */}
-      {activeSection === 'RISK_SCORE' && (
-        <div className="space-y-6">
-          <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-            isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-          }`}>
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>🧠</span>
-                <span>Financial Risk Score (9 Dimensions) & Action Plan</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Holistic financial diagnosis and step-by-step roadmap to eliminate debt dependency
-              </p>
-            </div>
-
-            {/* 9 Dimensions Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {forensicData.riskScores.map((score, i) => (
-                <div key={i} className={`p-4 rounded-2xl border space-y-1.5 ${
-                  score.rating === 'RED'
-                    ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
-                    : score.rating === 'AMBER'
-                    ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
-                    : (isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200')
-                }`}>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs">{score.dimension}</span>
-                    <span className="text-sm">{score.rating === 'RED' ? '🔴' : score.rating === 'AMBER' ? '🟡' : '🟢'}</span>
-                  </div>
-                  <div className="text-xs font-black">{score.scoreText}</div>
-                  <p className="text-[10px] text-slate-400 leading-normal">{score.details}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Top 5 Action Steps */}
-            <div className={`p-5 rounded-2xl border mt-4 ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-              <h3 className="text-sm font-black text-brand-viridian uppercase tracking-wide mb-3">
-                🏆 Top 5 High-Impact Action Steps
-              </h3>
-              <div className="space-y-2 text-xs">
-                {forensicData.topActions.map((act, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <span className="font-black text-brand-viridian">{i + 1}.</span>
-                    <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>{act}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 13. SECTION 16: 🤖 STATEMENT AI COPILOT ───────────────────── */}
-      {activeSection === 'AI_ANALYST' && (
-        <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-          isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-        }`}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black flex items-center gap-2">
-              <span>🤖</span>
-              <span>Statement Forensic AI Analyst</span>
-            </h2>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-brand-500/20 text-brand-viridian border border-brand-500/30">
-              17-Fact Context Loaded
-            </span>
-          </div>
-
-          {/* Quick Query Pills */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {[
-              'Check single year credits & debits',
-              'What is my loan recycling ratio?',
-              'Show Boby Tandan transfer total',
-              'Explain Swiggy vs Instamart split',
-              'Show where every ₹100 went',
-            ].map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => setChatInput(q)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition border ${
-                  isDark ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49] text-slate-300' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800'
-                }`}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-
-          {/* Chat Container */}
-          <div className={`p-4 rounded-2xl border min-h-[220px] max-h-[400px] overflow-y-auto space-y-3 ${
-            isDark ? 'bg-[#0D1418] border-[#1D2930]' : 'bg-slate-50 border-slate-200'
-          }`}>
-            {chatMessages.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-              >
-                <div className={`max-w-[88%] p-3.5 rounded-2xl text-xs leading-relaxed ${
-                  msg.role === 'user'
-                    ? 'bg-brand-600 text-white font-bold'
-                    : isDark
-                    ? 'bg-[#18242D] text-slate-200 border border-[#273B49]'
-                    : 'bg-white text-slate-800 border border-slate-200 shadow-sm'
-                }`}>
-                  <div className="whitespace-pre-line">{msg.text}</div>
-                </div>
-                <span className="text-[9px] text-slate-500 mt-1 px-1">{msg.time}</span>
-              </div>
-            ))}
-            {isAiTyping && (
-              <div className="flex items-center gap-2 text-xs text-brand-viridian font-mono">
-                <span className="animate-spin">⚡</span>
-                <span>Forensic AI reasoning over 17 analysis dimensions...</span>
               </div>
             )}
-          </div>
 
-          {/* Input Box */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Ask about single financial year, lenders, Boby Tandan, or where money went..."
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className={`flex-1 px-4 py-2.5 rounded-2xl text-xs outline-none border transition ${
-                isDark 
-                  ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500 focus:border-brand-viridian' 
-                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-brand-600'
-              }`}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={isAiTyping || !chatInput.trim()}
-              className="px-5 py-2.5 rounded-2xl text-xs font-black bg-brand-600 hover:bg-brand-700 text-white transition border border-brand-600 disabled:opacity-50"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── 14. SECTION 17: 📑 MASTER CANONICAL LEDGER ────────────────── */}
-      {activeSection === 'TRANSACTIONS' && (
-        <div className={`p-5 sm:p-6 rounded-[28px] border space-y-4 ${
-          isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900 shadow-sm'
-        }`}>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-black flex items-center gap-2">
-                <span>📑</span>
-                <span>Master Canonical Transaction Ledger ({forensicData.totalTransactions.toLocaleString('en-IN')} rows)</span>
-              </h2>
-              <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                14 debit categories with exact classification and running balance verification
-              </p>
-            </div>
-
-            <input
-              type="text"
-              placeholder="Search category, merchant, lender..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-mono outline-none border transition w-full sm:w-64 ${
-                isDark 
-                  ? 'bg-[#18242D] border-[#273B49] text-white placeholder-slate-500 focus:border-brand-viridian' 
-                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-brand-600'
-              }`}
-            />
-          </div>
-
-          {/* Breakdown Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead>
-                <tr className={`border-b ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                  <th className="py-2.5 px-3">RANK</th>
-                  <th className="py-2.5 px-3">OUTFLOW CATEGORY</th>
-                  <th className="py-2.5 px-3 text-right">TOTAL AMOUNT</th>
-                  <th className="py-2.5 px-3 text-right">% OF DEBITS</th>
-                  <th className="py-2.5 px-3 text-center">TYPE</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filteredLedgerRows.map((d) => (
-                  <tr key={d.rank} className={`hover:${isDark ? 'bg-white/5' : 'bg-slate-50'} transition`}>
-                    <td className="py-2.5 px-3 text-slate-400">#{d.rank}</td>
-                    <td className="py-2.5 px-3 font-bold flex items-center gap-2">
-                      <span>{d.icon}</span>
-                      <span className={isDark ? 'text-white' : 'text-slate-900'}>{d.category}</span>
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-black text-rose-500">
-                      ₹{d.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-bold text-slate-300">
-                      {d.percentage.toFixed(2)}%
-                    </td>
-                    <td className="py-2.5 px-3 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                        d.isLifestyle ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/20 text-indigo-400'
-                      }`}>
-                        {d.isLifestyle ? 'Lifestyle Spend' : 'Money Movement'}
-                      </span>
-                    </td>
-                  </tr>
+            {/* Suggested Forensic Query Pills */}
+            <div className="space-y-1.5">
+              <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Suggested Forensic Queries</div>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  'Where is my money going most in a single month?',
+                  'How much interest/extra have I paid till now for loans?',
+                  'How much do I spend in daily spend across each month?',
+                  'What is my overall loan credits received till now?',
+                  'Explain the ₹80,000 EPFO withdrawal details',
+                  'Show corporate salary vs loan borrowings breakdown',
+                  'Who are my top P2P transfer recipients?',
+                ].map((promptText, idx) => (
+                  <button
+                    key={idx}
+                    disabled={isAiTyping}
+                    onClick={() => handleSendChatMessage(promptText)}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition text-left ${
+                      isDark 
+                        ? 'bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08] hover:border-emerald-400/40 text-slate-200' 
+                        : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-emerald-500 text-slate-700'
+                    }`}
+                  >
+                    {promptText}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* ── 15. SECTION 18: 📤 UPLOAD STATEMENT ───────────────────────── */}
-      {activeSection === 'UPLOAD' && (
-        <div className="space-y-6">
-          <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`p-8 sm:p-12 rounded-[28px] border-2 border-dashed text-center space-y-4 cursor-pointer transition ${
-              isDragging
-                ? 'border-brand-viridian bg-brand-viridian/10'
-                : isDark
-                ? 'border-[#273B49] bg-[#121B22] hover:border-brand-viridian/50'
-                : 'border-slate-300 bg-white hover:border-brand-600/50'
-            }`}
-          >
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              accept=".csv,.xlsx,.xls,.txt,.pdf" 
-              className="hidden" 
-            />
-            <div className="w-16 h-16 mx-auto rounded-3xl bg-brand-500/20 text-brand-viridian flex items-center justify-center text-3xl">
-              📥
-            </div>
-            <div className="space-y-1">
-              <div className="text-base sm:text-lg font-black">
-                Drop your bank statement file here
-              </div>
-              <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Supports .xlsx, .xls (BIFF8), .csv, .txt, and password-protected PDF statements
               </div>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 text-[10px] font-mono text-slate-400">
-              <span>🔒 100% Client-Side Private Ingestion • Zero PII Leakage</span>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* ── 16. SINGLE YEAR COMPARISON MODAL ──────────────────────────── */}
-      {showSingleYearComparisonModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-          <div className={`w-full max-w-2xl p-6 sm:p-7 rounded-[32px] border space-y-5 shadow-2xl ${
-            isDark ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' : 'bg-white border-slate-200 text-slate-900 shadow-xl'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base sm:text-lg font-black">Financial Year vs Single Year Statement Analysis</h3>
-                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Comparison between FY 2025-26, Current FY 2026-27 (YTD), and Full 16-Month Coverage
-                </p>
-              </div>
-              <button
-                onClick={() => setShowSingleYearComparisonModal(false)}
-                className={`p-1.5 rounded-full ${isDark ? 'bg-white/5 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-600'}`}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black text-brand-viridian uppercase">FY 2025-26 (Full Year)</div>
-                <div className="text-xs text-slate-400 mt-0.5">01-Apr-2025 → 31-Mar-2026</div>
-                <div className="mt-3 space-y-1">
-                  <div>Credits: <strong className="text-emerald-400">+₹11,89,297.96</strong></div>
-                  <div>Debits: <strong className="text-rose-400">-₹12,05,995.80</strong></div>
-                  <div>Net Delta: <strong className="text-rose-400">-₹16,697.84</strong></div>
+            {/* Chat Messages Log */}
+            <div className={`p-4 rounded-2xl border min-h-[350px] max-h-[500px] overflow-y-auto space-y-4 ${
+              isDark ? 'bg-black/30 border-white/[0.06]' : 'bg-slate-50 border-slate-200'
+            }`}>
+              {chatMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+                >
+                  <div
+                    className={`p-4 rounded-2xl text-xs leading-relaxed max-w-[90%] shadow-sm ${
+                      msg.role === 'assistant'
+                        ? (isDark ? 'bg-[#142028] text-slate-100 border border-white/[0.08]' : 'bg-white text-slate-900 border border-slate-200')
+                        : (isDark ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold' : 'bg-emerald-600 text-white font-bold')
+                    }`}
+                  >
+                    <div className="whitespace-pre-line prose prose-invert prose-xs max-w-none">
+                      {msg.text}
+                    </div>
+                    <div className={`text-[9px] mt-2 opacity-60 font-mono flex items-center justify-between gap-4 ${msg.role === 'assistant' ? '' : 'text-right'}`}>
+                      <span>{msg.role === 'assistant' ? 'BytFloww Copilot (Gemini 2.5 Flash)' : 'You'}</span>
+                      <span>{msg.timestamp}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black text-amber-400 uppercase">FY 2026-27 (Current YTD)</div>
-                <div className="text-xs text-slate-400 mt-0.5">01-Apr-2026 → 12-Aug-2026</div>
-                <div className="mt-3 space-y-1">
-                  <div>Credits: <strong className="text-emerald-400">+₹8,12,825.42</strong></div>
-                  <div>Debits: <strong className="text-rose-400">-₹8,26,593.64</strong></div>
-                  <div>Net Delta: <strong className="text-rose-400">-₹13,768.22</strong></div>
+              {isAiTyping && (
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-indigo-400 text-xs animate-pulse">
+                  <span className="animate-spin text-sm">⚙️</span>
+                  <span className="font-semibold">Querying Gemini 2.5 Flash & calculating ledger facts...</span>
                 </div>
-              </div>
-
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-black text-indigo-400 uppercase">Combined 16-Month Total</div>
-                <div className="text-xs text-slate-400 mt-0.5">2,587 Transactions</div>
-                <div className="mt-3 space-y-1">
-                  <div>Credits: <strong className="text-emerald-400">+₹20,02,123.38</strong></div>
-                  <div>Debits: <strong className="text-rose-400">-₹20,32,589.44</strong></div>
-                  <div>Net Delta: <strong className="text-rose-400">-₹30,466.06</strong></div>
-                </div>
-              </div>
+              )}
             </div>
 
-            <button
-              onClick={() => setShowSingleYearComparisonModal(false)}
-              className="w-full py-2.5 rounded-2xl text-xs font-black bg-brand-600 hover:bg-brand-700 text-white"
+            {/* Input Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendChatMessage();
+              }}
+              className="flex items-center gap-2 pt-1"
             >
-              Done
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── 17. LENDER DRILLDOWN MODAL ────────────────────────────────── */}
-      {selectedLender && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-          <div className={`w-full max-w-md p-6 rounded-[32px] border space-y-4 shadow-2xl ${
-            isDark ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' : 'bg-white border-slate-200 text-slate-900 shadow-xl'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-black">{selectedLender.name}</h3>
-                <p className="text-[11px] text-slate-400">{selectedLender.productType}</p>
-              </div>
+              <input
+                type="text"
+                value={chatInput}
+                disabled={isAiTyping}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Ask any question about your transactions, interest, salary, lenders, or daily spend..."
+                className={`flex-1 px-4 py-3 rounded-xl text-xs border outline-none transition ${
+                  isDark 
+                    ? 'bg-[#142028] border-white/[0.08] text-white focus:border-emerald-400 placeholder:text-slate-500' 
+                    : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500 placeholder:text-slate-400 shadow-sm'
+                }`}
+              />
               <button
-                onClick={() => setSelectedLender(null)}
-                className={`p-1.5 rounded-full ${isDark ? 'bg-white/5 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-600'}`}
+                type="submit"
+                disabled={isAiTyping || !chatInput.trim()}
+                className={`px-6 py-3 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-md ${
+                  isAiTyping || !chatInput.trim()
+                    ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400'
+                    : (isDark ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:brightness-110' : 'bg-emerald-600 text-white hover:bg-emerald-700')
+                }`}
               >
-                ✕
+                <span>Send</span>
+                <span>🚀</span>
               </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5 font-mono text-xs">
-              <div className={`p-3 rounded-xl ${isDark ? 'bg-[#142027]' : 'bg-slate-50'}`}>
-                <div className="text-[10px] text-slate-400">TOTAL BORROWED</div>
-                <div className="text-base font-black text-amber-500 mt-0.5">
-                  {selectedLender.totalBorrowed > 0 ? `₹${selectedLender.totalBorrowed.toLocaleString('en-IN')}` : '—'}
-                </div>
-                <div className="text-[9px] text-slate-400">{selectedLender.borrowCount} disbursals</div>
-              </div>
-
-              <div className={`p-3 rounded-xl ${isDark ? 'bg-[#142027]' : 'bg-slate-50'}`}>
-                <div className="text-[10px] text-slate-400">TOTAL REPAID</div>
-                <div className="text-base font-black text-rose-500 mt-0.5">
-                  ₹{selectedLender.totalRepaid.toLocaleString('en-IN')}
-                </div>
-                <div className="text-[9px] text-slate-400">{selectedLender.repayCount} debits</div>
-              </div>
-            </div>
-
-            <div className={`p-3 rounded-xl text-xs space-y-1.5 ${isDark ? 'bg-black/20' : 'bg-slate-100'}`}>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Net Repayment Delta:</span>
-                <span className={`font-mono font-black ${selectedLender.netDelta >= 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                  {selectedLender.netDelta >= 0 ? `+₹${selectedLender.netDelta.toLocaleString('en-IN')}` : `-₹${Math.abs(selectedLender.netDelta).toLocaleString('en-IN')}`}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Recycling Risk Tier:</span>
-                <span className="font-bold text-amber-400">{selectedLender.recyclingRisk}</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSelectedLender(null)}
-              className="w-full py-2.5 rounded-2xl text-xs font-black bg-brand-600 hover:bg-brand-700 text-white"
-            >
-              Done
-            </button>
+            </form>
           </div>
         </div>
       )}
-
-      {/* ── 18. RECIPIENT DRILLDOWN MODAL ─────────────────────────────── */}
-      {selectedRecipient && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-          <div className={`w-full max-w-md p-6 rounded-[32px] border space-y-4 shadow-2xl ${
-            isDark ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' : 'bg-white border-slate-200 text-slate-900 shadow-xl'
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-black">{selectedRecipient.name}</h3>
-                <p className="text-[11px] text-slate-400 font-mono">{selectedRecipient.upiHandle}</p>
-              </div>
-              <button
-                onClick={() => setSelectedRecipient(null)}
-                className={`p-1.5 rounded-full ${isDark ? 'bg-white/5 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-600'}`}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5 font-mono text-xs">
-              <div className={`p-3 rounded-xl ${isDark ? 'bg-[#142027]' : 'bg-slate-50'}`}>
-                <div className="text-[10px] text-slate-400">TOTAL SENT (DEBIT)</div>
-                <div className="text-base font-black text-rose-500 mt-0.5">₹{selectedRecipient.totalSent.toLocaleString('en-IN')}</div>
-              </div>
-
-              <div className={`p-3 rounded-xl ${isDark ? 'bg-[#142027]' : 'bg-slate-50'}`}>
-                <div className="text-[10px] text-slate-400">TOTAL RECEIVED</div>
-                <div className="text-base font-black text-emerald-400 mt-0.5">
-                  {selectedRecipient.totalReceived > 0 ? `₹${selectedRecipient.totalReceived.toLocaleString('en-IN')}` : '—'}
-                </div>
-              </div>
-            </div>
-
-            <div className={`p-3.5 rounded-xl text-xs space-y-1.5 leading-relaxed ${isDark ? 'bg-black/20 text-slate-300' : 'bg-slate-100 text-slate-700'}`}>
-              <div><strong>Forensic Audit Note:</strong> {selectedRecipient.notes}</div>
-              <div><strong>Average Ticket Size:</strong> ₹{Math.round(selectedRecipient.totalSent / selectedRecipient.txnCount).toLocaleString('en-IN')} ({selectedRecipient.txnCount} transactions)</div>
-            </div>
-
-            <button
-              onClick={() => setSelectedRecipient(null)}
-              className="w-full py-2.5 rounded-2xl text-xs font-black bg-brand-600 hover:bg-brand-700 text-white"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+      {/* Forensic Report Export Modal */}
+      {showReportModal && hasData && (
+        <ForensicReportModal
+          dataset={forensicData}
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+          onClose={() => setShowReportModal(false)}
+        />
       )}
-
     </div>
   );
 };

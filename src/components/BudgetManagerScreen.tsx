@@ -28,10 +28,10 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
   const isOverBudget = remainingBudget < 0;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-8">
+    <div className="space-y-6 max-w-4xl mx-auto pb-8 animate-emergence">
       {/* 1. Overall Monthly Budget Card */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-200 relative overflow-hidden ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
+      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 relative overflow-hidden backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div>
@@ -48,10 +48,10 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
 
           <button
             onClick={() => setIsEditingBudget(!isEditingBudget)}
-            className={`px-4 py-2 rounded-2xl text-xs font-black border transition-all duration-150 active:scale-95 ${
+            className={`px-4 py-2 rounded-2xl text-xs font-black border transition-all duration-150 active:scale-95 backdrop-blur-md ${
               isDark 
-                ? 'bg-[#142027] hover:bg-[#1a2832] text-brand-viridian border-brand-viridian/30 shadow-md' 
-                : 'bg-emerald-50 hover:bg-emerald-100 text-brand-800 border-brand-200 shadow-sm'
+                ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-400/30 shadow-md' 
+                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200 shadow-sm'
             }`}
           >
             {isEditingBudget ? 'Cancel Edit' : '⚙️ Adjust Budget Target'}
@@ -59,8 +59,8 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
         </div>
 
         {isEditingBudget && (
-          <div className={`mb-5 p-4 rounded-2xl border flex items-center gap-3 max-w-md animate-fade-in ${
-            isDark ? 'bg-[#142027] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+          <div className={`mb-5 p-4 rounded-2xl border flex items-center gap-3 max-w-md animate-emergence backdrop-blur-xl ${
+            isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
           }`}>
             <span className="text-sm text-slate-400 font-bold">₹</span>
             <input
@@ -78,7 +78,7 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
                 setIsEditingBudget(false);
               }}
               className={`px-4 py-2 font-black text-xs rounded-xl transition shadow-sm ${
-                isDark ? 'bg-brand-viridian text-slate-950 hover:bg-brand-viridianDark' : 'bg-brand-600 text-white hover:bg-brand-700'
+                isDark ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 hover:brightness-110' : 'bg-emerald-600 text-white hover:bg-emerald-700'
               }`}
             >
               Save Limit
@@ -87,18 +87,18 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
         )}
 
         {/* Progress Bar */}
-        <div className={`h-3.5 rounded-full overflow-hidden mb-3 ${isDark ? 'bg-black/40' : 'bg-slate-100'}`}>
+        <div className={`h-3.5 rounded-full overflow-hidden mb-3 p-0.5 border ${isDark ? 'bg-black/40 border-white/10' : 'bg-slate-100 border-slate-200'}`}>
           <div
             style={{ width: `${budgetPct}%` }}
             className={`h-full rounded-full transition-all duration-500 ${
-              budgetPct >= 90 ? 'bg-rose-500' : budgetPct >= 75 ? 'bg-amber-500' : isDark ? 'bg-brand-viridian' : 'bg-brand-600'
+              budgetPct >= 90 ? 'bg-rose-500' : budgetPct >= 75 ? 'bg-amber-500' : 'bg-gradient-to-r from-emerald-400 to-teal-400'
             }`}
           />
         </div>
 
         <div className="flex items-center justify-between text-xs sm:text-sm">
           <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{budgetPct}% of target budget consumed</span>
-          <span className={`font-black font-mono ${isOverBudget ? 'text-rose-600 dark:text-rose-400' : isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>
+          <span className={`font-black font-mono ${isOverBudget ? 'text-rose-500 dark:text-rose-400' : isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
             {isOverBudget 
               ? `₹${Math.abs(Math.round(remainingBudget)).toLocaleString('en-IN')} Over Budget` 
               : `₹${Math.round(remainingBudget).toLocaleString('en-IN')} Safe to Spend`}
@@ -107,10 +107,10 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
       </div>
 
       {/* 2. Category-Specific Budget Breakdown */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-200 ${
-        isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
+      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
+        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
       }`}>
-        <h4 className={`text-sm font-black uppercase tracking-wider mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+        <h4 className={`text-sm font-black font-heading uppercase tracking-wider mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           Category Budgets & Velocity
         </h4>
 
@@ -122,8 +122,8 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
             return (
               <div
                 key={cat.category}
-                className={`p-4 rounded-2xl border transition-all duration-150 ${
-                  isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'
+                className={`p-4 rounded-2xl border transition-all duration-150 backdrop-blur-xl ${
+                  isDark ? 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -135,7 +135,7 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
                       ●
                     </div>
                     <div>
-                      <div className={`text-xs font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{cat.category}</div>
+                      <div className={`text-xs sm:text-sm font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{cat.category}</div>
                       <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{cat.eventCount} transactions</div>
                     </div>
                   </div>
@@ -164,4 +164,3 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
     </div>
   );
 };
-

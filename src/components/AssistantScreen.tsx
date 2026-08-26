@@ -92,8 +92,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
   ];
 
   return (
-    <div className={`p-6 sm:p-8 rounded-[32px] border flex flex-col h-[75vh] transition-all duration-200 ${
-      isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
+    <div className={`p-6 sm:p-8 rounded-[32px] border flex flex-col h-[75vh] transition-all duration-300 backdrop-blur-2xl animate-emergence ${
+      isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
     }`}>
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto space-y-4 pr-2 no-scrollbar">
@@ -103,12 +103,12 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
             className={`flex flex-col ${m.sender === 'USER' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`p-4 sm:p-5 rounded-[24px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition ${
+              className={`p-4 sm:p-5 rounded-[24px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition backdrop-blur-xl ${
                 m.sender === 'USER'
-                  ? 'bg-gradient-to-r from-selvex-600 to-selvex-500 text-white font-bold rounded-tr-none shadow-md shadow-selvex-500/25'
+                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold rounded-tr-none shadow-md shadow-indigo-500/25'
                   : isDark
-                  ? 'bg-[#142027] text-white border border-white/[0.08] rounded-tl-none'
-                  : 'bg-slate-50 text-slate-900 border border-slate-200/80 shadow-sm rounded-tl-none'
+                  ? 'bg-white/[0.04] text-white border border-white/[0.08] rounded-tl-none shadow-sm'
+                  : 'bg-white text-slate-900 border border-slate-200/80 shadow-sm rounded-tl-none'
               }`}
             >
               <div className="whitespace-pre-wrap">{m.text}</div>
@@ -120,17 +120,17 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
                     <div
                       key={ev.id}
                       onClick={() => onSelectEvent(ev)}
-                      className={`p-3 rounded-2xl cursor-pointer flex items-center justify-between transition text-xs border ${
+                      className={`p-3 rounded-2xl cursor-pointer flex items-center justify-between transition text-xs border backdrop-blur-md ${
                         isDark 
-                          ? 'bg-[#10181E] border-white/[0.06] hover:border-brand-viridian/40' 
-                          : 'bg-white border-slate-200 hover:border-brand-500 shadow-sm'
+                          ? 'bg-[#0E1720]/90 border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06]' 
+                          : 'bg-slate-50 border-slate-200 hover:border-emerald-500 shadow-sm'
                       }`}
                     >
                       <div className="min-w-0 pr-2">
-                        <div className={`font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{ev.merchant}</div>
+                        <div className={`font-black font-heading truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{ev.merchant}</div>
                         <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{ev.dateFormatted}</div>
                       </div>
-                      <div className="font-black font-mono text-rose-600 dark:text-rose-400 flex-shrink-0">
+                      <div className="font-black font-mono text-rose-500 dark:text-rose-400 flex-shrink-0">
                         ₹{ev.amount.toLocaleString('en-IN')}
                       </div>
                     </div>
@@ -149,10 +149,10 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
           <button
             key={p}
             onClick={() => handleQuery(p)}
-            className={`px-3.5 py-1.5 rounded-2xl whitespace-nowrap transition-all duration-150 border flex-shrink-0 font-bold active:scale-95 ${
+            className={`px-3.5 py-1.5 rounded-2xl whitespace-nowrap transition-all duration-150 border flex-shrink-0 font-bold active:scale-95 backdrop-blur-md ${
               isDark 
-                ? 'bg-[#142027] border-white/[0.08] text-slate-200 hover:border-selvex-400 hover:text-white' 
-                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                ? 'bg-white/[0.04] border-white/[0.08] text-slate-200 hover:border-indigo-400 hover:text-white hover:bg-white/[0.08]' 
+                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white hover:text-slate-900 shadow-sm'
             }`}
           >
             {p}
@@ -168,15 +168,15 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleQuery(inputText)}
           placeholder="Ask Copilot about any spend, payee, loan, cashflow..."
-          className={`w-full px-5 py-4 pr-24 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-150 ${
+          className={`w-full px-5 py-4 pr-24 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-200 backdrop-blur-xl ${
             isDark 
-              ? 'bg-[#142027] border-white/[0.08] text-white placeholder-slate-500 focus:border-selvex-500 focus:ring-2 focus:ring-selvex-500/20' 
-              : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-selvex-500 focus:ring-2 focus:ring-selvex-500/20 shadow-sm'
+              ? 'bg-[#0E1720]/90 border-white/[0.1] text-white placeholder-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 shadow-inner' 
+              : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-sm'
           }`}
         />
         <button
           onClick={() => handleQuery(inputText)}
-          className="absolute right-3 top-5 px-5 py-2 bg-selvex-600 hover:bg-selvex-500 text-white font-black text-xs rounded-xl transition-all duration-150 shadow-md shadow-selvex-500/30 hover:scale-105 active:scale-95"
+          className="absolute right-3 top-5 px-5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:brightness-110 text-white font-black text-xs rounded-xl transition-all duration-150 shadow-md shadow-indigo-500/30 hover:scale-105 active:scale-95"
         >
           Send
         </button>
@@ -184,4 +184,5 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
     </div>
   );
 };
+
 
