@@ -22,10 +22,33 @@ export const AppShell: React.FC<AppShellProps> = ({
   onLogout,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('bytfloww_theme_mode') as 'dark' | 'light') || 'dark';
+  });
+
+  // Apply theme class to root
+  React.useEffect(() => {
+    if (themeMode === 'light') {
+      document.documentElement.classList.add('light');
+      document.body.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+      document.body.classList.remove('light');
+    }
+  }, [themeMode]);
+
+  const handleToggleTheme = () => {
+    const nextMode = themeMode === 'dark' ? 'light' : 'dark';
+    setThemeMode(nextMode);
+    localStorage.setItem('bytfloww_theme_mode', nextMode);
+    const nextEnv = nextMode === 'light' ? 'bytlend_champagne' : 'bytlend_gold_obsidian';
+    localStorage.setItem('bytfloww_spatial_env', nextEnv);
+    window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: nextEnv }));
+  };
 
   const handleCycleEnvironment = () => {
     const envs = ['bytlend_gold_obsidian', 'bytlend_champagne', 'living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
-    const cur = localStorage.getItem('bytfloww_spatial_env') || 'bytlend_gold_obsidian';
+    const cur = localStorage.getItem('bytfloww_spatial_env') || (themeMode === 'light' ? 'bytlend_champagne' : 'bytlend_gold_obsidian');
     const nextIndex = (envs.indexOf(cur as any) + 1) % envs.length;
     const nextEnv = envs[nextIndex];
     localStorage.setItem('bytfloww_spatial_env', nextEnv);
@@ -47,15 +70,15 @@ export const AppShell: React.FC<AppShellProps> = ({
             <BytLendLogo size="md" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm sm:text-base tracking-tight text-white flex items-center">
-                  Byt<span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Lend</span>
+                <span className="font-bold text-sm sm:text-base tracking-tight flex items-center text-white">
+                  Byt<span className="bg-gradient-to-r from-[#F9E7B9] via-[#E5A96A] to-[#B87B3D] bg-clip-text text-transparent ml-0.5">Lend</span>
                 </span>
-                <span className="text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#F3E6B1] border border-[#D4AF37]/30 tracking-wider uppercase">
-                  3D LUXURY
+                <span className="text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#D49B5A]/15 text-[#F9E7B9] border border-[#D49B5A]/30 tracking-wider uppercase">
+                  {themeMode === 'light' ? '3D CHAMPAGNE' : '3D OBSIDIAN'}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/60">
-                <span className="text-[#D4AF37] font-semibold">● Capital Intelligence</span>
+                <span className="text-[#D49B5A] font-semibold">● Capital Intelligence</span>
                 <span className="hidden sm:inline text-white/40">• Borrow Smarter. Live Better.</span>
               </div>
             </div>
@@ -94,7 +117,7 @@ export const AppShell: React.FC<AppShellProps> = ({
             {/* User Session Profile Chip */}
             {currentUser && (
               <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-[#D4AF37]/25 text-xs">
-                <div className="w-6 h-6 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-[10px] font-bold text-[#F3E6B1]">
+                <div className="w-6 h-6 rounded-full bg-[#D49B5A]/20 border border-[#D49B5A]/40 flex items-center justify-center text-[10px] font-bold text-[#F9E7B9]">
                   {currentUser.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="text-left">
@@ -108,11 +131,21 @@ export const AppShell: React.FC<AppShellProps> = ({
               </div>
             )}
 
+            {/* Light / Dark Mode Toggle Button */}
+            <button
+              onClick={handleToggleTheme}
+              className="spatial-btn px-3.5 py-1.5 text-xs flex items-center gap-1.5 border-[#D49B5A]/30"
+              title={`Switch to ${themeMode === 'dark' ? 'Light Champagne Mode' : 'Dark Obsidian Mode'}`}
+            >
+              <span>{themeMode === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="hidden sm:inline font-semibold">{themeMode === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
+
             {/* Environment Switcher (Desktop Header) */}
             <button
               onClick={handleCycleEnvironment}
-              className="hidden sm:flex spatial-btn px-3.5 py-1.5 text-xs items-center gap-1.5"
-              title="Switch Spatial Environment (Gold & Obsidian)"
+              className="hidden sm:flex spatial-btn px-3.5 py-1.5 text-xs items-center gap-1.5 border-[#D49B5A]/30"
+              title="Switch Spatial Environment Space"
             >
               <span>✨</span>
               <span className="hidden md:inline">Theme Space</span>
