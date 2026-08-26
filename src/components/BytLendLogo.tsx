@@ -12,77 +12,91 @@ export const BytLendLogo: React.FC<BytLendLogoProps> = ({
   className = '',
 }) => {
   const sizeMap = {
-    sm: 'w-7 h-7 rounded-[10px]',
-    md: 'w-10 h-10 rounded-[14px]',
-    lg: 'w-14 h-14 rounded-[18px]',
-    xl: 'w-20 h-20 rounded-[24px]',
+    sm: 'w-8 h-8 rounded-[12px]',
+    md: 'w-11 h-11 rounded-[16px]',
+    lg: 'w-16 h-16 rounded-[22px]',
+    xl: 'w-24 h-24 rounded-[32px]',
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* 3D Gold Squircle Emblem */}
+    <div className={`flex items-center gap-3.5 ${className}`}>
+      {/* 3D Rose-Gold Squircle Emblem matching exact reference */}
       <div 
-        className={`${sizeMap[size]} relative flex items-center justify-center p-1.5 shrink-0 bg-gradient-to-b from-[#1E232A] to-[#0A0D11] border border-[#D4AF37]/50 shadow-[0_4px_20px_rgba(212,175,55,0.35)] transition-transform duration-300 hover:scale-105`}
+        className={`${sizeMap[size]} relative flex items-center justify-center p-2 shrink-0 bg-gradient-to-b from-[#14171D] via-[#0E1116] to-[#080A0D] border-[1.5px] border-[#D49B5A] shadow-[0_8px_28px_rgba(0,0,0,0.85),0_0_20px_rgba(212,155,90,0.3)] transition-transform duration-300 hover:scale-105`}
         style={{
-          boxShadow: '0 4px 20px rgba(212, 175, 55, 0.35), inset 0 1px 1px rgba(243, 230, 177, 0.4)',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.9), inset 0 1px 1.5px rgba(243, 210, 162, 0.7), 0 0 16px rgba(212, 155, 90, 0.25)',
         }}
       >
         <svg
-          viewBox="0 0 100 100"
-          className="w-full h-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+          viewBox="0 0 120 120"
+          className="w-full h-full drop-shadow-[0_4px_8px_rgba(0,0,0,0.95)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <linearGradient id="bytlendGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F9F1D8" />
-              <stop offset="35%" stopColor="#D4AF37" />
-              <stop offset="70%" stopColor="#AA7C11" />
-              <stop offset="100%" stopColor="#E5C158" />
+            {/* Satin Brushed Rose-Gold Metallic Gradient */}
+            <linearGradient id="roseGold3D" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F9E7B9" />
+              <stop offset="25%" stopColor="#E5A96A" />
+              <stop offset="60%" stopColor="#B87B3D" />
+              <stop offset="85%" stopColor="#D49B5A" />
+              <stop offset="100%" stopColor="#8F5C26" />
             </linearGradient>
-            <linearGradient id="bytlendGoldGradLight" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#AA7C11" />
-              <stop offset="50%" stopColor="#F3E6B1" />
-              <stop offset="100%" stopColor="#D4AF37" />
+
+            {/* Top Light Glint Gradient */}
+            <linearGradient id="roseGoldHighlight" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#A86E32" />
+              <stop offset="40%" stopColor="#ECC18D" />
+              <stop offset="70%" stopColor="#FFF2D6" />
+              <stop offset="100%" stopColor="#D49B5A" />
             </linearGradient>
+
+            {/* Inner Depth Shadow */}
+            <filter id="goldDepth" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#000000" floodOpacity="0.8" />
+            </filter>
           </defs>
 
-          {/* Left Vertical Spine Bar */}
+          {/* 1. Left Vertical Spine Pill (Bar 1) */}
           <path
-            d="M26 18C26 16.8954 26.8954 16 28 16H34C35.1046 16 36 16.8954 36 18V82C36 83.1046 35.1046 84 34 84H28C26.8954 84 26 83.1046 26 82V18Z"
-            fill="url(#bytlendGoldGrad)"
+            d="M32 24C32 20.6863 34.6863 18 38 18C41.3137 18 44 20.6863 44 24V96C44 99.3137 41.3137 102 38 102C34.6863 102 32 99.3137 32 96V24Z"
+            fill="url(#roseGold3D)"
+            filter="url(#goldDepth)"
           />
 
-          {/* Top Angled Chevron */}
+          {/* 2. Top-Right Angled Diagonal Pill (Bar 2) */}
           <path
-            d="M48 20C48 18.8954 48.8954 18 50 18H58C58.7403 18 59.4316 18.4087 59.7913 19.0573L77.7913 51.0573C78.4735 52.2852 77.5855 53.8 76.1857 53.8H67.8143C67.074 53.8 66.3827 53.3913 66.023 52.7427L51.023 25.7427C50.3408 24.5148 51.2288 23 52.6286 23H48V20Z"
-            fill="url(#bytlendGoldGradLight)"
+            d="M58 24C58 20.6863 60.6863 18 64 18H72C74.6522 18 77.1087 19.4673 78.4343 21.7671L90.4343 42.5671C92.0519 45.3742 90.0384 48.9 86.8 48.9H78.8C76.1478 48.9 73.6913 47.4327 72.3657 45.1329L60.3657 24.3329C58.8471 21.6967 58 22.8464 58 24Z"
+            fill="url(#roseGoldHighlight)"
+            filter="url(#goldDepth)"
           />
 
-          {/* Middle Inner Chevron */}
+          {/* 3. Middle Arrowhead Chevron (Bar 3) */}
           <path
-            d="M48 42C48 40.8954 48.8954 40 50 40H56C56.7403 40 57.4316 40.4087 57.7913 41.0573L67.7913 58.8351C68.4735 60.063 67.5855 61.5778 66.1857 61.5778H59.8143C59.074 61.5778 58.3827 61.1691 58.023 60.5205L50.023 46.1205C49.3408 44.8926 50.2288 43.3778 51.6286 43.3778H48V42Z"
-            fill="url(#bytlendGoldGrad)"
+            d="M58 48C58 45.2386 60.2386 43 63 43H68C70.1217 43 72.087 44.1739 73.1475 46.0137L81.1475 59.8863C82.4187 62.0914 80.8288 64.9 78.2713 64.9H73.2713C71.1496 64.9 69.1843 63.7261 68.1238 61.8863L60.1238 48.0137C58.8525 45.8086 58 46.6193 58 48Z"
+            fill="url(#roseGold3D)"
+            filter="url(#goldDepth)"
           />
 
-          {/* Bottom Angled Chevron Leg */}
+          {/* 4. Bottom-Right Angled Diagonal Leg (Bar 4) */}
           <path
-            d="M78 80C78 81.1046 77.1046 82 76 82H68C67.2597 82 66.5684 81.5913 66.2087 80.9427L44.2087 41.9427C43.5265 40.7148 44.4145 39.2 45.8143 39.2H54.1857C54.926 39.2 55.6173 39.6087 55.977 40.2573L76.977 77.2573C77.6592 78.4852 76.7712 80 75.3714 80H78Z"
-            fill="url(#bytlendGoldGrad)"
+            d="M92 96C92 99.3137 89.3137 102 86 102H78C75.3478 102 72.8913 100.533 71.5657 98.2329L53.5657 67.0329C51.9481 64.2258 53.9616 60.7 57.2 60.7H65.2C67.8522 60.7 70.3087 62.1673 71.6343 64.4671L89.6343 95.6671C91.1529 98.3033 92 97.1536 92 96Z"
+            fill="url(#roseGold3D)"
+            filter="url(#goldDepth)"
           />
         </svg>
       </div>
 
-      {/* Brand Typography Lockup */}
+      {/* Exact Typography matching BytLend brand guidelines */}
       {showText && (
         <div>
-          <div className="flex items-center text-lg sm:text-xl font-bold tracking-tight">
-            <span className="text-white">Byt</span>
-            <span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent ml-0.5">
+          <div className="flex items-center text-xl sm:text-2xl font-bold tracking-tight">
+            <span className="text-white font-semibold">Byt</span>
+            <span className="bg-gradient-to-r from-[#F9E7B9] via-[#E5A96A] to-[#B87B3D] bg-clip-text text-transparent ml-0.5 font-bold">
               Lend
             </span>
           </div>
-          <div className="text-[8px] font-bold tracking-[0.2em] text-[#D4AF37]/80 uppercase mt-0.5">
+          <div className="text-[9px] font-bold tracking-[0.25em] text-[#D49B5A] uppercase mt-0.5">
             Borrow Smarter. Live Better.
           </div>
         </div>

@@ -15,7 +15,12 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
   environment = 'bytlend_gold_obsidian' 
 }) => {
   const [currentEnv, setCurrentEnv] = useState<SpatialEnvironmentType>(() => {
-    return (localStorage.getItem('bytfloww_spatial_env') as SpatialEnvironmentType) || environment;
+    const saved = localStorage.getItem('bytfloww_spatial_env');
+    if (saved === 'living_room' || saved === 'twilight_penthouse' || !saved) {
+      localStorage.setItem('bytfloww_spatial_env', 'bytlend_gold_obsidian');
+      return 'bytlend_gold_obsidian';
+    }
+    return (saved as SpatialEnvironmentType) || 'bytlend_gold_obsidian';
   });
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 

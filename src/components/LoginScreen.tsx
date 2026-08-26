@@ -268,30 +268,46 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         )}
 
         {/* Quick Demo Access */}
-        <div className="pt-4 border-t border-white/10 space-y-3">
-          <div className="text-[10px] font-bold uppercase text-white/50 tracking-wider">
+        <div className="pt-4 border-t border-[#D49B5A]/25 space-y-3">
+          <div className="text-[10px] font-bold uppercase text-[#D49B5A]/80 tracking-wider">
             Quick One-Click Access (Authorized Session)
           </div>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => handleGuestAccess('BANK_STATEMENTS')}
-              className="spatial-btn p-3 text-xs text-white"
+              className="spatial-btn p-3 text-xs text-white border-[#D49B5A]/30"
             >
-              <div className="font-bold">🏛️ Statement Hub</div>
+              <div className="font-bold text-[#F9E7B9]">🏛️ Statement Hub</div>
               <div className="text-[9px] text-white/50 mt-0.5 font-normal">Forensics Engine</div>
             </button>
 
             <button
               type="button"
               onClick={() => handleGuestAccess('SMS_INTELLIGENCE')}
-              className="spatial-btn p-3 text-xs text-white"
+              className="spatial-btn p-3 text-xs text-white border-[#D49B5A]/30"
             >
-              <div className="font-bold">📱 SMS Simulator</div>
+              <div className="font-bold text-[#F9E7B9]">📱 SMS Simulator</div>
               <div className="text-[9px] text-white/50 mt-0.5 font-normal">Android XML Parser</div>
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Brand Trust Badges from Official Spec */}
+      <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-bold tracking-[0.2em] text-[#D49B5A] uppercase">
+        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
+          🛡️ TRUSTED
+        </span>
+        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
+          🔒 SECURE
+        </span>
+        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
+          📈 SMART AI
+        </span>
+        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
+          ⚡ FAST
+        </span>
       </div>
     </div>
   );

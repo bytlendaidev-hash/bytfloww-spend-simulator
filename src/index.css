@@ -6,21 +6,23 @@
 
 @layer base {
   :root {
-    /* BytLend 3D Luxury Gold & Obsidian Palette */
-    --spatial-bg: #080C0E;
-    --gold-primary: #D4AF37;
-    --gold-light: #F3E6B1;
-    --gold-dark: #AA7C11;
-    --gold-accent: #E5C158;
-    --obsidian-surface: #121417;
-    --obsidian-card: #16191E;
-    --spatial-accent: #D4AF37; /* BytLend Signature Gold */
+    /* Exact BytLend 3D Rose-Gold & Carbon Obsidian Palette */
+    --spatial-bg: #080A0D;
+    --gold-primary: #D49B5A;
+    --gold-bright: #E5A96A;
+    --gold-light: #F9E7B9;
+    --gold-dark: #B87B3D;
+    --gold-deep: #8F5C26;
+    --obsidian-canvas: #080A0D;
+    --obsidian-surface: #0E1217;
+    --obsidian-card: #13171F;
+    --spatial-accent: #D49B5A; /* BytLend Signature Rose Gold */
     --spatial-accent-purple: #AF52DE;
     --spatial-accent-indigo: #6366F1;
   }
 
   body {
-    background-color: #080C0E;
+    background-color: #080A0D;
     color: #FFFFFF;
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Satoshi', 'Plus Jakarta Sans', 'SF Pro Display', sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -43,106 +45,106 @@
 }
 
 @layer components {
-  /* ── 1. THE BYTLEND 3D GOLD & OBSIDIAN SPATIAL GLASS BASE ───────────── */
+  /* ── 1. THE BYTLEND 3D ROSE-GOLD & CARBON OBSIDIAN SPATIAL GLASS ───── */
   .spatial-window {
-    background-color: rgba(14, 18, 24, 0.82);
+    background-color: rgba(10, 13, 18, 0.88);
     backdrop-filter: blur(35px) saturate(210%);
     -webkit-backdrop-filter: blur(35px) saturate(210%);
-    border: 1px solid rgba(212, 175, 55, 0.28);
+    border: 1px solid rgba(212, 155, 90, 0.32);
     box-shadow: 
-      0 12px 48px 0 rgba(0, 0, 0, 0.65),
-      0 0 40px 0 rgba(212, 175, 55, 0.08),
-      inset 0 1px 1px 0 rgba(243, 230, 177, 0.35),
-      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.40);
+      0 16px 64px 0 rgba(0, 0, 0, 0.90),
+      0 0 50px 0 rgba(212, 155, 90, 0.12),
+      inset 0 1px 1.5px 0 rgba(249, 231, 185, 0.40),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.50);
     border-radius: 24px;
   }
 
   .spatial-card {
-    background-color: rgba(18, 22, 28, 0.78);
+    background-color: rgba(14, 18, 24, 0.82);
     backdrop-filter: blur(30px) saturate(210%);
     -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(212, 175, 55, 0.18);
+    border: 1px solid rgba(212, 155, 90, 0.22);
     box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.45),
-      inset 0 1px 1px 0 rgba(243, 230, 177, 0.22);
+      0 10px 36px 0 rgba(0, 0, 0, 0.65),
+      inset 0 1px 1px 0 rgba(249, 231, 185, 0.25);
     border-radius: 18px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .spatial-card:hover {
-    background-color: rgba(26, 31, 40, 0.88);
-    border-color: rgba(212, 175, 55, 0.40);
+    background-color: rgba(20, 26, 35, 0.90);
+    border-color: rgba(212, 155, 90, 0.45);
     transform: scale(1.01) translateY(-2px);
     box-shadow: 
-      0 14px 40px 0 rgba(0, 0, 0, 0.55),
-      0 0 25px 0 rgba(212, 175, 55, 0.15),
-      inset 0 1px 1px 0 rgba(243, 230, 177, 0.40);
+      0 16px 48px 0 rgba(0, 0, 0, 0.75),
+      0 0 30px 0 rgba(212, 155, 90, 0.18),
+      inset 0 1px 1px 0 rgba(249, 231, 185, 0.45);
   }
 
   /* ── 2. GAZE & TOUCH INTERACTIVE BUTTONS ────────────────────────────── */
   .spatial-btn {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(14, 18, 24, 0.75);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(212, 175, 55, 0.20);
+    border: 1px solid rgba(212, 155, 90, 0.25);
     border-radius: 9999px;
-    color: rgba(255, 255, 255, 0.80);
+    color: #F9E7B9;
     font-weight: 600;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: inset 0 1px 0 0 rgba(243, 230, 177, 0.15);
+    box-shadow: inset 0 1px 0 0 rgba(249, 231, 185, 0.20);
   }
 
   .spatial-btn:hover {
-    background-color: rgba(212, 175, 55, 0.15);
-    border-color: rgba(212, 175, 55, 0.50);
+    background-color: rgba(212, 155, 90, 0.20);
+    border-color: rgba(212, 155, 90, 0.55);
     color: #FFFFFF;
     transform: scale(1.02);
     box-shadow: 
-      0 4px 16px 0 rgba(0, 0, 0, 0.35),
-      0 0 15px 0 rgba(212, 175, 55, 0.20),
-      inset 0 1px 1px 0 rgba(243, 230, 177, 0.35);
+      0 4px 16px 0 rgba(0, 0, 0, 0.40),
+      0 0 18px 0 rgba(212, 155, 90, 0.25),
+      inset 0 1px 1px 0 rgba(249, 231, 185, 0.40);
   }
 
   .spatial-btn:active {
     transform: scale(0.98);
   }
 
-  /* Selected State: Signature BytLend Satin Gold Gradient */
+  /* Selected State: Signature BytLend 3D Rose-Gold Gradient */
   .spatial-btn-selected {
-    background: linear-gradient(135deg, #D4AF37 0%, #F3E6B1 50%, #C5A059 100%) !important;
-    border-color: #F3E6B1 !important;
-    color: #0C0E12 !important;
+    background: linear-gradient(135deg, #E5A96A 0%, #F9E7B9 45%, #D49B5A 100%) !important;
+    border-color: #FFF2D6 !important;
+    color: #080A0D !important;
     font-weight: 800 !important;
     box-shadow: 
-      0 4px 24px 0 rgba(212, 175, 55, 0.45),
-      0 2px 8px 0 rgba(0, 0, 0, 0.40),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.60) !important;
+      0 4px 28px 0 rgba(212, 155, 90, 0.55),
+      0 2px 8px 0 rgba(0, 0, 0, 0.50),
+      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.70) !important;
     transform: scale(1.02);
   }
 
-  /* Gold Luxury Card Variant */
+  /* Rose-Gold Luxury Card Variant */
   .spatial-card-gold {
-    background: linear-gradient(180deg, rgba(28, 32, 40, 0.85) 0%, rgba(14, 18, 24, 0.90) 100%);
+    background: linear-gradient(180deg, rgba(22, 28, 38, 0.90) 0%, rgba(10, 13, 18, 0.95) 100%);
     backdrop-filter: blur(35px) saturate(210%);
     -webkit-backdrop-filter: blur(35px) saturate(210%);
-    border: 1px solid rgba(212, 175, 55, 0.35);
+    border: 1.5px solid rgba(212, 155, 90, 0.40);
     box-shadow: 
-      0 12px 40px 0 rgba(0, 0, 0, 0.60),
-      0 0 30px 0 rgba(212, 175, 55, 0.12),
-      inset 0 1px 1px 0 rgba(243, 230, 177, 0.35);
-    border-radius: 20px;
+      0 16px 48px 0 rgba(0, 0, 0, 0.75),
+      0 0 35px 0 rgba(212, 155, 90, 0.16),
+      inset 0 1px 1.5px 0 rgba(249, 231, 185, 0.40);
+    border-radius: 22px;
   }
 
   /* ── 3. TAB BAR ORNAMENT (BYTLEND OBSIDIAN CAPSULE) ─────────────────── */
   .spatial-ornament {
-    background-color: rgba(14, 18, 24, 0.85);
+    background-color: rgba(10, 13, 18, 0.90);
     backdrop-filter: blur(30px) saturate(210%);
     -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(212, 175, 55, 0.25);
+    border: 1px solid rgba(212, 155, 90, 0.30);
     box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.55),
-      0 0 20px 0 rgba(212, 175, 55, 0.10),
-      inset 0 1px 1px 0 rgba(243, 230, 177, 0.30);
+      0 10px 36px 0 rgba(0, 0, 0, 0.70),
+      0 0 25px 0 rgba(212, 155, 90, 0.12),
+      inset 0 1px 1px 0 rgba(249, 231, 185, 0.35);
     border-radius: 9999px;
   }
 
