@@ -113,14 +113,14 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       </div>
 
       {/* ── ROW 1: DATE HORIZON FILTER PILLS (SWIPEABLE HORIZONTAL BAR) ── */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-2 px-2 sm:mx-0 sm:px-0">
         {dateRanges.map((range) => {
           const isSelected = snapshot.periodKey === range.key || (range.key === '2026-08' && snapshot.periodKey === '2026-08');
           return (
             <button
               key={range.key}
               onClick={() => onSelectPeriod(range.key)}
-              className={`px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`px-3.5 sm:px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0 ${
                 isSelected
                   ? 'spatial-btn-selected rounded-full'
                   : 'spatial-btn'
@@ -133,14 +133,14 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       </div>
 
       {/* ── ROW 2: MAIN TAB BAR ORNAMENT (VISIONOS SEGMENTED CONTROL) ──── */}
-      <div className="flex items-center gap-1.5 p-1.5 spatial-ornament overflow-x-auto no-scrollbar w-fit">
+      <div className="flex items-center gap-1.5 p-1.5 spatial-ornament overflow-x-auto no-scrollbar max-w-full -mx-2 px-2 sm:mx-0 sm:px-1.5">
         {mainTabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isActive
                   ? 'spatial-btn-selected'
                   : 'text-white/70 hover:text-white hover:bg-white/15'

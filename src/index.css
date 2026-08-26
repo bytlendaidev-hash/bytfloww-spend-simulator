@@ -122,9 +122,9 @@
     border-radius: 9999px;
   }
 
-  /* ── 4. MODALS & SHEETS ─────────────────────────────────────────────── */
+  /* ── 4. MODALS & SHEETS (RESPONSIVE DESKTOP + MOBILE BOTTOM SHEET) ── */
   .spatial-modal {
-    background-color: rgba(20, 26, 32, 0.85);
+    background-color: rgba(20, 26, 32, 0.90);
     backdrop-filter: blur(40px) saturate(220%);
     -webkit-backdrop-filter: blur(40px) saturate(220%);
     border: 1px solid rgba(255, 255, 255, 0.25);
@@ -132,6 +132,28 @@
       0 24px 64px 0 rgba(0, 0, 0, 0.75),
       inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45);
     border-radius: 24px;
+  }
+
+  /* Mobile Bottom Sheet Modal Class (Slides up smoothly on Android/iOS) */
+  .spatial-bottom-sheet {
+    background-color: rgba(18, 24, 30, 0.95);
+    backdrop-filter: blur(40px) saturate(220%);
+    -webkit-backdrop-filter: blur(40px) saturate(220%);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 
+      0 -12px 48px 0 rgba(0, 0, 0, 0.8),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+  }
+
+  /* Mobile Sticky Bottom Navigation (Android Native Navigation Feel) */
+  .spatial-bottom-nav {
+    background-color: rgba(12, 16, 23, 0.88);
+    backdrop-filter: blur(35px) saturate(210%);
+    -webkit-backdrop-filter: blur(35px) saturate(210%);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 -8px 32px 0 rgba(0, 0, 0, 0.5);
   }
 
   /* Legacy aliases mapped to pure spatial tokens */
@@ -162,6 +184,20 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  
+  /* Mobile Safe Area Padding */
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  /* Touch scrolling smoothness */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 

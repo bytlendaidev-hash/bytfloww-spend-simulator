@@ -100,42 +100,42 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       </div>
 
       {/* ── 2. TRI-METRIC CASHFLOW STRIP (3-COLUMN SPATIAL CARD) ─────────── */}
-      <div className="spatial-card p-6 grid grid-cols-3 gap-4 text-left">
+      <div className="spatial-card p-4 sm:p-6 grid grid-cols-3 gap-2 sm:gap-4 text-left">
         {/* Income */}
         <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#30D158]">
+          <div className="flex items-center gap-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#30D158]">
             <span>↓</span> Income
           </div>
-          <div className="text-sm sm:text-2xl font-bold font-mono text-white truncate">
+          <div className="text-xs sm:text-2xl font-bold font-mono text-white truncate">
             ₹{snapshot.totalIncome.toLocaleString('en-IN')}
           </div>
-          <div className="text-[10px] text-white/40 font-mono">Inflows reconciled</div>
+          <div className="text-[9px] sm:text-[10px] text-white/40 font-mono">Inflows</div>
         </div>
 
         {/* Expenses */}
-        <div className="space-y-1 border-l border-r border-white/15 px-4 sm:px-6">
-          <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#FF453A]">
-            <span>↑</span> Expenses
+        <div className="space-y-1 border-l border-r border-white/15 px-2 sm:px-6">
+          <div className="flex items-center gap-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#FF453A]">
+            <span>↑</span> Spend
           </div>
-          <div className="text-sm sm:text-2xl font-bold font-mono text-[#FF453A] truncate">
+          <div className="text-xs sm:text-2xl font-bold font-mono text-[#FF453A] truncate">
             ₹{snapshot.totalSpend.toLocaleString('en-IN')}
           </div>
-          <div className="text-[10px] text-white/40 font-mono">Total debits</div>
+          <div className="text-[9px] sm:text-[10px] text-white/40 font-mono">Debits</div>
         </div>
 
         {/* Net Flow */}
-        <div className="space-y-1 pl-2">
-          <div className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
+        <div className="space-y-1 pl-1 sm:pl-2">
+          <div className={`flex items-center gap-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
             snapshot.netCashflow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'
           }`}>
-            <span>⇄</span> Net Flow
+            <span>⇄</span> Net
           </div>
-          <div className={`text-sm sm:text-2xl font-bold font-mono truncate ${
+          <div className={`text-xs sm:text-2xl font-bold font-mono truncate ${
             snapshot.netCashflow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'
           }`}>
             {snapshot.netCashflow >= 0 ? '+' : '-'}₹{Math.abs(snapshot.netCashflow).toLocaleString('en-IN')}
           </div>
-          <div className="text-[10px] text-white/40 font-mono">Runway delta</div>
+          <div className="text-[9px] sm:text-[10px] text-white/40 font-mono">Delta</div>
         </div>
       </div>
 
