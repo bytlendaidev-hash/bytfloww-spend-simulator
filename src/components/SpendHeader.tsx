@@ -220,10 +220,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
               className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
                 isSelected
                   ? isDark 
-                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25 font-black' 
+                    ? 'visionos-pill-active text-white' 
                     : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20 font-black'
                   : isDark
-                  ? 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white'
+                  ? 'bg-white/[0.06] text-white/70 border-white/[0.12] hover:bg-white/[0.12] hover:text-white'
                   : 'bg-white/80 text-slate-700 border-slate-200/90 hover:bg-white hover:text-slate-900 shadow-sm'
               }`}
             >
@@ -237,7 +237,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           onClick={onOpenFilter}
           className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap border transition-all duration-150 flex-shrink-0 active:scale-95 backdrop-blur-xl ${
             isDark 
-              ? 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08]' 
+              ? 'bg-white/[0.06] text-white/80 border-white/[0.12] hover:bg-white/[0.12]' 
               : 'bg-white/80 text-slate-800 border-slate-200/90 hover:bg-white shadow-sm'
           }`}
         >
@@ -257,20 +257,21 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
               className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl text-[11px] sm:text-xs font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
                 isActive
                   ? isDark 
-                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25' 
+                    ? 'visionos-pill-active text-white' 
                     : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
                   : isDark
-                  ? 'bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white'
+                  ? 'bg-white/[0.06] text-white/70 border-white/[0.12] hover:bg-white/[0.12] hover:text-white'
                   : 'bg-white/80 text-slate-700 border-slate-200/90 hover:bg-white hover:text-slate-900 shadow-sm'
               }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
-              {isActive && <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-slate-950' : 'bg-white'}`} />}
+              {isActive && <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-white shadow-[0_0_8px_white]' : 'bg-white'}`} />}
             </button>
           );
         })}
       </div>
+
     </div>
   );
 };
