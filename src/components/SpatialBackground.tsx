@@ -1,51 +1,25 @@
 import React, { useEffect, useState } from 'react';
-
-export type SpatialEnvironmentType = 
-  | 'titanium_prism'
-  | 'bytlend_gold_obsidian' 
-  | 'bytlend_champagne' 
-  | 'living_room' 
-  | 'twilight_penthouse' 
-  | 'cosmic_mesh';
+import { THEME_TEMPLATES, ThemeTemplateId, getActiveThemeId } from '../theme/themes';
 
 interface SpatialBackgroundProps {
-  environment?: SpatialEnvironmentType;
   isDark?: boolean;
 }
 
 export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({ 
-  environment = 'titanium_prism',
-  isDark,
+  isDark = true,
 }) => {
-  const [currentEnv, setCurrentEnv] = useState<SpatialEnvironmentType>(() => {
-    const saved = localStorage.getItem('bytfloww_spatial_env');
-    if (saved === 'living_room' || saved === 'twilight_penthouse' || !saved) {
-      const defaultEnv = isDark === false ? 'bytlend_champagne' : 'titanium_prism';
-      localStorage.setItem('bytfloww_spatial_env', defaultEnv);
-      return defaultEnv;
-    }
-    return (saved as SpatialEnvironmentType) || (isDark === false ? 'bytlend_champagne' : 'titanium_prism');
-  });
+  const [activeTheme, setActiveTheme] = useState<ThemeTemplateId>(getActiveThemeId());
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
-  // Sync when isDark prop changes
+  // Listen for custom theme template change events across the app
   useEffect(() => {
-    if (isDark !== undefined) {
-      const targetEnv = isDark ? 'titanium_prism' : 'bytlend_champagne';
-      setCurrentEnv(targetEnv);
-    }
-  }, [isDark]);
-
-  // Listen for custom environment change events across the app
-  useEffect(() => {
-    const handleEnvChange = (e: CustomEvent<SpatialEnvironmentType>) => {
-      if (e.detail) {
-        setCurrentEnv(e.detail);
-        localStorage.setItem('bytfloww_spatial_env', e.detail);
+    const handleThemeChange = (e: CustomEvent<ThemeTemplateId>) => {
+      if (e.detail && e.detail in THEME_TEMPLATES) {
+        setActiveTheme(e.detail);
       }
     };
-    window.addEventListener('spatial-env-change' as any, handleEnvChange);
-    return () => window.removeEventListener('spatial-env-change' as any, handleEnvChange);
+    window.addEventListener('theme-template-change' as any, handleThemeChange);
+    return () => window.removeEventListener('theme-template-change' as any, handleThemeChange);
   }, []);
 
   useEffect(() => {
@@ -72,15 +46,45 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
     };
   }, []);
 
+  const currentTemplate = THEME_TEMPLATES[activeTheme] || THEME_TEMPLATES.apex_obsidian;
+  const t = isDark ? currentTemplate.dark : currentTemplate.light;
+
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-abyss-canvas"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
+      style={{ backgroundColor: t.canvas }}
       aria-hidden="true"
     >
-      {/* ── 1. SOLID DYNAMIC CANVAS ──────────────────────────────────────── */}
-      <div className="absolute inset-0 bg-abyss-canvas transition-colors duration-300" />
+      {/* ── 1. DYNAMIC AMBIENT MESH GLOW ─────────────────────────────────── */}
+      <div 
+        className="absolute inset-0 transition-opacity duration-700 opacity-100"
+        style={{
+          background: t.ambientGlow,
+          transform: `translate3d(${mouseOffset.x}px, ${mouseOffset.y}px, 0)`,
+          transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      />
 
-      {/* ── 3. MICRO-GRAIN NOISE OVERLAY ─────────────────────────────────── */}
+      {/* ── 2. SUBTLE RADIAL HIGHLIGHT (CYBER / SPATIAL AESTHETIC) ───────── */}
+      <div 
+        className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-[140px] opacity-20 pointer-events-none"
+        style={{ backgroundColor: currentTemplate.swatches.ai }}
+      />
+      <div 
+        className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full blur-[140px] opacity-20 pointer-events-none"
+        style={{ backgroundColor: currentTemplate.swatches.primary }}
+      />
+
+      {/* ── 3. SUBTLE CYBER GRID TEXTURE ─────────────────────────────────── */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] mix-blend-screen pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(${isDark ? '#FFFFFF' : '#000000'} 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
+        }}
+      />
+
+      {/* ── 4. MICRO-GRAIN NOISE OVERLAY ─────────────────────────────────── */}
       <svg
         className="absolute inset-0 w-full h-full opacity-[0.015] mix-blend-overlay"
         xmlns="http://www.w3.org/2000/svg"

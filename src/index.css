@@ -7,129 +7,105 @@
 @layer base {
   :root {
     /* ══════════════════════════════════════════════════════════════════════
-       BYTFLOWW "APEX VOID" DESIGN SYSTEM — DARK MODE DEFAULTS
-       Zero gradients. Six signal pillars. Void surfaces.
-       The color language of next-generation financial intelligence.
+       BYTFLOWW BILLION-DOLLAR FINTECH OS — CSS VARIABLES & DEFAULTS
+       Zero compromise. Five signature theme architectures.
     ══════════════════════════════════════════════════════════════════════ */
 
-    --spatial-bg: #07080E;
+    --spatial-bg: #07090E;
 
-    /* ── PILLAR 1: APEX TEAL — "Signal Green" (Inflow, Salary, Surplus) ──
-       Not generic green. Electric bioluminescent teal — unique in Indian fintech.
-       Reminiscent of phosphor displays & deep-sea bioluminescence. */
-    --color-jade-50:  #E0FFF7;
-    --color-jade-100: #B3FFE9;
-    --color-jade-200: #6DFFD5;
-    --color-jade-300: #00F5C0;
-    --color-jade-400: #00E0A8;
-    --color-jade-500: #00C896;   /* DARK MODE HERO — Electric Apex Teal */
-    --color-jade-600: #00A07A;
-    --color-jade-700: #007A5E;   /* LIGHT MODE HERO — Deep Forest Teal */
+    /* ── PILLAR 1: CYBER EMERALD (Inflow, Salary, Surplus) ── */
+    --color-jade-50:  #E6FAF2;
+    --color-jade-100: #C2F4DF;
+    --color-jade-200: #8DE7C2;
+    --color-jade-300: #4FD69F;
+    --color-jade-400: #1EC882;
+    --color-jade-500: #00F5A0;   /* DARK HERO — Electric Cyber Emerald */
+    --color-jade-600: #00C882;
+    --color-jade-700: #00875A;   /* LIGHT HERO — Sovereign Forest Jade */
     --color-jade-800: #004D3B;
     --color-jade-900: #002D22;
 
-    /* ── PILLAR 2: APEX VIOLET — "Synaptic Purple" (AI, Forensics, Intelligence) ──
-       Richer, warmer violet. Deeper than amethyst. More premium than indigo. */
+    /* ── PILLAR 2: HYPER VIOLET (AI Forensics, Synapse Intelligence) ── */
     --color-synapse-50:  #F4F0FF;
     --color-synapse-100: #E8DDFF;
     --color-synapse-200: #D4BBFF;
     --color-synapse-300: #B990FF;
     --color-synapse-400: #A070FF;
-    --color-synapse-500: #8B5CF6;  /* DARK MODE HERO — Hyper Violet */
+    --color-synapse-500: #8B5CF6;  /* DARK HERO — Hyper Violet */
     --color-synapse-600: #7340E8;
-    --color-synapse-700: #5B2EE0;  /* LIGHT MODE HERO — Deep Ultraviolet */
+    --color-synapse-700: #5B2EE0;  /* LIGHT HERO — Deep Ultraviolet */
     --color-synapse-800: #3D1AAA;
     --color-synapse-900: #220D6B;
 
-    /* ── PILLAR 3: APEX FLAME — "Vermillion Signal" (Outflow, Debits, Expenses) ──
-       RADICAL BREAK: Warm plasma orange-vermillion, NOT red.
-       Bloomberg orange. The color of urgency without panic.
-       No other Indian fintech uses this for expenses. */
+    /* ── PILLAR 3: PLASMA VERMILLION (Outflow, Expenses, Debits) ── */
     --color-pulse-50:  #FFF4EE;
     --color-pulse-100: #FFE5D4;
     --color-pulse-200: #FFC8A4;
     --color-pulse-300: #FFA070;
     --color-pulse-400: #FF7A48;
-    --color-pulse-500: #FF5722;  /* DARK MODE HERO — Plasma Vermillion */
+    --color-pulse-500: #FF4757;  /* DARK HERO — Cyber Vermillion */
     --color-pulse-600: #E03E0A;
-    --color-pulse-700: #B83000;  /* LIGHT MODE HERO — Burnt Sienna */
+    --color-pulse-700: #B83000;  /* LIGHT HERO — Burnt Sienna */
     --color-pulse-800: #851E00;
     --color-pulse-900: #4A0D00;
 
-    /* ── PILLAR 4: APEX GOLD — "Solar Aurum" (Vault, Loans, Net Worth) ──
-       Pure electric gold. Not amber, not ochre. Terminal gold. */
+    /* ── PILLAR 4: SOLSTICE GOLD (Vault, Net Worth, Investments) ── */
     --color-ochre-50:  #FFFCE0;
     --color-ochre-100: #FFF6B0;
     --color-ochre-200: #FFEC70;
     --color-ochre-300: #FFE040;
     --color-ochre-400: #FFD020;
-    --color-ochre-500: #FFBB00;  /* DARK MODE HERO — Electric Gold */
+    --color-ochre-500: #FFB800;  /* DARK HERO — Solstice Gold */
     --color-ochre-600: #D9960A;
-    --color-ochre-700: #8A5C00;  /* LIGHT MODE HERO — Dark Gold */
+    --color-ochre-700: #8A5C00;  /* LIGHT HERO — Dark Gold */
     --color-ochre-800: #5C3800;
     --color-ochre-900: #2E1B00;
 
-    /* ── PILLAR 5: APEX ICE — "Arctic Signal" (Telemetry, EPFO, Real-time) ──
-       Arctic ice blue. Crisp, precise, data-terminal energy. */
+    /* ── PILLAR 5: ARCTIC CYAN (Telemetry, Real-time Sync) ── */
     --color-telemetry-50:  #E0FAFF;
     --color-telemetry-100: #B3F2FF;
     --color-telemetry-200: #70E6FF;
     --color-telemetry-300: #28D8FF;
     --color-telemetry-400: #00CAFF;
-    --color-telemetry-500: #00B4E0;  /* DARK MODE HERO — Arctic Ice */
+    --color-telemetry-500: #00E5FF;  /* DARK HERO — Arctic Cyan */
     --color-telemetry-600: #0090B8;
-    --color-telemetry-700: #006A88;  /* LIGHT MODE HERO — Deep Arctic */
+    --color-telemetry-700: #006A88;  /* LIGHT HERO — Deep Arctic */
     --color-telemetry-800: #004460;
     --color-telemetry-900: #001E2E;
 
-    /* ── PILLAR 6: VOID SURFACES — "Apex Noir" (Backgrounds, Text, Borders) ──
-       Not navy, not slate. Near-void with a cool blue undertone.
-       Darker than typical dark modes — creates extreme contrast. */
-    --obsidian-canvas:       #07080E;  /* Near-void black */
-    --obsidian-card:         #0D1018;  /* Deep void card */
-    --obsidian-elevated:     #131926;  /* Elevated void */
-    --obsidian-well:         #1A2030;  /* Inset void well */
-    --obsidian-border:       #1E2840;  /* Cool dark border */
-    --obsidian-border-strong:#28364E;  /* Strong cool border */
-    --text-primary:          #EEF2FF;  /* Cool blue-white (NOT warm white) */
-    --text-secondary:        #8892B0;  /* Muted blue-grey */
-    --text-muted:            #50607A;  /* Deeper blue-grey */
-    --text-subtle:           #38465C;  /* Subtle void text */
-
-    /* Semantic aliases */
-    --quantum-mint:         var(--color-jade-500);
-    --quantum-mint-700:     var(--color-jade-700);
-    --cyber-amethyst:       var(--color-synapse-500);
-    --cyber-amethyst-700:   var(--color-synapse-700);
-    --electric-cyan:        var(--color-telemetry-500);
-    --neon-coral:           var(--color-pulse-500);
-    --solar-amber:          var(--color-ochre-500);
-    --color-primary:        var(--color-jade-500);
-    --color-ai:             var(--color-synapse-500);
-    --color-debit:          var(--color-pulse-500);
-    --color-vault:          var(--color-ochre-500);
-    --color-telemetry:      var(--color-telemetry-500);
+    /* ── PILLAR 6: LUXURY SURFACES (Apex Noir Obsidian) ── */
+    --obsidian-canvas:       #07090E;
+    --obsidian-card:         #0D111A;
+    --obsidian-elevated:     #141A26;
+    --obsidian-well:         #182030;
+    --obsidian-border:       #1E2840;
+    --obsidian-border-strong:#2E3D60;
+    --text-primary:          #F1F5F9;
+    --text-secondary:        #94A3B8;
+    --text-muted:            #64748B;
+    --text-subtle:           #38465C;
 
     /* Legacy mapping */
-    --titanium-chrome:         #EEF2FF;
+    --titanium-chrome:         #F1F5F9;
     --cyber-iris:              #8B5CF6;
     --cyber-iris-dark:         #5B2EE0;
-    --photon-cyan:             #00C896;
-    --magma-pulse:             #FF5722;
-    --aerospace-slate:         #07080E;
-    --deep-vacuum:             #07080E;
-    --spatial-accent:          #00C896;
+    --photon-cyan:             #00F5A0;
+    --magma-pulse:             #FF4757;
+    --aerospace-slate:         #07090E;
+    --deep-vacuum:             #07090E;
+    --spatial-accent:          #00F5A0;
     --spatial-accent-purple:   #8B5CF6;
     --spatial-accent-indigo:   #5B2EE0;
   }
 
   body {
-    background-color: #07080E;
-    color: #EEF2FF;
+    background-color: var(--obsidian-canvas, #07090E);
+    color: var(--text-primary, #F1F5F9);
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Strict Tabular Numerals for Precise Financial Alignment */
@@ -140,7 +116,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: #EEF2FF;
+    color: var(--text-primary, #F1F5F9);
     letter-spacing: -0.025em;
     font-weight: 700;
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
@@ -148,434 +124,207 @@
 }
 
 @layer components {
-  /* ── 1. APEX VOID WINDOW & CARDS ─────────────────────────────────────── */
+  /* ── 1. BILLION-DOLLAR STARTUP WINDOW & CARDS ──────────────────────── */
   .spatial-window {
-    background-color: #0D1018;
-    border: 1px solid #1E2840;
-    box-shadow: 0 24px 64px 0 rgba(0, 0, 0, 0.85);
+    background-color: var(--obsidian-card, #0D111A);
+    border: 1px solid var(--obsidian-border, #1E2840);
+    box-shadow: 0 32px 80px -16px rgba(0, 0, 0, 0.85);
     border-radius: 24px;
+    backdrop-filter: blur(20px);
   }
 
   .spatial-card {
-    background-color: #0D1018;
-    border: 1px solid #1E2840;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
+    background-color: var(--obsidian-card, #0D111A);
+    border: 1px solid var(--obsidian-border, #1E2840);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
     border-radius: 18px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
   }
 
   .spatial-card:hover {
-    background-color: #131926;
-    border-color: #28364E;
+    background-color: var(--obsidian-elevated, #141A26);
+    border-color: var(--obsidian-border-strong, #2E3D60);
     transform: translateY(-2px);
-    box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.75);
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.7);
   }
 
-  /* ── 2. APEX INTERACTIVE BUTTONS ────────────────────────────────────── */
+  .spatial-card-hero {
+    background: linear-gradient(180deg, var(--obsidian-card, #0D111A) 0%, var(--obsidian-elevated, #141A26) 100%);
+    border: 1px solid var(--obsidian-border-strong, #2E3D60);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .spatial-card-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-jade-500, #00F5A0), transparent);
+    opacity: 0.8;
+  }
+
+  /* ── 2. INTERACTIVE BUTTONS & PILLS ────────────────────────────────── */
   .spatial-btn {
-    background-color: #131926;
-    border: 1px solid #1E2840;
+    background-color: var(--obsidian-elevated, #141A26);
+    border: 1px solid var(--obsidian-border, #1E2840);
     border-radius: 9999px;
-    color: #EEF2FF;
+    color: var(--text-primary, #F1F5F9);
     font-weight: 600;
-    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 
   .spatial-btn:hover {
-    background-color: #1A2030;
-    border-color: #00C896;
-    color: #00C896;
+    background-color: var(--obsidian-well, #182030);
+    border-color: var(--color-jade-500, #00F5A0);
+    color: var(--color-jade-500, #00F5A0);
     transform: translateY(-1px);
-    box-shadow: 0 4px 16px 0 rgba(0, 200, 150, 0.15);
+    box-shadow: 0 4px 20px -2px rgba(0, 245, 160, 0.2);
   }
 
   .spatial-btn:active {
     transform: scale(0.97);
   }
 
-  /* Selected State: Solid Apex Teal */
+  /* Selected State: Radiant Solid Glow */
   .spatial-btn-selected {
-    background-color: #00C896 !important;
-    border-color: #00C896 !important;
-    color: #07080E !important;
-    font-weight: 800 !important;
-    box-shadow: 0 2px 16px 0 rgba(0, 200, 150, 0.40) !important;
+    background-color: var(--color-jade-500, #00F5A0) !important;
+    border-color: var(--color-jade-500, #00F5A0) !important;
+    color: #07090E !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 16px 0 rgba(0, 245, 160, 0.35) !important;
   }
 
-  /* Solid Hero Card Variant */
-  .spatial-card-gold, .spatial-card-prism {
-    background-color: #0D1018;
-    border: 1.5px solid #00C896;
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(0, 200, 150, 0.08);
-    border-radius: 22px;
-  }
-
-  /* ── 3. TAB BAR ORNAMENT ─────────────────────────────────────────────── */
+  /* ── 3. FLOATING SEGMENTED ORNAMENT ────────────────────────────────── */
   .spatial-ornament {
-    background-color: #0D1018;
-    border: 1px solid #1E2840;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.65);
+    background-color: var(--obsidian-well, #182030);
+    border: 1px solid var(--obsidian-border, #1E2840);
     border-radius: 9999px;
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
   }
 
-  /* ── 4. APEX ICE LIGHT THEME ─────────────────────────────────────────── */
-  html.light, body.light, .light {
-    --spatial-bg: #F0F4FA;
-
-    /* Light Mode Pillar Heroes */
-    --color-jade-500:      #007A5E;  /* Deep forest teal */
-    --color-synapse-500:   #5B2EE0;  /* Deep ultraviolet */
-    --color-pulse-500:     #B83000;  /* Burnt sienna */
-    --color-ochre-500:     #8A5C00;  /* Dark gold */
-    --color-telemetry-500: #006A88;  /* Deep arctic */
-
-    /* Light Mode Surfaces — Cool Alabaster */
-    --obsidian-canvas:       #F0F4FA;
-    --obsidian-card:         #FFFFFF;
-    --obsidian-elevated:     #FFFFFF;
-    --obsidian-well:         #E6ECFA;
-    --obsidian-border:       #CCD6EC;
-    --obsidian-border-strong:#A8B8D8;
-    --text-primary:          #080C18;
-    --text-secondary:        #3A4A6A;
-    --text-muted:            #6070A0;
-    --text-subtle:           #8898C0;
-
-    /* Aliases */
-    --quantum-mint:         #007A5E;
-    --quantum-mint-700:     #007A5E;
-    --cyber-amethyst:       #5B2EE0;
-    --cyber-amethyst-700:   #5B2EE0;
-    --electric-cyan:        #006A88;
-    --neon-coral:           #B83000;
-    --solar-amber:          #8A5C00;
-    --color-primary:        #007A5E;
-    --color-ai:             #5B2EE0;
-    --color-debit:          #B83000;
-    --color-vault:          #8A5C00;
-    --color-telemetry:      #006A88;
-    color: #080C18 !important;
-    background-color: #F0F4FA !important;
+  /* ── 4. TELEMETRY BADGES & GLOW ────────────────────────────────────── */
+  .telemetry-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background-color: rgba(0, 245, 160, 0.1);
+    color: var(--color-jade-500, #00F5A0);
+    border: 1px solid rgba(0, 245, 160, 0.3);
   }
 
-  html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
-  body.light h1, body.light h2, body.light h3, body.light h4, body.light h5, body.light h6,
-  .light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
-    color: #080C18 !important;
+  .glass-card {
+    background: rgba(13, 17, 26, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
   }
 
-  .light .spatial-window {
-    background-color: #FFFFFF !important;
-    border: 1px solid #CCD6EC !important;
-    box-shadow: 0 16px 48px 0 rgba(8, 12, 24, 0.08) !important;
-    color: #080C18 !important;
+  .neon-border-pulse {
+    position: relative;
   }
 
-  .light .spatial-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid #CCD6EC !important;
-    box-shadow: 0 2px 12px 0 rgba(8, 12, 24, 0.05) !important;
-    color: #080C18 !important;
+  .neon-border-pulse::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--color-jade-500, #00F5A0), var(--color-synapse-500, #8B5CF6), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
   }
 
-  .light .spatial-card:hover {
-    background-color: #FAFCFF !important;
-    border-color: #A8B8D8 !important;
-    box-shadow: 0 8px 28px 0 rgba(8, 12, 24, 0.10) !important;
-  }
-
-  .light .spatial-card-gold, .light .spatial-card-prism {
-    background-color: #FFFFFF !important;
-    border: 1.5px solid #007A5E !important;
-    box-shadow: 0 8px 28px 0 rgba(0, 122, 94, 0.12) !important;
-    color: #080C18 !important;
-  }
-
-  .light .spatial-btn {
-    background-color: #FFFFFF !important;
-    border: 1px solid #CCD6EC !important;
-    color: #080C18 !important;
-    box-shadow: 0 1px 4px rgba(8, 12, 24, 0.06) !important;
-  }
-
-  .light .spatial-btn:hover {
-    background-color: #E0FFF7 !important;
-    border-color: #007A5E !important;
-    color: #007A5E !important;
-    box-shadow: 0 4px 16px 0 rgba(0, 122, 94, 0.12) !important;
-  }
-
-  .light .spatial-btn-selected {
-    background-color: #007A5E !important;
-    border-color: #007A5E !important;
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
-    box-shadow: 0 2px 12px 0 rgba(0, 122, 94, 0.28) !important;
-  }
-
-  .light .spatial-ornament {
-    background-color: #FFFFFF !important;
-    border: 1px solid #CCD6EC !important;
-    box-shadow: 0 4px 16px 0 rgba(8, 12, 24, 0.06) !important;
-    color: #080C18 !important;
-  }
-
-  .light .text-white {
-    color: #080C18 !important;
-  }
-
-  .light .text-white\/60, .light .text-white\/50, .light .text-white\/40 {
-    color: #6070A0 !important;
-  }
-
-  .light .text-white\/80, .light .text-white\/70 {
-    color: #3A4A6A !important;
-  }
-
-  .light .border-white\/10, .light .border-white\/15, .light .border-white\/20 {
-    border-color: #CCD6EC !important;
-  }
-
-  .light .bg-white\/5, .light .bg-white\/10 {
-    background-color: #E6ECFA !important;
-  }
-
-  /* ── 5. APEX MODALS & SHEETS ─────────────────────────────────────────── */
-  .spatial-modal {
-    background-color: #0D1018;
-    border: 1px solid #1E2840;
-    box-shadow: 0 32px 80px 0 rgba(0, 0, 0, 0.92);
-    border-radius: 28px;
-  }
-
-  .light .spatial-modal {
-    background-color: #FFFFFF !important;
-    border: 1px solid #CCD6EC !important;
-    box-shadow: 0 32px 80px 0 rgba(8, 12, 24, 0.16) !important;
-  }
-
-  .spatial-bottom-sheet {
-    background-color: #0D1018;
-    border-top: 1px solid #1E2840;
-    box-shadow: 0 -16px 56px 0 rgba(0, 0, 0, 0.92);
-    border-top-left-radius: 32px;
-    border-top-right-radius: 32px;
-  }
-
-  .light .spatial-bottom-sheet {
-    background-color: #FFFFFF !important;
-    border-top: 1px solid #CCD6EC !important;
-    box-shadow: 0 -16px 56px 0 rgba(8, 12, 24, 0.12) !important;
-  }
-
-  .spatial-bottom-nav {
-    background-color: #0D1018;
-    border-top: 1px solid #1E2840;
-    box-shadow: 0 -8px 32px 0 rgba(0, 0, 0, 0.75);
-  }
-
-  .light .spatial-bottom-nav {
-    background-color: #FFFFFF !important;
-    border-top: 1px solid #CCD6EC !important;
-    box-shadow: 0 -8px 32px 0 rgba(8, 12, 24, 0.08) !important;
-  }
-
-  /* Legacy aliases */
-  .glass-card-dark, .glass-card-light, .spatial-card-dark, .spatial-card-light {
-    @apply spatial-card;
-  }
-  .glass-pill-dark, .glass-pill-light, .spatial-pill-dark, .spatial-pill-light {
-    @apply spatial-btn;
-  }
-  .spatial-modal-dark, .spatial-modal-light {
-    @apply spatial-modal;
-  }
-  .visionos-window, .visionos-window-light {
-    @apply spatial-window;
-  }
-  .visionos-pill-active {
-    @apply spatial-btn-selected;
-  }
-  .visionos-card, .visionos-card-light {
-    @apply spatial-card;
+  .neon-border-pulse:hover::after {
+    opacity: 1;
   }
 }
 
-@layer utilities {
-  /* ── EXPLICIT 6-PILLAR GLOBAL UTILITIES ─────────────────────────────── */
-
-  /* Pillar 1: Apex Teal (Inflow, Salary, Surplus) */
-  .text-jade-50  { color: var(--color-jade-50)  !important; }
-  .text-jade-100 { color: var(--color-jade-100) !important; }
-  .text-jade-200 { color: var(--color-jade-200) !important; }
-  .text-jade-300 { color: var(--color-jade-300) !important; }
-  .text-jade-400 { color: var(--color-jade-400) !important; }
-  .text-jade-500 { color: var(--color-jade-500) !important; }
-  .text-jade-600 { color: var(--color-jade-600) !important; }
-  .text-jade-700 { color: var(--color-jade-700) !important; }
-  .text-jade-800 { color: var(--color-jade-800) !important; }
-  .text-jade-900 { color: var(--color-jade-900) !important; }
-
-  .bg-jade-50  { background-color: var(--color-jade-50)  !important; }
-  .bg-jade-100 { background-color: var(--color-jade-100) !important; }
-  .bg-jade-200 { background-color: var(--color-jade-200) !important; }
-  .bg-jade-300 { background-color: var(--color-jade-300) !important; }
-  .bg-jade-400 { background-color: var(--color-jade-400) !important; }
-  .bg-jade-500 { background-color: var(--color-jade-500) !important; }
-  .bg-jade-600 { background-color: var(--color-jade-600) !important; }
-  .bg-jade-700 { background-color: var(--color-jade-700) !important; }
-  .bg-jade-800 { background-color: var(--color-jade-800) !important; }
-  .bg-jade-900 { background-color: var(--color-jade-900) !important; }
-
-  .border-jade-500 { border-color: var(--color-jade-500) !important; }
-  .fill-jade-500   { fill:         var(--color-jade-500) !important; }
-  .stroke-jade-500 { stroke:       var(--color-jade-500) !important; }
-
-  /* Pillar 2: Apex Violet (AI, Forensics, Intelligence) */
-  .text-synapse-50  { color: var(--color-synapse-50)  !important; }
-  .text-synapse-100 { color: var(--color-synapse-100) !important; }
-  .text-synapse-200 { color: var(--color-synapse-200) !important; }
-  .text-synapse-300 { color: var(--color-synapse-300) !important; }
-  .text-synapse-400 { color: var(--color-synapse-400) !important; }
-  .text-synapse-500 { color: var(--color-synapse-500) !important; }
-  .text-synapse-600 { color: var(--color-synapse-600) !important; }
-  .text-synapse-700 { color: var(--color-synapse-700) !important; }
-  .text-synapse-800 { color: var(--color-synapse-800) !important; }
-  .text-synapse-900 { color: var(--color-synapse-900) !important; }
-
-  .bg-synapse-50  { background-color: var(--color-synapse-50)  !important; }
-  .bg-synapse-100 { background-color: var(--color-synapse-100) !important; }
-  .bg-synapse-200 { background-color: var(--color-synapse-200) !important; }
-  .bg-synapse-300 { background-color: var(--color-synapse-300) !important; }
-  .bg-synapse-400 { background-color: var(--color-synapse-400) !important; }
-  .bg-synapse-500 { background-color: var(--color-synapse-500) !important; }
-  .bg-synapse-600 { background-color: var(--color-synapse-600) !important; }
-  .bg-synapse-700 { background-color: var(--color-synapse-700) !important; }
-  .bg-synapse-800 { background-color: var(--color-synapse-800) !important; }
-  .bg-synapse-900 { background-color: var(--color-synapse-900) !important; }
-
-  .border-synapse-500 { border-color: var(--color-synapse-500) !important; }
-  .fill-synapse-500   { fill:         var(--color-synapse-500) !important; }
-  .stroke-synapse-500 { stroke:       var(--color-synapse-500) !important; }
-
-  /* Pillar 3: Apex Flame (Outflow, Debits, Expenses) */
-  .text-pulse-50  { color: var(--color-pulse-50)  !important; }
-  .text-pulse-100 { color: var(--color-pulse-100) !important; }
-  .text-pulse-200 { color: var(--color-pulse-200) !important; }
-  .text-pulse-300 { color: var(--color-pulse-300) !important; }
-  .text-pulse-400 { color: var(--color-pulse-400) !important; }
-  .text-pulse-500 { color: var(--color-pulse-500) !important; }
-  .text-pulse-600 { color: var(--color-pulse-600) !important; }
-  .text-pulse-700 { color: var(--color-pulse-700) !important; }
-  .text-pulse-800 { color: var(--color-pulse-800) !important; }
-  .text-pulse-900 { color: var(--color-pulse-900) !important; }
-
-  .bg-pulse-50  { background-color: var(--color-pulse-50)  !important; }
-  .bg-pulse-100 { background-color: var(--color-pulse-100) !important; }
-  .bg-pulse-200 { background-color: var(--color-pulse-200) !important; }
-  .bg-pulse-300 { background-color: var(--color-pulse-300) !important; }
-  .bg-pulse-400 { background-color: var(--color-pulse-400) !important; }
-  .bg-pulse-500 { background-color: var(--color-pulse-500) !important; }
-  .bg-pulse-600 { background-color: var(--color-pulse-600) !important; }
-  .bg-pulse-700 { background-color: var(--color-pulse-700) !important; }
-  .bg-pulse-800 { background-color: var(--color-pulse-800) !important; }
-  .bg-pulse-900 { background-color: var(--color-pulse-900) !important; }
-
-  .border-pulse-500 { border-color: var(--color-pulse-500) !important; }
-  .fill-pulse-500   { fill:         var(--color-pulse-500) !important; }
-  .stroke-pulse-500 { stroke:       var(--color-pulse-500) !important; }
-
-  /* Pillar 4: Apex Gold (Vault, Loans, Net Worth) */
-  .text-ochre-50  { color: var(--color-ochre-50)  !important; }
-  .text-ochre-100 { color: var(--color-ochre-100) !important; }
-  .text-ochre-200 { color: var(--color-ochre-200) !important; }
-  .text-ochre-300 { color: var(--color-ochre-300) !important; }
-  .text-ochre-400 { color: var(--color-ochre-400) !important; }
-  .text-ochre-500 { color: var(--color-ochre-500) !important; }
-  .text-ochre-600 { color: var(--color-ochre-600) !important; }
-  .text-ochre-700 { color: var(--color-ochre-700) !important; }
-  .text-ochre-800 { color: var(--color-ochre-800) !important; }
-  .text-ochre-900 { color: var(--color-ochre-900) !important; }
-
-  .bg-ochre-50  { background-color: var(--color-ochre-50)  !important; }
-  .bg-ochre-100 { background-color: var(--color-ochre-100) !important; }
-  .bg-ochre-200 { background-color: var(--color-ochre-200) !important; }
-  .bg-ochre-300 { background-color: var(--color-ochre-300) !important; }
-  .bg-ochre-400 { background-color: var(--color-ochre-400) !important; }
-  .bg-ochre-500 { background-color: var(--color-ochre-500) !important; }
-  .bg-ochre-600 { background-color: var(--color-ochre-600) !important; }
-  .bg-ochre-700 { background-color: var(--color-ochre-700) !important; }
-  .bg-ochre-800 { background-color: var(--color-ochre-800) !important; }
-  .bg-ochre-900 { background-color: var(--color-ochre-900) !important; }
-
-  .border-ochre-500 { border-color: var(--color-ochre-500) !important; }
-  .fill-ochre-500   { fill:         var(--color-ochre-500) !important; }
-  .stroke-ochre-500 { stroke:       var(--color-ochre-500) !important; }
-
-  /* Pillar 5: Apex Ice (Telemetry, EPFO, Sync) */
-  .text-telemetry-50  { color: var(--color-telemetry-50)  !important; }
-  .text-telemetry-100 { color: var(--color-telemetry-100) !important; }
-  .text-telemetry-200 { color: var(--color-telemetry-200) !important; }
-  .text-telemetry-300 { color: var(--color-telemetry-300) !important; }
-  .text-telemetry-400 { color: var(--color-telemetry-400) !important; }
-  .text-telemetry-500 { color: var(--color-telemetry-500) !important; }
-  .text-telemetry-600 { color: var(--color-telemetry-600) !important; }
-  .text-telemetry-700 { color: var(--color-telemetry-700) !important; }
-  .text-telemetry-800 { color: var(--color-telemetry-800) !important; }
-  .text-telemetry-900 { color: var(--color-telemetry-900) !important; }
-
-  .bg-telemetry-50  { background-color: var(--color-telemetry-50)  !important; }
-  .bg-telemetry-100 { background-color: var(--color-telemetry-100) !important; }
-  .bg-telemetry-500 { background-color: var(--color-telemetry-500) !important; }
-  .bg-telemetry-700 { background-color: var(--color-telemetry-700) !important; }
-
-  .border-telemetry-500 { border-color: var(--color-telemetry-500) !important; }
-  .fill-telemetry-500   { fill:         var(--color-telemetry-500) !important; }
-  .stroke-telemetry-500 { stroke:       var(--color-telemetry-500) !important; }
-
-  /* Pillar 6: Void Surfaces */
-  .bg-abyss-canvas   { background-color: var(--obsidian-canvas)       !important; }
-  .bg-abyss-card     { background-color: var(--obsidian-card)         !important; }
-  .bg-abyss-elevated { background-color: var(--obsidian-elevated)     !important; }
-  .bg-abyss-well     { background-color: var(--obsidian-well)         !important; }
-  .border-abyss-border       { border-color: var(--obsidian-border)       !important; }
-  .border-abyss-borderStrong { border-color: var(--obsidian-border-strong) !important; }
-  .text-abyss-textPrimary    { color: var(--text-primary)   !important; }
-  .text-abyss-textSecondary  { color: var(--text-secondary) !important; }
-  .text-abyss-textMuted      { color: var(--text-muted)     !important; }
-
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
-  .pt-safe { padding-top: max(1rem, env(safe-area-inset-top)); }
-
-  .touch-scroll {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+/* ── 5. MICRO ANIMATIONS & TRANSITIONS ──────────────────────────────── */
+@keyframes emergence {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes emergenceIn {
-  from { opacity: 0; transform: scale(0.98) translateY(8px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0);   }
-}
 .animate-emergence {
-  animation: emergenceIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: emergence 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.99); }
-  to   { opacity: 1; transform: scale(1);    }
-}
-.animate-fade-in {
-  animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
 }
 
-@keyframes apexPulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s infinite ease-in-out;
 }
-.animate-apex-pulse {
-  animation: apexPulse 2s ease-in-out infinite;
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--obsidian-border, #1E2840);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--obsidian-border-strong, #2E3D60);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile Safe Area & Fluid Helpers */
+.safe-area-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem));
+}
+
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+

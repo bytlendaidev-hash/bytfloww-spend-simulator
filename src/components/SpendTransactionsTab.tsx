@@ -70,8 +70,8 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
           type="text"
           value={searchQuery}
           onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-          placeholder="Search merchant, amount, UPI ID, reference..."
-          className="w-full px-6 py-4 pl-12 rounded-full text-sm bg-abyss-card light:bg-white border border-jade-500/20 text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-jade-500 shadow-solid-sm transition-colors duration-200"
+          placeholder="Search merchant, amount, UPI ID, reference number..."
+          className="w-full px-6 py-4 pl-12 rounded-full text-sm bg-abyss-card border border-abyss-border text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-jade-500 shadow-md transition-colors duration-200"
         />
         <span className="absolute left-4.5 top-4 text-sm text-jade-500">🔍</span>
         {searchQuery && (
@@ -111,7 +111,7 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         })}
       </div>
 
-      {/* ── 3. SUMMARY BANNER SOLID CARD ───────────────────────────────── */}
+      {/* ── 3. SUMMARY BANNER CARD ───────────────────────────────────────── */}
       <div className="spatial-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h4 className="text-base sm:text-lg font-bold tracking-tight text-abyss-textPrimary">
@@ -138,87 +138,85 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         </div>
       </div>
 
-      {/* ── 4. SOLID TABLE WRAPPER ───────────────────────────────────────── */}
-      <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden shadow-solid-sm">
+      {/* ── 4. TRANSACTION ROWS WRAPPER ──────────────────────────────────── */}
+      <div className="bg-abyss-card border border-abyss-border rounded-[20px] overflow-hidden shadow-lg">
         {/* Table Header Bar */}
-        <div className="bg-abyss-card px-5 py-3 border-b border-abyss-border flex items-center justify-between text-xs font-semibold text-abyss-textMuted uppercase tracking-wider">
+        <div className="bg-abyss-elevated px-5 py-3.5 border-b border-abyss-border flex items-center justify-between text-xs font-semibold text-abyss-textMuted uppercase tracking-wider">
           <span>Transaction Details</span>
-          <span>Amount & Time</span>
+          <span>Amount & Timestamp</span>
         </div>
 
         {/* Table Rows */}
         <div className="divide-y divide-abyss-border">
-          {displayedEvents.map((ev) => {
-            const isCredit = ev.direction === 'INFLOW';
-
-            return (
-              <div
-                key={ev.id}
-                onClick={() => onSelectEvent(ev)}
-                className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-abyss-elevated transition-colors duration-150"
+          {displayedEvents.length === 0 ? (
+            <div className="p-12 text-center text-abyss-textMuted">
+              <span className="text-3xl block mb-2">🔍</span>
+              <p className="text-sm font-semibold">No transactions match your search criteria.</p>
+              <button
+                onClick={() => { setSearchQuery(''); setActiveFilter('ALL'); }}
+                className="mt-3 text-xs text-jade-500 hover:underline font-bold"
               >
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="relative shrink-0">
-                    <MerchantLogoView merchantName={ev.merchant} size={42} />
-                    <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shadow-sm ${
-                      isCredit ? 'bg-jade-500 text-abyss-canvas' : 'bg-pulse-500/20 text-pulse-500 border border-pulse-500/50'
-                    }`}>
-                      {isCredit ? '↓' : '↑'}
-                    </span>
+                Clear all filters
+              </button>
+            </div>
+          ) : (
+            displayedEvents.map((ev) => {
+              const isOutflow = ev.direction === 'OUTFLOW';
+
+              return (
+                <div
+                  key={ev.id}
+                  onClick={() => onSelectEvent(ev)}
+                  className="p-4 sm:p-5 hover:bg-abyss-well/60 cursor-pointer transition-colors duration-150 flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <MerchantLogoView merchantName={ev.merchant} size={42} shape="rounded" />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-xs sm:text-sm text-abyss-textPrimary truncate group-hover:text-jade-500 transition-colors">
+                          {ev.merchant}
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-abyss-well text-abyss-textSecondary border border-abyss-border font-medium">
+                          {ev.category}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-abyss-textMuted truncate mt-0.5 flex items-center gap-2">
+                        <span>{ev.accountHint}</span>
+                        {ev.referenceNumber && (
+                          <span className="hidden sm:inline font-mono opacity-75">Ref: {ev.referenceNumber}</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="min-w-0">
-                    <div className="text-sm font-bold text-abyss-textPrimary truncate max-w-[180px] sm:max-w-md">
-                      {ev.merchant}
-                    </div>
-                    <div className="text-xs text-abyss-textMuted font-medium truncate mt-0.5">
-                      {ev.category} {ev.accountHint ? `• ${ev.accountHint}` : ''}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 shrink-0 pl-3">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSplitBill(ev);
-                    }}
-                    className="spatial-btn hidden sm:flex items-center gap-1.5 px-3 py-1 text-[11px] border-synapse-500/30 text-synapse-400 light:text-synapse-700"
-                    title="Split bill with friends"
-                  >
-                    <span>➗</span>
-                    <span>Split</span>
-                  </button>
-
-                  <div className="text-right">
-                    <div className={`text-sm sm:text-base font-bold font-mono ${
-                      isCredit ? 'text-jade-500' : 'text-abyss-textPrimary'
+                  <div className="text-right shrink-0">
+                    <div className={`font-mono font-bold text-sm sm:text-base ${
+                      isOutflow ? 'text-pulse-500' : 'text-jade-500'
                     }`}>
-                      {isCredit ? '+' : '-'}₹{ev.amount.toLocaleString('en-IN')}
+                      {isOutflow ? '-' : '+'}₹{ev.amount.toLocaleString('en-IN')}
                     </div>
                     <div className="text-[10px] text-abyss-textMuted font-mono mt-0.5">
-                      {ev.dateFormatted}, {ev.timeFormatted}
+                      {ev.dateFormatted || ev.timeFormatted || new Date(ev.timestamp).toLocaleDateString('en-IN')}
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
-      </div>
 
-      {/* ── 5. LOAD MORE BUTTON ─────────────────────────────────────────── */}
-      {filteredEvents.length > page * pageSize && (
-        <div className="pt-2 text-center">
-          <button
-            onClick={() => setPage(p => p + 1)}
-            className="spatial-btn w-full py-4 text-xs font-bold text-abyss-textPrimary"
-          >
-            Load More Transactions ({filteredEvents.length - page * pageSize} remaining)
-          </button>
-        </div>
-      )}
+        {/* Load More Button */}
+        {displayedEvents.length < filteredEvents.length && (
+          <div className="p-4 border-t border-abyss-border text-center bg-abyss-elevated">
+            <button
+              onClick={() => setPage(p => p + 1)}
+              className="spatial-btn px-6 py-2 text-xs font-bold text-jade-500 border-jade-500/30"
+            >
+              Load More Transactions ({filteredEvents.length - displayedEvents.length} remaining) ↓
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

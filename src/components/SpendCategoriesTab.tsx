@@ -32,7 +32,7 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
-      {/* ── 1. SPENDS BY CATEGORY DONUT CHART SOLID CARD ────────────────── */}
+      {/* ── 1. SPENDS BY CATEGORY DONUT CHART CARD ──────────────────────── */}
       <div className="spatial-card p-6 sm:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -44,7 +44,7 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
             </p>
           </div>
 
-          <span className="spatial-btn px-4 py-1.5 text-xs text-abyss-textPrimary">
+          <span className="spatial-btn px-4 py-1.5 text-xs text-abyss-textPrimary border-abyss-border">
             📅 Current Period
           </span>
         </div>
@@ -52,14 +52,14 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-8 items-center pt-2">
           {/* Donut Chart Ring with Center Total */}
           <div className="sm:col-span-5 flex items-center justify-center relative">
-            <svg className="w-52 h-52 transform -rotate-90" viewBox="0 0 100 100">
+            <svg className="w-56 h-56 transform -rotate-90" viewBox="0 0 100 100">
               {/* Background circle */}
               <circle
                 cx="50"
                 cy="50"
                 r="38"
                 fill="transparent"
-                className="stroke-abyss-border"
+                stroke="var(--obsidian-border, #1E2840)"
                 strokeWidth="11"
               />
               {/* Dynamic solid segments */}
@@ -91,10 +91,10 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
 
             {/* Center Text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-xl sm:text-2xl font-bold font-mono text-abyss-textPrimary tracking-tight">
+              <span className="text-2xl sm:text-3xl font-black font-mono text-abyss-textPrimary tracking-tight">
                 ₹{Math.round(effectiveTotalSpend).toLocaleString('en-IN')}
               </span>
-              <span className="text-xs text-abyss-textMuted font-medium">
+              <span className="text-[11px] text-abyss-textMuted font-bold uppercase tracking-wider mt-0.5">
                 Total Spend
               </span>
             </div>
@@ -112,13 +112,13 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
                       <span className="font-semibold text-abyss-textPrimary tracking-tight">{cat.category}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-abyss-textMuted">{cat.pct}%</span>
+                      <span className="font-mono text-xs text-abyss-textMuted font-bold">{cat.pct}%</span>
                       <span className="font-mono font-bold text-xs sm:text-sm text-abyss-textPrimary">
                         ₹{cat.amount.toLocaleString('en-IN')}
                       </span>
                     </div>
                   </div>
-                  <div className="h-1.5 rounded-full bg-abyss-well overflow-hidden">
+                  <div className="h-2 rounded-full bg-abyss-well overflow-hidden">
                     <div 
                       style={{ width: `${Math.max(2, cat.pct)}%`, backgroundColor: catColor }}
                       className="h-full rounded-full"
@@ -149,75 +149,55 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
             const catColors = getCategoryColor(cat.category, isDark);
 
             return (
-              <div
+              <div 
                 key={cat.category}
-                className="p-4 sm:p-5 rounded-[16px] bg-abyss-well border border-abyss-border hover:bg-abyss-elevated transition-all duration-200"
+                className="rounded-[18px] bg-abyss-well border border-abyss-border overflow-hidden transition-all duration-200"
               >
                 <div 
                   onClick={() => setExpandedCategory(isExpanded ? null : cat.category)}
-                  className="cursor-pointer space-y-3"
+                  className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-abyss-elevated transition"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3.5">
-                      <div 
-                        className="w-10 h-10 rounded-[12px] flex items-center justify-center font-bold text-sm shadow-sm"
-                        style={{ backgroundColor: catColors.bg, color: catColors.solid }}
-                      >
-                        {cat.category.slice(0, 1)}
+                  <div className="flex items-center gap-3.5">
+                    <span className="w-3.5 h-3.5 rounded-full shadow-sm shrink-0" style={{ backgroundColor: catColors.solid }} />
+                    <div>
+                      <div className="text-sm font-bold text-abyss-textPrimary">
+                        {cat.category}
                       </div>
-                      <div>
-                        <div className="text-sm font-bold text-abyss-textPrimary tracking-tight">
-                          {cat.category}
-                        </div>
-                        <div className="text-xs text-abyss-textMuted font-medium">
-                          {cat.eventCount} transactions
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="text-sm font-bold font-mono text-abyss-textPrimary">
-                          ₹{cat.amount.toLocaleString('en-IN')}
-                        </div>
-                        <div className="text-xs font-semibold" style={{ color: catColors.solid }}>
-                          {cat.pct}%
-                        </div>
-                      </div>
-                      <span className={`text-abyss-textMuted text-base font-bold transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
-                        ›
+                      <span className="text-[11px] text-abyss-textMuted">
+                        {cat.eventCount} transactions • {cat.pct}% of period budget
                       </span>
                     </div>
                   </div>
 
-                  <div className="h-1.5 rounded-full bg-abyss-canvas overflow-hidden">
-                    <div 
-                      style={{ width: `${Math.max(2, cat.pct)}%`, backgroundColor: catColors.solid }}
-                      className="h-full rounded-full"
-                    />
+                  <div className="flex items-center gap-4 text-right">
+                    <div>
+                      <span className="font-mono font-bold text-sm sm:text-base text-abyss-textPrimary block">
+                        ₹{cat.amount.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <span className="text-sm text-abyss-textMuted">{isExpanded ? '▲' : '▼'}</span>
                   </div>
                 </div>
 
-                {/* Expanded Sub-transactions Table */}
                 {isExpanded && (
-                  <div className="mt-4 pt-3 border-t border-abyss-border space-y-2 animate-fade-in">
-                    <div className="bg-abyss-card border border-abyss-border rounded-[12px] overflow-hidden divide-y divide-abyss-border">
-                      {catEvents.map((e: FinancialEvent) => (
+                  <div className="p-4 bg-abyss-card border-t border-abyss-border space-y-2">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-abyss-textMuted block px-1">
+                      Recent {cat.category} Events
+                    </span>
+                    {catEvents.length === 0 ? (
+                      <p className="text-xs text-abyss-textMuted px-1">No detailed debits logged for this period.</p>
+                    ) : (
+                      catEvents.slice(0, 10).map((ev) => (
                         <div 
-                          key={e.id}
-                          onClick={() => onSelectEvent?.(e)}
-                          className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-abyss-well transition text-xs"
+                          key={ev.id}
+                          onClick={() => onSelectEvent && onSelectEvent(ev)}
+                          className="p-2.5 rounded-xl hover:bg-abyss-well flex items-center justify-between text-xs cursor-pointer"
                         >
-                          <div>
-                            <div className="font-bold text-abyss-textPrimary">{e.merchant}</div>
-                            <div className="text-[10px] text-abyss-textMuted font-medium">{e.dateFormatted} • {e.paymentMode}</div>
-                          </div>
-                          <div className="font-mono font-bold text-pulse-500">
-                            -₹{e.amount.toLocaleString('en-IN')}
-                          </div>
+                          <span className="text-abyss-textPrimary font-medium">{ev.merchant}</span>
+                          <span className="font-mono font-bold text-pulse-500">₹{ev.amount.toLocaleString('en-IN')}</span>
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    )}
                   </div>
                 )}
               </div>

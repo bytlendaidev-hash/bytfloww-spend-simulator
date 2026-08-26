@@ -1,10 +1,11 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- * BYTFLOWW GLOBAL SOLID THEME TOKENS (ZERO GRADIENT ARCHITECTURE)
+ * BYTFLOWW GLOBAL THEME TOKENS & BILLION-DOLLAR STARTUP COLOR SYSTEM
  * ─────────────────────────────────────────────────────────────────────────────
  * Single point of truth for all colors, typography, surfaces, and semantic tokens.
- * Modifying any value here instantly affects the entire application.
  */
+
+import { THEME_TEMPLATES, ThemeTemplateId, getActiveThemeId } from './themes';
 
 // ── 1. SOLID RAW PALETTES ────────────────────────────────────────────────────
 
@@ -16,8 +17,8 @@ export const SOLID_PALETTE = {
     200: '#8DE7C2',
     300: '#4FD69F',
     400: '#1EC882',
-    500: '#00D084', // Dark Hero
-    600: '#00AB6B',
+    500: '#00F5A0', // Cyber Emerald
+    600: '#00C882',
     700: '#00875A', // Light Hero
     800: '#006342',
     900: '#003D29',
@@ -30,9 +31,9 @@ export const SOLID_PALETTE = {
     200: '#CEBEFF',
     300: '#AD93FD',
     400: '#9171FB',
-    500: '#7C5CFC', // Dark AI Hero
-    600: '#6842F5',
-    700: '#5B34EA', // Light AI Hero
+    500: '#8B5CF6', // Electric Violet
+    600: '#7C3AED',
+    700: '#6D28D9', // Light AI Hero
     800: '#4520B8',
     900: '#2B1277',
   },
@@ -44,7 +45,7 @@ export const SOLID_PALETTE = {
     200: '#FECDD6',
     300: '#FF8AA5',
     400: '#FF5C81',
-    500: '#FF3366', // Dark Spend Hero
+    500: '#FF4757', // Cyber Vermillion
     600: '#E61C50',
     700: '#D91E4E', // Light Spend Hero
     800: '#A30F36',
@@ -58,7 +59,7 @@ export const SOLID_PALETTE = {
     200: '#FCE0A5',
     300: '#FACD6E',
     400: '#F7B73E',
-    500: '#F5A623', // Dark Net Worth Hero
+    500: '#FFB800', // Solstice Gold
     600: '#D9890F',
     700: '#C67D0A', // Light Net Worth Hero
     800: '#8A5200',
@@ -72,7 +73,7 @@ export const SOLID_PALETTE = {
     200: '#8CE3F0',
     300: '#47D0E6',
     400: '#1EBED9',
-    500: '#00D8F6', // Dark Telemetry Hero
+    500: '#00E5FF', // Electric Cyan
     600: '#00ADC7',
     700: '#0284C7', // Light Telemetry Hero
     800: '#03628F',
@@ -81,28 +82,28 @@ export const SOLID_PALETTE = {
 
   // Obsidian Abyss (Dark Mode Canvas, Cards, Insets, Borders)
   abyss: {
-    canvas: '#0B0E14',
-    card: '#131822',
-    elevated: '#1A2230',
-    well: '#1F293D',
-    border: '#232D42',
-    borderStrong: '#33415C',
-    textPrimary: '#F8FAFC',
+    canvas: '#07090E',
+    card: '#0D111A',
+    elevated: '#141A26',
+    well: '#182030',
+    border: '#1E2840',
+    borderStrong: '#2E3D60',
+    textPrimary: '#F1F5F9',
     textSecondary: '#94A3B8',
     textMuted: '#64748B',
   },
 
   // Titanium Alabaster (Light Mode Canvas, Cards, Insets, Borders)
   alabaster: {
-    canvas: '#F4F6F9',
+    canvas: '#F5F7FA',
     card: '#FFFFFF',
     elevated: '#FFFFFF',
-    well: '#EAEEF4',
-    border: '#D8DFEA',
-    borderStrong: '#B0BECE',
-    textPrimary: '#0D141F',
-    textSecondary: '#4B586E',
-    textMuted: '#7A889E',
+    well: '#EDF1F7',
+    border: '#DCE3EE',
+    borderStrong: '#B8C6DC',
+    textPrimary: '#0F172A',
+    textSecondary: '#475569',
+    textMuted: '#64748B',
   },
 } as const;
 
@@ -110,6 +111,7 @@ export const SOLID_PALETTE = {
 
 export interface ThemeTokens {
   isDark: boolean;
+  themeId: ThemeTemplateId;
   bg: {
     app: string;
     card: string;
@@ -162,115 +164,63 @@ export interface ThemeTokens {
   };
 }
 
-export function getThemeTokens(isDark: boolean): ThemeTokens {
-  if (isDark) {
-    return {
-      isDark: true,
-      bg: {
-        app: SOLID_PALETTE.abyss.canvas,
-        card: SOLID_PALETTE.abyss.card,
-        cardElevated: SOLID_PALETTE.abyss.elevated,
-        well: SOLID_PALETTE.abyss.well,
-        active: SOLID_PALETTE.jade[900],
-      },
-      border: {
-        subtle: SOLID_PALETTE.abyss.border,
-        strong: SOLID_PALETTE.abyss.borderStrong,
-        primary: SOLID_PALETTE.jade[600],
-        ai: SOLID_PALETTE.synapse[600],
-        debit: SOLID_PALETTE.pulse[600],
-      },
-      text: {
-        primary: SOLID_PALETTE.abyss.textPrimary,
-        secondary: SOLID_PALETTE.abyss.textSecondary,
-        muted: SOLID_PALETTE.abyss.textMuted,
-        inverse: SOLID_PALETTE.alabaster.textPrimary,
-      },
-      primary: {
-        hero: SOLID_PALETTE.jade[500],
-        hover: SOLID_PALETTE.jade[400],
-        subtle: SOLID_PALETTE.jade[900],
-        border: 'rgba(0, 208, 132, 0.35)',
-      },
-      ai: {
-        hero: SOLID_PALETTE.synapse[500],
-        hover: SOLID_PALETTE.synapse[400],
-        subtle: SOLID_PALETTE.synapse[900],
-        border: 'rgba(124, 92, 252, 0.35)',
-      },
-      debit: {
-        hero: SOLID_PALETTE.pulse[500],
-        hover: SOLID_PALETTE.pulse[400],
-        subtle: SOLID_PALETTE.pulse[900],
-        border: 'rgba(255, 51, 102, 0.35)',
-      },
-      vault: {
-        hero: SOLID_PALETTE.ochre[500],
-        hover: SOLID_PALETTE.ochre[400],
-        subtle: SOLID_PALETTE.ochre[900],
-        border: 'rgba(245, 166, 35, 0.35)',
-      },
-      telemetry: {
-        hero: SOLID_PALETTE.telemetry[500],
-        hover: SOLID_PALETTE.telemetry[400],
-        subtle: SOLID_PALETTE.telemetry[900],
-        border: 'rgba(0, 216, 246, 0.35)',
-      },
-    };
-  }
+export function getThemeTokens(isDark: boolean, themeId?: ThemeTemplateId): ThemeTokens {
+  const activeId = themeId || getActiveThemeId();
+  const template = THEME_TEMPLATES[activeId] || THEME_TEMPLATES.apex_obsidian;
+  const t = isDark ? template.dark : template.light;
 
-  // Light Mode Tokens
   return {
-    isDark: false,
+    isDark,
+    themeId: activeId,
     bg: {
-      app: SOLID_PALETTE.alabaster.canvas,
-      card: SOLID_PALETTE.alabaster.card,
-      cardElevated: SOLID_PALETTE.alabaster.elevated,
-      well: SOLID_PALETTE.alabaster.well,
-      active: SOLID_PALETTE.jade[50],
+      app: t.canvas,
+      card: t.card,
+      cardElevated: t.cardElevated,
+      well: t.well,
+      active: `${t.primaryHero}20`,
     },
     border: {
-      subtle: SOLID_PALETTE.alabaster.border,
-      strong: SOLID_PALETTE.alabaster.borderStrong,
-      primary: SOLID_PALETTE.jade[700],
-      ai: SOLID_PALETTE.synapse[700],
-      debit: SOLID_PALETTE.pulse[700],
+      subtle: t.border,
+      strong: t.borderStrong,
+      primary: t.primaryHero,
+      ai: t.aiHero,
+      debit: t.spendHero,
     },
     text: {
-      primary: SOLID_PALETTE.alabaster.textPrimary,
-      secondary: SOLID_PALETTE.alabaster.textSecondary,
-      muted: SOLID_PALETTE.alabaster.textMuted,
-      inverse: SOLID_PALETTE.abyss.textPrimary,
+      primary: t.textPrimary,
+      secondary: t.textSecondary,
+      muted: t.textMuted,
+      inverse: isDark ? '#0F172A' : '#F8FAFC',
     },
     primary: {
-      hero: SOLID_PALETTE.jade[700],
-      hover: SOLID_PALETTE.jade[800],
-      subtle: SOLID_PALETTE.jade[50],
-      border: 'rgba(0, 135, 90, 0.30)',
+      hero: t.primaryHero,
+      hover: t.primaryHero,
+      subtle: `${t.primaryHero}15`,
+      border: `${t.primaryHero}40`,
     },
     ai: {
-      hero: SOLID_PALETTE.synapse[700],
-      hover: SOLID_PALETTE.synapse[800],
-      subtle: SOLID_PALETTE.synapse[50],
-      border: 'rgba(91, 52, 234, 0.30)',
+      hero: t.aiHero,
+      hover: t.aiHero,
+      subtle: `${t.aiHero}15`,
+      border: `${t.aiHero}40`,
     },
     debit: {
-      hero: SOLID_PALETTE.pulse[700],
-      hover: SOLID_PALETTE.pulse[800],
-      subtle: SOLID_PALETTE.pulse[50],
-      border: 'rgba(217, 30, 78, 0.30)',
+      hero: t.spendHero,
+      hover: t.spendHero,
+      subtle: `${t.spendHero}15`,
+      border: `${t.spendHero}40`,
     },
     vault: {
-      hero: SOLID_PALETTE.ochre[700],
-      hover: SOLID_PALETTE.ochre[800],
-      subtle: SOLID_PALETTE.ochre[50],
-      border: 'rgba(198, 125, 10, 0.30)',
+      hero: t.vaultHero,
+      hover: t.vaultHero,
+      subtle: `${t.vaultHero}15`,
+      border: `${t.vaultHero}40`,
     },
     telemetry: {
-      hero: SOLID_PALETTE.telemetry[700],
-      hover: SOLID_PALETTE.telemetry[800],
-      subtle: SOLID_PALETTE.telemetry[50],
-      border: 'rgba(2, 132, 199, 0.30)',
+      hero: t.telemetryHero,
+      hover: t.telemetryHero,
+      subtle: `${t.telemetryHero}15`,
+      border: `${t.telemetryHero}40`,
     },
   };
 }
@@ -298,22 +248,22 @@ export const CATEGORY_SOLID_COLORS: Record<string, CategoryColorDef> = {
     bgLight: '#FFF3EB',
   },
   Shopping: {
-    solidDark: SOLID_PALETTE.pulse[500],
-    solidLight: SOLID_PALETTE.pulse[700],
-    bgDark: SOLID_PALETTE.pulse[900],
-    bgLight: SOLID_PALETTE.pulse[50],
+    solidDark: '#FF4757',
+    solidLight: '#E11D48',
+    bgDark: '#2D0B14',
+    bgLight: '#FFF1F2',
   },
   Travel: {
-    solidDark: SOLID_PALETTE.telemetry[500],
-    solidLight: SOLID_PALETTE.telemetry[700],
-    bgDark: SOLID_PALETTE.telemetry[900],
-    bgLight: SOLID_PALETTE.telemetry[50],
+    solidDark: '#00E5FF',
+    solidLight: '#0284C7',
+    bgDark: '#052331',
+    bgLight: '#F0F9FF',
   },
   'Travel & Transit': {
-    solidDark: SOLID_PALETTE.telemetry[500],
-    solidLight: SOLID_PALETTE.telemetry[700],
-    bgDark: SOLID_PALETTE.telemetry[900],
-    bgLight: SOLID_PALETTE.telemetry[50],
+    solidDark: '#00E5FF',
+    solidLight: '#0284C7',
+    bgDark: '#052331',
+    bgLight: '#F0F9FF',
   },
   Bills: {
     solidDark: '#38BDF8',
@@ -328,34 +278,34 @@ export const CATEGORY_SOLID_COLORS: Record<string, CategoryColorDef> = {
     bgLight: '#F0F9FF',
   },
   Entertainment: {
-    solidDark: SOLID_PALETTE.synapse[500],
-    solidLight: SOLID_PALETTE.synapse[700],
-    bgDark: SOLID_PALETTE.synapse[900],
-    bgLight: SOLID_PALETTE.synapse[50],
+    solidDark: '#8B5CF6',
+    solidLight: '#6D28D9',
+    bgDark: '#220D6B',
+    bgLight: '#F5F3FF',
   },
   Investment: {
-    solidDark: SOLID_PALETTE.ochre[500],
-    solidLight: SOLID_PALETTE.ochre[700],
-    bgDark: SOLID_PALETTE.ochre[900],
-    bgLight: SOLID_PALETTE.ochre[50],
+    solidDark: '#FFB800',
+    solidLight: '#D97706',
+    bgDark: '#2E1B00',
+    bgLight: '#FFFBEB',
   },
   'Investments & Wealth': {
-    solidDark: SOLID_PALETTE.ochre[500],
-    solidLight: SOLID_PALETTE.ochre[700],
-    bgDark: SOLID_PALETTE.ochre[900],
-    bgLight: SOLID_PALETTE.ochre[50],
+    solidDark: '#FFB800',
+    solidLight: '#D97706',
+    bgDark: '#2E1B00',
+    bgLight: '#FFFBEB',
   },
   Salary: {
-    solidDark: SOLID_PALETTE.jade[500],
-    solidLight: SOLID_PALETTE.jade[700],
-    bgDark: SOLID_PALETTE.jade[900],
-    bgLight: SOLID_PALETTE.jade[50],
+    solidDark: '#00F5A0',
+    solidLight: '#059669',
+    bgDark: '#002D22',
+    bgLight: '#ECFDF5',
   },
   Income: {
-    solidDark: SOLID_PALETTE.jade[500],
-    solidLight: SOLID_PALETTE.jade[700],
-    bgDark: SOLID_PALETTE.jade[900],
-    bgLight: SOLID_PALETTE.jade[50],
+    solidDark: '#00F5A0',
+    solidLight: '#059669',
+    bgDark: '#002D22',
+    bgLight: '#ECFDF5',
   },
   Transfers: {
     solidDark: '#A78BFA',
@@ -370,10 +320,10 @@ export const CATEGORY_SOLID_COLORS: Record<string, CategoryColorDef> = {
     bgLight: '#ECFDF5',
   },
   Default: {
-    solidDark: SOLID_PALETTE.synapse[400],
-    solidLight: SOLID_PALETTE.synapse[700],
-    bgDark: SOLID_PALETTE.abyss.well,
-    bgLight: SOLID_PALETTE.alabaster.well,
+    solidDark: '#8B5CF6',
+    solidLight: '#6D28D9',
+    bgDark: '#182030',
+    bgLight: '#EDF1F7',
   },
 };
 
@@ -388,23 +338,23 @@ export function getCategoryColor(category: string, isDark: boolean): { solid: st
 // ── 4. CHART SOLID COLOR PALETTES ────────────────────────────────────────────
 
 export const CHART_SOLID_PALETTE_DARK = [
-  '#00D084', // Sovereign Jade
-  '#7C5CFC', // Synapse Iris
-  '#FF3366', // Crimson Pulse
-  '#F5A623', // Aureolin Ochre
-  '#00D8F6', // Electric Cyan
+  '#00F5A0', // Cyber Emerald
+  '#8B5CF6', // Hyper Iris
+  '#FF4757', // Plasma Flame
+  '#FFB800', // Solstice Gold
+  '#00E5FF', // Arctic Cyan
   '#FF8A3D', // Saffron Tangerine
   '#A78BFA', // Violet
   '#34D399', // Mint
 ];
 
 export const CHART_SOLID_PALETTE_LIGHT = [
-  '#00875A', // Sovereign Jade (Light)
-  '#5B34EA', // Synapse Iris (Light)
-  '#D91E4E', // Crimson Pulse (Light)
-  '#C67D0A', // Aureolin Ochre (Light)
-  '#0284C7', // Electric Cyan (Light)
-  '#D45A00', // Saffron Tangerine (Light)
-  '#6D28D9', // Violet (Light)
-  '#059669', // Mint (Light)
+  '#059669', // Sovereign Jade
+  '#6D28D9', // Deep Iris
+  '#E11D48', // Crimson Pulse
+  '#D97706', // Dark Gold
+  '#0284C7', // Deep Arctic
+  '#D45A00', // Saffron
+  '#7C3AED', // Violet
+  '#047857', // Mint
 ];

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ActiveModule } from '../types';
 import { BytLendLogo } from './BytLendLogo';
+import { THEME_TEMPLATES, ThemeTemplateId, getActiveThemeId, setActiveThemeId } from '../theme/themes';
 
 interface LoginScreenProps {
   isDark?: boolean;
@@ -18,6 +19,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const [step, setStep] = useState<'INPUT' | 'OTP'>('INPUT');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeTheme, setActiveTheme] = useState<ThemeTemplateId>(getActiveThemeId());
 
   // Helper to derive a clean display name from email
   const deriveNameFromEmail = (rawEmail: string): string => {
@@ -99,24 +101,57 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     );
   };
 
+  const handleSelectTheme = (id: ThemeTemplateId) => {
+    setActiveTheme(id);
+    setActiveThemeId(id);
+  };
+
   return (
     <div className="min-h-[82vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
-      <div className="spatial-card w-full max-w-md p-8 sm:p-10 text-center space-y-6">
+      <div className="spatial-card w-full max-w-md p-8 sm:p-10 text-center space-y-6 shadow-2xl relative overflow-hidden">
+        {/* Top ambient glow */}
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-jade-500/20 blur-3xl pointer-events-none" />
+
         {/* Brand Icon Badge */}
-        <div className="flex justify-center">
+        <div className="flex justify-center relative z-10">
           <BytLendLogo size="lg" />
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1 relative z-10">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-abyss-textPrimary flex items-center justify-center">
-            Byt<span className="text-jade-500 font-black">Lend</span>
+            Byt<span className="text-jade-500 font-black ml-0.5">Floww</span>
           </h1>
           <p className="text-xs text-jade-500 font-bold uppercase tracking-widest">
             Autonomous AI Capital Forensics
           </p>
           <p className="text-[11px] text-abyss-textMuted pt-0.5">
-            Sovereign Jade & Synapse Iris Intelligence
+            Billion-Dollar Multi-Theme Financial Intelligence OS
           </p>
+        </div>
+
+        {/* Theme Quick Selector Swatches */}
+        <div className="p-3 rounded-2xl bg-abyss-well border border-abyss-border space-y-2">
+          <div className="flex items-center justify-between text-[10px] uppercase font-bold text-abyss-textMuted px-1">
+            <span>Choose Startup Theme</span>
+            <span className="text-jade-500">{THEME_TEMPLATES[activeTheme]?.name}</span>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            {Object.values(THEME_TEMPLATES).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => handleSelectTheme(t.id)}
+                className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm transition-all duration-200 border ${
+                  activeTheme === t.id
+                    ? 'border-jade-500 bg-jade-500/20 scale-110 shadow-sm'
+                    : 'border-abyss-border bg-abyss-card hover:scale-105'
+                }`}
+                title={t.name}
+              >
+                {t.icon}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Auth Mode Tabs Pill */}
@@ -149,165 +184,133 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {authMode === 'EMAIL' && (
           <form onSubmit={handleEmailLogin} className="space-y-4 text-left">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-abyss-textMuted">
-                Work / Personal Email
+              <label className="block text-xs font-semibold text-abyss-textSecondary mb-1.5">
+                Corporate or Personal Email
               </label>
               <input
                 type="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
+                className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-jade-500"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-abyss-textMuted">
+              <label className="block text-xs font-semibold text-abyss-textSecondary mb-1.5">
                 Password
               </label>
               <input
                 type="password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
+                className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-jade-500"
               />
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-[12px] bg-pulse-500/15 border border-pulse-500/30 text-pulse-500 text-xs font-bold text-center">
-                ⚠️ {errorMessage}
-              </div>
+              <p className="text-xs text-pulse-500 font-semibold">{errorMessage}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="spatial-btn-selected w-full py-4 rounded-full text-xs font-bold flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full spatial-btn-selected text-xs font-bold transition flex items-center justify-center gap-2"
             >
-              {loading ? (
-                <span>Authenticating...</span>
-              ) : (
-                <span>Sign In to System →</span>
-              )}
+              {loading ? 'Authenticating...' : 'Sign In Securely →'}
             </button>
           </form>
         )}
 
-        {/* Phone OTP Auth Form */}
+        {/* Phone Auth Form */}
         {authMode === 'PHONE' && (
-          <form onSubmit={step === 'INPUT' ? handleSendOtp : handleVerifyOtp} className="space-y-4 text-left">
+          <div className="space-y-4 text-left">
             {step === 'INPUT' ? (
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-abyss-textMuted">
-                  Indian Mobile Number
-                </label>
-                <div className="flex items-center gap-2">
-                  <span className="px-3.5 py-3.5 rounded-[14px] text-xs font-bold bg-abyss-well border border-abyss-border text-abyss-textPrimary">
-                    +91
-                  </span>
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-abyss-textSecondary mb-1.5">
+                    10-Digit Mobile Number
+                  </label>
+                  <div className="flex gap-2">
+                    <span className="px-3.5 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm font-mono text-abyss-textMuted flex items-center">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="84008 69600"
+                      className="flex-1 px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-jade-500 font-mono"
+                    />
+                  </div>
+                </div>
+
+                {errorMessage && (
+                  <p className="text-xs text-pulse-500 font-semibold">{errorMessage}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-full spatial-btn-selected text-xs font-bold transition flex items-center justify-center gap-2"
+                >
+                  {loading ? 'Sending OTP...' : 'Send Verification OTP →'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-abyss-textSecondary mb-1.5">
+                    Enter Verification Code (OTP sent to +91 {phone})
+                  </label>
                   <input
-                    type="tel"
-                    required
-                    maxLength={10}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="98765 43210"
-                    className="flex-1 px-4 py-3.5 rounded-[14px] text-xs font-mono bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-center text-lg font-mono tracking-widest text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-jade-500"
                   />
                 </div>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-abyss-textMuted">
-                    Enter 6-Digit OTP
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setStep('INPUT')}
-                    className="text-[10px] font-bold text-telemetry-500 hover:underline"
-                  >
-                    Change Number
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  required
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                  placeholder="123456"
-                  className="w-full px-4 py-3.5 rounded-[14px] text-base font-mono font-bold tracking-widest text-center bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
-                />
-              </div>
-            )}
 
-            {errorMessage && (
-              <div className="p-3 rounded-[12px] bg-pulse-500/15 border border-pulse-500/30 text-pulse-500 text-xs font-bold text-center">
-                ⚠️ {errorMessage}
-              </div>
-            )}
+                {errorMessage && (
+                  <p className="text-xs text-pulse-500 font-semibold">{errorMessage}</p>
+                )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="spatial-btn-selected w-full py-4 rounded-full text-xs font-bold flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <span>Processing...</span>
-              ) : step === 'INPUT' ? (
-                <span>Send Verification OTP →</span>
-              ) : (
-                <span>Verify & Enter OS →</span>
-              )}
-            </button>
-          </form>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-full spatial-btn-selected text-xs font-bold transition flex items-center justify-center gap-2"
+                >
+                  {loading ? 'Verifying...' : 'Verify & Enter Workspace →'}
+                </button>
+              </form>
+            )}
+          </div>
         )}
 
-        {/* Quick Access */}
-        <div className="pt-4 border-t border-abyss-border space-y-3">
-          <div className="text-[10px] font-bold uppercase text-jade-500 tracking-wider">
-            Quick One-Click Access (Authorized Session)
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => handleGuestAccess('BANK_STATEMENTS')}
-              className="spatial-btn p-3 text-xs text-abyss-textPrimary border-jade-500/30"
-            >
-              <div className="font-bold text-jade-500">🏛️ Statement Hub</div>
-              <div className="text-[9px] text-abyss-textMuted mt-0.5 font-normal">Forensics Engine</div>
-            </button>
-
+        {/* 1-Click Fast Access Buttons */}
+        <div className="pt-2 border-t border-abyss-border space-y-2">
+          <span className="text-[10px] text-abyss-textMuted uppercase font-bold tracking-wider block">
+            Instant 1-Click Demo Access
+          </span>
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => handleGuestAccess('SMS_INTELLIGENCE')}
-              className="spatial-btn p-3 text-xs text-abyss-textPrimary border-synapse-500/30"
+              className="py-2.5 px-3 rounded-xl bg-abyss-well hover:bg-abyss-elevated border border-abyss-border text-xs font-semibold text-abyss-textPrimary transition text-center"
             >
-              <div className="font-bold text-synapse-400 light:text-synapse-700">📱 SMS Simulator</div>
-              <div className="text-[9px] text-abyss-textMuted mt-0.5 font-normal">Android XML Parser</div>
+              📱 SMS Simulator
+            </button>
+            <button
+              type="button"
+              onClick={() => handleGuestAccess('BANK_STATEMENTS')}
+              className="py-2.5 px-3 rounded-xl bg-abyss-well hover:bg-abyss-elevated border border-abyss-border text-xs font-semibold text-abyss-textPrimary transition text-center"
+            >
+              📊 Bank Forensics
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Brand Trust Badges */}
-      <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-bold tracking-[0.2em] text-jade-500 uppercase">
-        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
-          🛡️ TRUSTED
-        </span>
-        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
-          🔒 SECURE
-        </span>
-        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
-          ✨ SMART AI
-        </span>
-        <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
-          ⚡ FAST
-        </span>
       </div>
     </div>
   );

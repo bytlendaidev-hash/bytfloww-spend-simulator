@@ -3,6 +3,7 @@ import { parseSmsXml } from './engine/xmlParser';
 import { generateWeeklyDebrief } from './engine/accounting';
 import { SAMPLE_SMS_XML } from './engine/sampleData';
 import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount, ActiveModule } from './types';
+import { applyThemeVariables } from './theme/themes';
 
 // Components
 import { AppShell } from './components/AppShell';
@@ -171,6 +172,7 @@ export const App: React.FC = () => {
     const env = isDark ? 'titanium_prism' : 'bytlend_champagne';
     localStorage.setItem('bytfloww_spatial_env', env);
     window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: env }));
+    applyThemeVariables();
   }, [isDark]);
 
   const handleToggleTheme = () => {
@@ -195,6 +197,14 @@ export const App: React.FC = () => {
       onLogout={handleLogout}
       isDark={isDark}
       onToggleTheme={handleToggleTheme}
+      activeTab={activeTab}
+      onSelectTab={setActiveTab}
+      counts={{
+        transactions: events.length,
+        categories: snapshot?.categoryDistribution.length || 0,
+        merchants: snapshot?.topMerchants.length || 0,
+        commitments: snapshot?.commitments.length || 0,
+      }}
     >
       {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ──────────────────────── */}
       {!currentUser ? (
