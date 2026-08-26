@@ -101,21 +101,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <div className="min-h-[82vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
-      <div className="spatial-card-gold w-full max-w-md p-8 sm:p-10 text-center space-y-6">
+      <div className="spatial-card-prism w-full max-w-md p-8 sm:p-10 text-center space-y-6">
         {/* Brand Icon Badge */}
         <div className="flex justify-center">
           <BytLendLogo size="lg" />
         </div>
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center justify-center">
-            Byt<span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Lend</span>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F0F4F8] flex items-center justify-center">
+            Byt<span className="bg-gradient-to-r from-[#00E5FF] via-[#A855F7] to-[#F0F4F8] bg-clip-text text-transparent font-black">Lend</span>
           </h1>
-          <p className="text-xs text-[#D4AF37]/80 font-bold uppercase tracking-widest">
-            Borrow Smarter. Live Better.
+          <p className="text-xs text-[#00E5FF] font-bold uppercase tracking-widest">
+            Autonomous AI Capital Forensics
           </p>
           <p className="text-[11px] text-white/50 pt-0.5">
-            3D Luxury Financial Forensics & Capital Intelligence
+            Titanium Prism • Algorithmic Spend Intelligence
           </p>
         </div>
 

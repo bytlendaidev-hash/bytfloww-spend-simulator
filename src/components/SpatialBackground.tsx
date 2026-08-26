@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 export type SpatialEnvironmentType = 
+  | 'titanium_prism'
   | 'bytlend_gold_obsidian' 
   | 'bytlend_champagne' 
   | 'living_room' 
@@ -12,15 +13,15 @@ interface SpatialBackgroundProps {
 }
 
 export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({ 
-  environment = 'bytlend_gold_obsidian' 
+  environment = 'titanium_prism' 
 }) => {
   const [currentEnv, setCurrentEnv] = useState<SpatialEnvironmentType>(() => {
     const saved = localStorage.getItem('bytfloww_spatial_env');
     if (saved === 'living_room' || saved === 'twilight_penthouse' || !saved) {
-      localStorage.setItem('bytfloww_spatial_env', 'bytlend_gold_obsidian');
-      return 'bytlend_gold_obsidian';
+      localStorage.setItem('bytfloww_spatial_env', 'titanium_prism');
+      return 'titanium_prism';
     }
-    return (saved as SpatialEnvironmentType) || 'bytlend_gold_obsidian';
+    return (saved as SpatialEnvironmentType) || 'titanium_prism';
   });
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
@@ -64,20 +65,20 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
     <div
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
       aria-hidden="true"
-      style={{ backgroundColor: currentEnv === 'bytlend_champagne' ? '#F8F6F0' : '#080C0E' }}
+      style={{ backgroundColor: currentEnv === 'bytlend_champagne' ? '#F8F6F0' : '#05080C' }}
     >
-      {/* ── 1. BYTLEND 3D GOLD & OBSIDIAN LUXURY FINTECH ENVIRONMENT ─────── */}
-      {(currentEnv === 'bytlend_gold_obsidian' || !currentEnv) && (
+      {/* ── 1. TITANIUM PRISM 3D CYBER IRIS & AEROSPACE SPACE ────────────── */}
+      {(currentEnv === 'titanium_prism' || currentEnv === 'bytlend_gold_obsidian' || !currentEnv) && (
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.06]"
           style={{
-            backgroundImage: `url('/environments/bytlend_gold_obsidian.jpg')`,
+            backgroundImage: `url('/environments/titanium_prism.jpg')`,
             transform: `scale(1.06) translate(${mouseOffset.x * -0.5}px, ${mouseOffset.y * -0.5}px)`,
           }}
         />
       )}
 
-      {/* ── 2. BYTLEND WARM CHAMPAGNE LUXURY ENVIRONMENT ─────────────────── */}
+      {/* ── 2. WARM CHAMPAGNE LUXURY ENVIRONMENT ─────────────────────────── */}
       {currentEnv === 'bytlend_champagne' && (
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.06]"
@@ -116,40 +117,41 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
           className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{
             background: `
-              radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.25) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(30, 20, 50, 0.45) 0%, transparent 45%),
-              radial-gradient(circle at 50% 85%, rgba(197, 160, 89, 0.2) 0%, transparent 60%),
-              radial-gradient(circle at 50% 50%, rgba(8, 12, 14, 1) 0%, rgba(4, 8, 10, 1) 100%)
+              radial-gradient(circle at 20% 15%, rgba(0, 229, 255, 0.25) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.35) 0%, transparent 45%),
+              radial-gradient(circle at 50% 85%, rgba(0, 180, 216, 0.2) 0%, transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(5, 8, 12, 1) 0%, rgba(2, 4, 6, 1) 100%)
             `,
             transform: `scale(1.05) translate(${mouseOffset.x * -0.4}px, ${mouseOffset.y * -0.4}px)`,
           }}
         />
       )}
 
-      {/* ── 6. ATMOSPHERIC LUXURY VIGNETTE & GOLD AMBIENT GLOW ──────────── */}
+      {/* ── 6. ATMOSPHERIC LUXURY VIGNETTE & CYBER IRIS GLOW ────────────── */}
       {currentEnv !== 'bytlend_champagne' && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-black/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/60" />
           <div 
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.70) 100%)',
+              background: 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.75) 100%)',
             }}
           />
 
-          {/* Golden Warm Light Orbit Orb */}
+          {/* Photon Cyan Ambient Light Orb */}
           <div
             className="absolute -top-[10%] -left-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full blur-[140px] opacity-35 animate-spatial-atmosphere pointer-events-none"
             style={{
-              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.35) 0%, rgba(243, 230, 177, 0.15) 40%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(0, 229, 255, 0.35) 0%, rgba(168, 85, 247, 0.15) 45%, transparent 70%)',
               transform: `translate(${mouseOffset.x * 0.7}px, ${mouseOffset.y * 0.7}px)`,
             }}
           />
 
+          {/* Cyber Iris Violet Ambient Light Orb */}
           <div
-            className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] max-w-[750px] max-h-[750px] rounded-full blur-[160px] opacity-25 animate-spatial-atmosphere pointer-events-none"
+            className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] max-w-[750px] max-h-[750px] rounded-full blur-[160px] opacity-30 animate-spatial-atmosphere pointer-events-none"
             style={{
-              background: 'radial-gradient(circle, rgba(197, 160, 89, 0.30) 0%, rgba(14, 20, 26, 0.2) 45%, transparent 75%)',
+              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(14, 20, 29, 0.2) 45%, transparent 75%)',
               transform: `translate(${mouseOffset.x * -0.5}px, ${mouseOffset.y * -0.5}px)`,
             }}
           />

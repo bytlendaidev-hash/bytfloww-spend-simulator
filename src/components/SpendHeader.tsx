@@ -49,14 +49,14 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Left Title and Subtitle */}
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-[14px] bg-gradient-to-b from-[#1E232A] to-[#0A0D11] border border-[#D4AF37]/40 flex items-center justify-center text-[#F3E6B1] text-lg font-bold shadow-[0_4px_16px_rgba(212,175,55,0.25)]">
+          <div className="w-11 h-11 rounded-[14px] bg-gradient-to-b from-[#1E2738] to-[#0A101A] border border-[#00E5FF]/40 flex items-center justify-center text-[#00E5FF] text-lg font-bold shadow-[0_4px_16px_rgba(0,229,255,0.25)]">
             ✨
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-1.5">
-              Capital <span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Intelligence</span>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F0F4F8] flex items-center gap-1.5">
+              Capital <span className="bg-gradient-to-r from-[#00E5FF] via-[#A855F7] to-[#F0F4F8] bg-clip-text text-transparent font-black">Intelligence</span>
             </h1>
-            <p className="text-xs text-[#D4AF37]/80 font-medium">
+            <p className="text-xs text-[#00E5FF] font-medium">
               {totalParsedCount.toLocaleString('en-IN')} Ledger Transactions Reconciled • {snapshot.periodKey}
             </p>
           </div>
@@ -67,15 +67,15 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Spatial Environment Switcher */}
           <button
             onClick={() => {
-              const envs = ['bytlend_gold_obsidian', 'bytlend_champagne', 'living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
-              const cur = localStorage.getItem('bytfloww_spatial_env') || 'bytlend_gold_obsidian';
+              const envs = ['titanium_prism', 'bytlend_champagne', 'living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
+              const cur = localStorage.getItem('bytfloww_spatial_env') || 'titanium_prism';
               const nextIndex = (envs.indexOf(cur as any) + 1) % envs.length;
               const nextEnv = envs[nextIndex];
               localStorage.setItem('bytfloww_spatial_env', nextEnv);
               window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: nextEnv }));
             }}
-            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5 border-[#D4AF37]/30 text-white"
-            title="Switch BytLend 3D Gold / Champagne Space"
+            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5 border-[#00E5FF]/30 text-[#F0F4F8]"
+            title="Switch Titanium Prism Space"
           >
             <span>✨</span>
             <span className="hidden sm:inline">Theme Space</span>
@@ -84,7 +84,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Ask AI Copilot Button */}
           <button
             onClick={onOpenCopilot}
-            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#D4AF37]/30 text-[#F3E6B1]"
+            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#A855F7]/40 text-[#D8B4FE] shadow-[0_0_15px_rgba(168,85,247,0.2)]"
             title="Ask BytLend AI Copilot"
           >
             <span>💬</span>
@@ -94,7 +94,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Filter Modal Trigger */}
           <button
             onClick={onOpenFilter}
-            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#D4AF37]/30 text-white"
+            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#00E5FF]/30 text-[#F0F4F8]"
             title="Filter Transactions"
           >
             <span>⚡</span>
@@ -104,7 +104,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Diagnostics Button */}
           <button
             onClick={onOpenDiagnostics}
-            className="spatial-btn w-9 h-9 flex items-center justify-center text-sm border-[#D4AF37]/30 text-white"
+            className="spatial-btn w-9 h-9 flex items-center justify-center text-sm border-[#00E5FF]/30 text-[#F0F4F8]"
             title="Security Diagnostics"
           >
             🛡️
