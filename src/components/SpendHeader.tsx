@@ -64,6 +64,23 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
 
         {/* Right Action Icons (Gaze Interactive) */}
         <div className="flex items-center gap-2">
+          {/* Spatial Environment Switcher */}
+          <button
+            onClick={() => {
+              const envs = ['living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
+              const cur = localStorage.getItem('bytfloww_spatial_env') || 'living_room';
+              const nextIndex = (envs.indexOf(cur as any) + 1) % envs.length;
+              const nextEnv = envs[nextIndex];
+              localStorage.setItem('bytfloww_spatial_env', nextEnv);
+              window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: nextEnv }));
+            }}
+            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5"
+            title="Switch visionOS Spatial Environment"
+          >
+            <span>🥽</span>
+            <span className="hidden sm:inline">Environment</span>
+          </button>
+
           {/* Ask AI Copilot Button */}
           <button
             onClick={onOpenCopilot}
