@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ActiveModule } from '../types';
+import { BytLendLogo } from './BytLendLogo';
 
 interface LoginScreenProps {
   isDark?: boolean;
@@ -100,21 +101,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <div className="min-h-[82vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
-      <div className="spatial-card w-full max-w-md p-8 sm:p-10 text-center space-y-6">
+      <div className="spatial-card-gold w-full max-w-md p-8 sm:p-10 text-center space-y-6">
         {/* Brand Icon Badge */}
-        <div className="relative mx-auto w-16 h-16">
-          <div className="w-16 h-16 rounded-[20px] flex items-center justify-center font-bold text-2xl bg-white/10 border border-white/20 text-white shadow-lg">
-            BF
-          </div>
-          <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#30D158] border-2 border-black animate-pulse" />
+        <div className="flex justify-center">
+          <BytLendLogo size="lg" />
         </div>
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            BytFloww Spatial OS
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center justify-center">
+            Byt<span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Lend</span>
           </h1>
-          <p className="text-xs text-white/60 font-medium">
-            Financial Forensics & Spatial Ledger Intelligence
+          <p className="text-xs text-[#D4AF37]/80 font-bold uppercase tracking-widest">
+            Borrow Smarter. Live Better.
+          </p>
+          <p className="text-[11px] text-white/50 pt-0.5">
+            3D Luxury Financial Forensics & Capital Intelligence
           </p>
         </div>
 

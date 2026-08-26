@@ -45,42 +45,40 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
-      {/* ── 1. HERO PERIOD SPEND SPATIAL WINDOW CARD ─────────────────────── */}
-      <div className="spatial-card p-6 sm:p-8 space-y-6 relative overflow-hidden">
-        {/* Top period header */}
+      {/* ── 1. HERO PERIOD SPEND SPATIAL WINDOW CARD (BYTLEND 3D GOLD LUXURY) ── */}
+      <div className="spatial-card-gold p-6 sm:p-8 space-y-6 relative overflow-hidden">
+        {/* Top period header with Gold Pill */}
         <div className="flex items-center justify-between gap-3 relative z-10">
-          <span className="spatial-btn px-4 py-1.5 text-xs flex items-center gap-2 text-white">
-            <span className="w-2 h-2 rounded-full bg-[#30D158] animate-pulse" />
-            <span>{snapshot.periodLabel.toUpperCase()}</span>
+          <span className="spatial-btn px-4 py-1.5 text-xs flex items-center gap-2 text-white border-[#D4AF37]/30 bg-[#D4AF37]/10">
+            <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
+            <span className="text-[#F3E6B1] font-bold">{snapshot.periodLabel.toUpperCase()}</span>
           </span>
 
-          <span className={`px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wider border backdrop-blur-xl ${
-            snapshot.netCashflow >= 0
-              ? 'bg-[#30D158]/20 text-[#30D158] border-[#30D158]/30'
-              : 'bg-[#FF453A]/20 text-[#FF453A] border-[#FF453A]/30'
-          }`}>
-            ● {snapshot.healthScoreTier} HEALTH TIER
+          <span className="px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wider border backdrop-blur-xl bg-[#D4AF37]/15 text-[#F3E6B1] border-[#D4AF37]/30">
+            ✨ {snapshot.healthScoreTier} CAPITAL HEALTH TIER
           </span>
         </div>
 
-        {/* Main spend number */}
+        {/* Main spend number with 3D Gold & Champagne typography */}
         <div className="relative z-10 pt-2">
-          <span className="text-xs uppercase tracking-widest text-white/60 font-semibold block">
-            Total Spent This Period
+          <span className="text-xs uppercase tracking-widest text-[#D4AF37]/80 font-bold block">
+            Capital Reconciled This Period
           </span>
-          <div className="text-4xl sm:text-6xl font-bold tracking-tight font-mono mt-1 text-white flex items-baseline gap-1">
-            <span className="text-2xl sm:text-4xl text-white/50 font-normal">₹</span>
-            {snapshot.totalSpend.toLocaleString('en-IN')}
+          <div className="text-4xl sm:text-6xl font-bold tracking-tight font-mono mt-1 flex items-baseline gap-1 text-white">
+            <span className="text-2xl sm:text-4xl text-[#D4AF37]/70 font-normal">₹</span>
+            <span className="bg-gradient-to-r from-[#FFFFFF] via-[#F3E6B1] to-[#D4AF37] bg-clip-text text-transparent">
+              {snapshot.totalSpend.toLocaleString('en-IN')}
+            </span>
           </div>
         </div>
 
-        {/* Budget Status line & Progress bar */}
-        <div className="space-y-3 pt-2 relative z-10 border-t border-white/10">
+        {/* Budget Status line & Progress bar with satin gold sheen */}
+        <div className="space-y-3 pt-2 relative z-10 border-t border-[#D4AF37]/20">
           <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 border border-white/15">
+            <span className="px-3 py-1 rounded-full bg-black/40 text-white/80 border border-[#D4AF37]/20">
               {snapshot.transactionCount} transactions analyzed
             </span>
-            <span className={isOverBudget ? 'text-[#FF9F0A]' : 'text-[#30D158]'}>
+            <span className={isOverBudget ? 'text-[#FF9F0A]' : 'text-[#D4AF37]'}>
               {isOverBudget 
                 ? `Over budget by ₹${varianceAmount.toLocaleString('en-IN')} (${budgetPct}%)` 
                 : `Within budget (${budgetPct}% utilized)`}
@@ -88,11 +86,11 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           </div>
 
           {/* Progress bar */}
-          <div className="h-2.5 rounded-full bg-black/40 border border-white/15 overflow-hidden p-0.5">
+          <div className="h-2.5 rounded-full bg-black/50 border border-[#D4AF37]/20 overflow-hidden p-0.5">
             <div 
               style={{ width: `${Math.min(100, Math.max(3, budgetPct))}%` }}
               className={`h-full rounded-full transition-all duration-500 ${
-                isOverBudget ? 'bg-[#FF453A]' : 'bg-gradient-to-r from-[#0A84FF] to-[#30D158]'
+                isOverBudget ? 'bg-[#FF453A]' : 'bg-gradient-to-r from-[#D4AF37] via-[#F3E6B1] to-[#30D158]'
               }`}
             />
           </div>

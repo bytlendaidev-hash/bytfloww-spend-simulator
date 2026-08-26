@@ -6,17 +6,23 @@
 
 @layer base {
   :root {
-    /* Apple visionOS Spatial Environment Colors */
-    --spatial-bg: #070B0E;
-    --spatial-accent: #0A84FF; /* Apple System Blue */
+    /* BytLend 3D Luxury Gold & Obsidian Palette */
+    --spatial-bg: #080C0E;
+    --gold-primary: #D4AF37;
+    --gold-light: #F3E6B1;
+    --gold-dark: #AA7C11;
+    --gold-accent: #E5C158;
+    --obsidian-surface: #121417;
+    --obsidian-card: #16191E;
+    --spatial-accent: #D4AF37; /* BytLend Signature Gold */
     --spatial-accent-purple: #AF52DE;
     --spatial-accent-indigo: #6366F1;
   }
 
   body {
-    background-color: #070B0E;
+    background-color: #080C0E;
     color: #FFFFFF;
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'SF Pro Text', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Satoshi', 'Plus Jakarta Sans', 'SF Pro Display', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -37,88 +43,106 @@
 }
 
 @layer components {
-  /* ── 1. THE VISIONOS SPATIAL GLASS BASE ──────────────────────────────── */
+  /* ── 1. THE BYTLEND 3D GOLD & OBSIDIAN SPATIAL GLASS BASE ───────────── */
   .spatial-window {
-    background-color: rgba(255, 255, 255, 0.10);
-    backdrop-filter: blur(30px) saturate(210%);
-    -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(255, 255, 255, 0.20);
+    background-color: rgba(14, 18, 24, 0.82);
+    backdrop-filter: blur(35px) saturate(210%);
+    -webkit-backdrop-filter: blur(35px) saturate(210%);
+    border: 1px solid rgba(212, 175, 55, 0.28);
     box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.37),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.40),
-      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.25);
+      0 12px 48px 0 rgba(0, 0, 0, 0.65),
+      0 0 40px 0 rgba(212, 175, 55, 0.08),
+      inset 0 1px 1px 0 rgba(243, 230, 177, 0.35),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.40);
     border-radius: 24px;
   }
 
   .spatial-card {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(18, 22, 28, 0.78);
     backdrop-filter: blur(30px) saturate(210%);
     -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(212, 175, 55, 0.18);
     box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.30),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.35);
-    border-radius: 16px;
+      0 8px 32px 0 rgba(0, 0, 0, 0.45),
+      inset 0 1px 1px 0 rgba(243, 230, 177, 0.22);
+    border-radius: 18px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .spatial-card:hover {
-    background-color: rgba(255, 255, 255, 0.14);
-    border-color: rgba(255, 255, 255, 0.30);
+    background-color: rgba(26, 31, 40, 0.88);
+    border-color: rgba(212, 175, 55, 0.40);
     transform: scale(1.01) translateY(-2px);
     box-shadow: 
-      0 14px 40px 0 rgba(0, 0, 0, 0.45),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.50);
+      0 14px 40px 0 rgba(0, 0, 0, 0.55),
+      0 0 25px 0 rgba(212, 175, 55, 0.15),
+      inset 0 1px 1px 0 rgba(243, 230, 177, 0.40);
   }
 
-  /* ── 2. GAZE INTERACTIVE BUTTONS & PILLS ────────────────────────────── */
+  /* ── 2. GAZE & TOUCH INTERACTIVE BUTTONS ────────────────────────────── */
   .spatial-btn {
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.20);
     border-radius: 9999px;
-    color: rgba(255, 255, 255, 0.70);
+    color: rgba(255, 255, 255, 0.80);
     font-weight: 600;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 0 0 rgba(243, 230, 177, 0.15);
   }
 
   .spatial-btn:hover {
-    background-color: rgba(255, 255, 255, 0.20);
-    border-color: rgba(255, 255, 255, 0.30);
+    background-color: rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.50);
     color: #FFFFFF;
     transform: scale(1.02);
     box-shadow: 
-      0 4px 16px 0 rgba(0, 0, 0, 0.25),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.40);
+      0 4px 16px 0 rgba(0, 0, 0, 0.35),
+      0 0 15px 0 rgba(212, 175, 55, 0.20),
+      inset 0 1px 1px 0 rgba(243, 230, 177, 0.35);
   }
 
   .spatial-btn:active {
     transform: scale(0.98);
   }
 
-  /* Selected State: Flips to solid pure white backplate with black text */
+  /* Selected State: Signature BytLend Satin Gold Gradient */
   .spatial-btn-selected {
-    background-color: #FFFFFF !important;
-    border-color: #FFFFFF !important;
-    color: #000000 !important;
-    font-weight: 700 !important;
+    background: linear-gradient(135deg, #D4AF37 0%, #F3E6B1 50%, #C5A059 100%) !important;
+    border-color: #F3E6B1 !important;
+    color: #0C0E12 !important;
+    font-weight: 800 !important;
     box-shadow: 
-      0 4px 20px 0 rgba(255, 255, 255, 0.35),
-      0 2px 8px 0 rgba(0, 0, 0, 0.25) !important;
+      0 4px 24px 0 rgba(212, 175, 55, 0.45),
+      0 2px 8px 0 rgba(0, 0, 0, 0.40),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.60) !important;
     transform: scale(1.02);
   }
 
-  /* ── 3. TAB BAR ORNAMENT (VISIONOS DOCKED CAPSULE) ──────────────────── */
+  /* Gold Luxury Card Variant */
+  .spatial-card-gold {
+    background: linear-gradient(180deg, rgba(28, 32, 40, 0.85) 0%, rgba(14, 18, 24, 0.90) 100%);
+    backdrop-filter: blur(35px) saturate(210%);
+    -webkit-backdrop-filter: blur(35px) saturate(210%);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    box-shadow: 
+      0 12px 40px 0 rgba(0, 0, 0, 0.60),
+      0 0 30px 0 rgba(212, 175, 55, 0.12),
+      inset 0 1px 1px 0 rgba(243, 230, 177, 0.35);
+    border-radius: 20px;
+  }
+
+  /* ── 3. TAB BAR ORNAMENT (BYTLEND OBSIDIAN CAPSULE) ─────────────────── */
   .spatial-ornament {
-    background-color: rgba(255, 255, 255, 0.10);
+    background-color: rgba(14, 18, 24, 0.85);
     backdrop-filter: blur(30px) saturate(210%);
     -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(255, 255, 255, 0.20);
+    border: 1px solid rgba(212, 175, 55, 0.25);
     box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.45),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.40);
+      0 8px 32px 0 rgba(0, 0, 0, 0.55),
+      0 0 20px 0 rgba(212, 175, 55, 0.10),
+      inset 0 1px 1px 0 rgba(243, 230, 177, 0.30);
     border-radius: 9999px;
   }
 

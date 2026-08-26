@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SpatialBackground } from './SpatialBackground';
+import { BytLendLogo } from './BytLendLogo';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -23,8 +24,8 @@ export const AppShell: React.FC<AppShellProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleCycleEnvironment = () => {
-    const envs = ['living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
-    const cur = localStorage.getItem('bytfloww_spatial_env') || 'living_room';
+    const envs = ['bytlend_gold_obsidian', 'bytlend_champagne', 'living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
+    const cur = localStorage.getItem('bytfloww_spatial_env') || 'bytlend_gold_obsidian';
     const nextIndex = (envs.indexOf(cur as any) + 1) % envs.length;
     const nextEnv = envs[nextIndex];
     localStorage.setItem('bytfloww_spatial_env', nextEnv);
@@ -32,7 +33,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden p-0 sm:p-3 lg:p-6 flex flex-col justify-between text-white selection:bg-[#0A84FF]/30 selection:text-white">
+    <div className="min-h-screen relative overflow-x-hidden p-0 sm:p-3 lg:p-6 flex flex-col justify-between text-white selection:bg-[#D4AF37]/30 selection:text-white">
       {/* ── 1. IMMERSIVE SPATIAL COSMIC ENVIRONMENT ─────────────────────── */}
       <SpatialBackground />
 
@@ -40,27 +41,22 @@ export const AppShell: React.FC<AppShellProps> = ({
       <div className="w-full max-w-[1520px] mx-auto my-auto relative z-10 flex flex-col spatial-window rounded-none sm:rounded-[24px] border-x-0 sm:border min-h-screen sm:min-h-0 shadow-2xl">
         
         {/* ── WINDOW TITLEBAR & CONTROLS ───────────────────────────────── */}
-        <header className="px-4 sm:px-8 py-3.5 sm:py-4 border-b border-white/15 flex items-center justify-between gap-3 sticky top-0 z-40 bg-[#0c1017]/80 backdrop-blur-2xl sm:bg-transparent sm:backdrop-blur-none">
+        <header className="px-4 sm:px-8 py-3.5 sm:py-4 border-b border-[#D4AF37]/20 flex items-center justify-between gap-3 sticky top-0 z-40 bg-[#0c1017]/85 backdrop-blur-2xl sm:bg-transparent sm:backdrop-blur-none">
           {/* Brand Identity & Title */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="relative">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-[12px] sm:rounded-[14px] bg-gradient-to-br from-[#0A84FF] to-[#6366F1] flex items-center justify-center font-bold text-xs sm:text-sm text-white shadow-[0_4px_16px_rgba(10,132,255,0.4)]">
-                BF
-              </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#30D158] border-2 border-[#070B0E] animate-pulse" />
-            </div>
+            <BytLendLogo size="md" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm sm:text-base tracking-tight text-white">
-                  BytFloww
+                <span className="font-bold text-sm sm:text-base tracking-tight text-white flex items-center">
+                  Byt<span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Lend</span>
                 </span>
-                <span className="text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/90 border border-white/20 tracking-wider uppercase">
-                  VISIONOS
+                <span className="text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#F3E6B1] border border-[#D4AF37]/30 tracking-wider uppercase">
+                  3D LUXURY
                 </span>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-white/60">
-                <span className="text-[#30D158] font-semibold">● Verified Ledger</span>
-                <span className="hidden sm:inline text-white/40">• Spatial Computing</span>
+                <span className="text-[#D4AF37] font-semibold">● Capital Intelligence</span>
+                <span className="hidden sm:inline text-white/40">• Borrow Smarter. Live Better.</span>
               </div>
             </div>
           </div>
@@ -97,8 +93,8 @@ export const AppShell: React.FC<AppShellProps> = ({
           <div className="flex items-center gap-2">
             {/* User Session Profile Chip */}
             {currentUser && (
-              <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/15 text-xs">
-                <div className="w-6 h-6 rounded-full bg-[#0A84FF]/25 border border-[#0A84FF]/40 flex items-center justify-center text-[10px] font-bold text-[#0A84FF]">
+              <div className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-[#D4AF37]/25 text-xs">
+                <div className="w-6 h-6 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 flex items-center justify-center text-[10px] font-bold text-[#F3E6B1]">
                   {currentUser.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="text-left">
@@ -116,10 +112,10 @@ export const AppShell: React.FC<AppShellProps> = ({
             <button
               onClick={handleCycleEnvironment}
               className="hidden sm:flex spatial-btn px-3.5 py-1.5 text-xs items-center gap-1.5"
-              title="Switch Spatial Environment"
+              title="Switch Spatial Environment (Gold & Obsidian)"
             >
-              <span>🥽</span>
-              <span className="hidden md:inline">Environment</span>
+              <span>✨</span>
+              <span className="hidden md:inline">Theme Space</span>
             </button>
 
             {/* Diagnostics Button */}

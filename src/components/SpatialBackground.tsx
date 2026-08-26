@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
-export type SpatialEnvironmentType = 'living_room' | 'twilight_penthouse' | 'cosmic_mesh';
+export type SpatialEnvironmentType = 
+  | 'bytlend_gold_obsidian' 
+  | 'bytlend_champagne' 
+  | 'living_room' 
+  | 'twilight_penthouse' 
+  | 'cosmic_mesh';
 
 interface SpatialBackgroundProps {
   environment?: SpatialEnvironmentType;
 }
 
 export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({ 
-  environment = 'living_room' 
+  environment = 'bytlend_gold_obsidian' 
 }) => {
   const [currentEnv, setCurrentEnv] = useState<SpatialEnvironmentType>(() => {
     return (localStorage.getItem('bytfloww_spatial_env') as SpatialEnvironmentType) || environment;
@@ -54,9 +59,31 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
     <div
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
       aria-hidden="true"
-      style={{ backgroundColor: '#070B0E' }}
+      style={{ backgroundColor: currentEnv === 'bytlend_champagne' ? '#F8F6F0' : '#080C0E' }}
     >
-      {/* ── 1. APPLE VISION PRO PASS-THROUGH ENVIRONMENT IMAGE ───────────── */}
+      {/* ── 1. BYTLEND 3D GOLD & OBSIDIAN LUXURY FINTECH ENVIRONMENT ─────── */}
+      {(currentEnv === 'bytlend_gold_obsidian' || !currentEnv) && (
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.06]"
+          style={{
+            backgroundImage: `url('/environments/bytlend_gold_obsidian.jpg')`,
+            transform: `scale(1.06) translate(${mouseOffset.x * -0.5}px, ${mouseOffset.y * -0.5}px)`,
+          }}
+        />
+      )}
+
+      {/* ── 2. BYTLEND WARM CHAMPAGNE LUXURY ENVIRONMENT ─────────────────── */}
+      {currentEnv === 'bytlend_champagne' && (
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.06]"
+          style={{
+            backgroundImage: `url('/environments/bytlend_champagne_luxury.jpg')`,
+            transform: `scale(1.06) translate(${mouseOffset.x * -0.5}px, ${mouseOffset.y * -0.5}px)`,
+          }}
+        />
+      )}
+
+      {/* ── 3. VISION PRO LIVING ROOM ENVIRONMENT ────────────────────────── */}
       {currentEnv === 'living_room' && (
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.06]"
@@ -67,6 +94,7 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
         />
       )}
 
+      {/* ── 4. TWILIGHT PENTHOUSE ENVIRONMENT ────────────────────────────── */}
       {currentEnv === 'twilight_penthouse' && (
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] scale-[1.06]"
@@ -77,51 +105,53 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
         />
       )}
 
-      {/* ── 2. DEEP COSMIC MESH GRADIENT (FOR COSMIC MODE OR BACKUP) ─────── */}
+      {/* ── 5. DEEP COSMIC MESH GRADIENT ─────────────────────────────────── */}
       {currentEnv === 'cosmic_mesh' && (
         <div 
           className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{
             background: `
-              radial-gradient(circle at 20% 15%, rgba(14, 38, 48, 0.6) 0%, transparent 50%),
+              radial-gradient(circle at 20% 15%, rgba(212, 175, 55, 0.25) 0%, transparent 50%),
               radial-gradient(circle at 80% 20%, rgba(30, 20, 50, 0.45) 0%, transparent 45%),
-              radial-gradient(circle at 50% 85%, rgba(10, 28, 38, 0.5) 0%, transparent 60%),
-              radial-gradient(circle at 50% 50%, rgba(6, 12, 16, 1) 0%, rgba(4, 8, 11, 1) 100%)
+              radial-gradient(circle at 50% 85%, rgba(197, 160, 89, 0.2) 0%, transparent 60%),
+              radial-gradient(circle at 50% 50%, rgba(8, 12, 14, 1) 0%, rgba(4, 8, 10, 1) 100%)
             `,
             transform: `scale(1.05) translate(${mouseOffset.x * -0.4}px, ${mouseOffset.y * -0.4}px)`,
           }}
         />
       )}
 
-      {/* ── 3. ATMOSPHERIC SPATIAL DARKENING & DEPTH VIGNETTE OVERLAY ───── */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/35 to-black/50"
-      />
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)',
-        }}
-      />
+      {/* ── 6. ATMOSPHERIC LUXURY VIGNETTE & GOLD AMBIENT GLOW ──────────── */}
+      {currentEnv !== 'bytlend_champagne' && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-black/55" />
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.70) 100%)',
+            }}
+          />
 
-      {/* ── 4. SUBTLE AMBIENT RADIAL LIGHT ORBS (SPATIAL ILLUMINATION) ──── */}
-      <div
-        className="absolute -top-[10%] -left-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full blur-[140px] opacity-30 animate-spatial-atmosphere pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(10, 132, 255, 0.25) 0%, rgba(48, 209, 88, 0.15) 40%, transparent 70%)',
-          transform: `translate(${mouseOffset.x * 0.7}px, ${mouseOffset.y * 0.7}px)`,
-        }}
-      />
+          {/* Golden Warm Light Orbit Orb */}
+          <div
+            className="absolute -top-[10%] -left-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full blur-[140px] opacity-35 animate-spatial-atmosphere pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.35) 0%, rgba(243, 230, 177, 0.15) 40%, transparent 70%)',
+              transform: `translate(${mouseOffset.x * 0.7}px, ${mouseOffset.y * 0.7}px)`,
+            }}
+          />
 
-      <div
-        className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] max-w-[750px] max-h-[750px] rounded-full blur-[160px] opacity-25 animate-spatial-atmosphere pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(175, 82, 222, 0.22) 0%, rgba(99, 102, 241, 0.15) 45%, transparent 75%)',
-          transform: `translate(${mouseOffset.x * -0.5}px, ${mouseOffset.y * -0.5}px)`,
-        }}
-      />
+          <div
+            className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] max-w-[750px] max-h-[750px] rounded-full blur-[160px] opacity-25 animate-spatial-atmosphere pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(197, 160, 89, 0.30) 0%, rgba(14, 20, 26, 0.2) 45%, transparent 75%)',
+              transform: `translate(${mouseOffset.x * -0.5}px, ${mouseOffset.y * -0.5}px)`,
+            }}
+          />
+        </>
+      )}
 
-      {/* ── 5. MICRO-GRAIN TACTILE NOISE OVERLAY ─────────────────────────── */}
+      {/* ── 7. MICRO-GRAIN NOISE OVERLAY ─────────────────────────────────── */}
       <svg
         className="absolute inset-0 w-full h-full opacity-[0.02] mix-blend-overlay"
         xmlns="http://www.w3.org/2000/svg"
