@@ -49,43 +49,43 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Left Title and Subtitle */}
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-[14px] bg-white/10 border border-white/20 flex items-center justify-center text-white text-lg font-bold shadow-sm backdrop-blur-xl">
-            ⚡
+          <div className="w-11 h-11 rounded-[14px] bg-gradient-to-b from-[#1E232A] to-[#0A0D11] border border-[#D4AF37]/40 flex items-center justify-center text-[#F3E6B1] text-lg font-bold shadow-[0_4px_16px_rgba(212,175,55,0.25)]">
+            ✨
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-              Spend Intelligence
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-1.5">
+              Capital <span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Intelligence</span>
             </h1>
-            <p className="text-xs text-white/60 font-medium">
-              {totalParsedCount.toLocaleString('en-IN')} Transactions Reconciled • {snapshot.periodKey}
+            <p className="text-xs text-[#D4AF37]/80 font-medium">
+              {totalParsedCount.toLocaleString('en-IN')} Ledger Transactions Reconciled • {snapshot.periodKey}
             </p>
           </div>
         </div>
 
         {/* Right Action Icons (Gaze Interactive) */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Spatial Environment Switcher */}
           <button
             onClick={() => {
-              const envs = ['living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
-              const cur = localStorage.getItem('bytfloww_spatial_env') || 'living_room';
+              const envs = ['bytlend_gold_obsidian', 'bytlend_champagne', 'living_room', 'twilight_penthouse', 'cosmic_mesh'] as const;
+              const cur = localStorage.getItem('bytfloww_spatial_env') || 'bytlend_gold_obsidian';
               const nextIndex = (envs.indexOf(cur as any) + 1) % envs.length;
               const nextEnv = envs[nextIndex];
               localStorage.setItem('bytfloww_spatial_env', nextEnv);
               window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: nextEnv }));
             }}
-            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5"
-            title="Switch visionOS Spatial Environment"
+            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5 border-[#D4AF37]/30 text-white"
+            title="Switch BytLend 3D Gold / Champagne Space"
           >
-            <span>🥽</span>
-            <span className="hidden sm:inline">Environment</span>
+            <span>✨</span>
+            <span className="hidden sm:inline">Theme Space</span>
           </button>
 
           {/* Ask AI Copilot Button */}
           <button
             onClick={onOpenCopilot}
-            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5"
-            title="Ask AI Copilot"
+            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#D4AF37]/30 text-[#F3E6B1]"
+            title="Ask BytLend AI Copilot"
           >
             <span>💬</span>
             <span>AI Copilot</span>
@@ -94,7 +94,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Filter Modal Trigger */}
           <button
             onClick={onOpenFilter}
-            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5"
+            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#D4AF37]/30 text-white"
             title="Filter Transactions"
           >
             <span>⚡</span>
@@ -104,7 +104,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Diagnostics Button */}
           <button
             onClick={onOpenDiagnostics}
-            className="spatial-btn w-9 h-9 flex items-center justify-center text-sm"
+            className="spatial-btn w-9 h-9 flex items-center justify-center text-sm border-[#D4AF37]/30 text-white"
             title="Security Diagnostics"
           >
             🛡️

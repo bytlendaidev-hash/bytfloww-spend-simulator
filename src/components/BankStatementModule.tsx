@@ -389,17 +389,17 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
   return (
     <div className="space-y-6 animate-emergence">
-      {/* ── TOP MULTI-FILE UPLOAD WORKSPACE & DROPZONE ─────────────────────── */}
+      {/* ── TOP MULTI-FILE UPLOAD WORKSPACE & DROPZONE (BYTLEND GOLD LUXURY) ── */}
       <div 
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={`p-6 sm:p-8 rounded-[24px] border-2 border-dashed transition-all relative overflow-hidden text-center ${
           isDragging 
-            ? 'border-white bg-white/20'
+            ? 'border-[#D4AF37] bg-[#D4AF37]/20 shadow-[0_0_40px_rgba(212,175,55,0.3)]' 
             : hasData 
-            ? 'border-white/20 bg-white/5'
-            : 'border-white/25 bg-white/10 backdrop-blur-[30px]'
+            ? 'border-[#D4AF37]/30 bg-[#12151B]/80 backdrop-blur-2xl' 
+            : 'border-[#D4AF37]/40 bg-[#12151B]/90 backdrop-blur-[35px] shadow-[0_12px_48px_rgba(0,0,0,0.6)]'
         }`}
       >
         <input
@@ -413,7 +413,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="flex items-center justify-center">
-            <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-3xl shadow-xl transition-transform duration-200 bg-white/10 border border-white/20 text-white ${
+            <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-3xl shadow-xl transition-transform duration-200 bg-gradient-to-b from-[#1E232A] to-[#0A0D11] border border-[#D4AF37]/50 text-[#F3E6B1] shadow-[0_4px_24px_rgba(212,175,55,0.3)] ${
               isDragging ? 'scale-110' : ''
             }`}>
               📑
@@ -421,11 +421,11 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-              Multi-Statement Financial Forensics Workspace
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+              Byt<span className="bg-gradient-to-r from-[#F3E6B1] via-[#D4AF37] to-[#AA7C11] bg-clip-text text-transparent">Lend</span> Multi-Statement Forensics Hub
             </h1>
-            <p className="text-xs sm:text-sm mt-1 max-w-lg mx-auto text-white/60 font-medium">
-              Drag & drop bank statement files (XLS, XLSX, CSV) to analyze multi-month timelines, loan recycling, salary cycles, and P2P transfers.
+            <p className="text-xs sm:text-sm mt-1 max-w-lg mx-auto text-[#D4AF37]/80 font-medium">
+              Drag & drop bank statements (XLS, XLSX, CSV) to unlock AI capital intelligence, loan recycling, salary cycles, and P2P audit trails.
             </p>
           </div>
 
@@ -443,7 +443,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             {hasData && (
               <button
                 onClick={handleClearAll}
-                className="spatial-btn px-4 py-3 text-xs text-[#FF453A] font-semibold"
+                className="spatial-btn px-4 py-3 text-xs text-[#FF453A] font-semibold border-[#FF453A]/30"
               >
                 Clear All Files
               </button>
@@ -455,12 +455,12 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         {isProcessing && (
           <div className="max-w-md mx-auto mt-6 space-y-2 animate-fade-in">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-[#30D158]">{processingStage}</span>
-              <span className="font-mono text-white/50">{processingProgress}%</span>
+              <span className="text-[#D4AF37]">{processingStage}</span>
+              <span className="font-mono text-white/70">{processingProgress}%</span>
             </div>
-            <div className="w-full h-2.5 rounded-full bg-black/40 overflow-hidden border border-white/15">
+            <div className="w-full h-2.5 rounded-full bg-black/60 overflow-hidden border border-[#D4AF37]/30">
               <div 
-                className="h-full bg-gradient-to-r from-[#0A84FF] to-[#30D158] transition-all duration-300 rounded-full"
+                className="h-full bg-gradient-to-r from-[#D4AF37] via-[#F3E6B1] to-[#30D158] transition-all duration-300 rounded-full"
                 style={{ width: `${processingProgress}%` }}
               />
             </div>
