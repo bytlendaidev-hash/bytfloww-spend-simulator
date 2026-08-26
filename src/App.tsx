@@ -170,8 +170,6 @@ export const App: React.FC = () => {
 
   return (
     <AppShell
-      isDark={isDark}
-      onToggleTheme={handleToggleTheme}
       rawCount={rawCount}
       onOpenUpload={() => setShowXmlUpload(true)}
       onOpenDiagnostics={() => setShowDiagnostics(true)}
@@ -183,26 +181,26 @@ export const App: React.FC = () => {
       {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ──────────────────────── */}
       {!currentUser ? (
         <LoginScreen
-          isDark={isDark}
+          isDark={true}
           onLoginSuccess={handleLoginSuccess}
         />
       ) : activeModule === 'BANK_STATEMENTS' ? (
         /* ── 2. SEPARATE MODULE: BANK STATEMENT FORENSICS HUB ──────────── */
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-1 text-[11px] sm:text-xs">
-            <span className={`font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Session: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{currentUser.name}</strong> ({currentUser.phone})
+          <div className="flex items-center justify-between px-1 text-xs">
+            <span className="font-semibold text-white/60">
+              Session: <strong className="text-white">{currentUser.name}</strong> ({currentUser.phone})
             </span>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveModule('SMS_INTELLIGENCE')}
-                className={`text-[11px] font-bold hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+                className="text-xs font-semibold text-[#0A84FF] hover:underline"
               >
                 📱 Open SMS Simulator
               </button>
               <button
                 onClick={handleLogout}
-                className="text-rose-500 font-bold hover:underline"
+                className="text-xs font-semibold text-[#FF453A] hover:underline"
               >
                 Sign Out 🚪
               </button>
@@ -210,7 +208,7 @@ export const App: React.FC = () => {
           </div>
 
           <BankStatementModule
-            isDark={isDark}
+            isDark={true}
             onMergeTransactions={(newTxs) => {
               setEvents((prev) => [...newTxs, ...prev]);
             }}
@@ -222,26 +220,26 @@ export const App: React.FC = () => {
         /* ── 3. IF SMS MODULE & NO XML: SHOW CLEAN UPLOAD SCREEN ─────── */
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2 text-xs">
-            <span className="font-bold text-slate-500">
-              Logged in as: <strong className="text-slate-800 dark:text-white">{currentUser.name}</strong> ({currentUser.phone})
+            <span className="font-semibold text-white/60">
+              Logged in as: <strong className="text-white">{currentUser.name}</strong> ({currentUser.phone})
             </span>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveModule('BANK_STATEMENTS')}
-                className="text-teal-600 font-bold hover:underline"
+                className="text-xs font-semibold text-[#0A84FF] hover:underline"
               >
                 🏛️ Open Statement Hub
               </button>
               <button
                 onClick={handleLogout}
-                className="text-rose-500 font-bold hover:underline"
+                className="text-xs font-semibold text-[#FF453A] hover:underline"
               >
                 Sign Out 🚪
               </button>
             </div>
           </div>
           <EmptyUploadState
-            isDark={isDark}
+            isDark={true}
             onXmlLoaded={handleXmlParsed}
             isProcessing={isProcessing}
           />
@@ -249,26 +247,26 @@ export const App: React.FC = () => {
       ) : (
         /* ── 4. IF SMS XML LOADED: SHOW SPEND INTELLIGENCE DASHBOARD ─── */
         <>
-          <div className="flex items-center justify-between mb-2.5 px-1 text-[11px] sm:text-xs">
-            <span className={`font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Session: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{currentUser.name}</strong> ({currentUser.phone})
+          <div className="flex items-center justify-between mb-3 px-1 text-xs">
+            <span className="font-semibold text-white/60">
+              Session: <strong className="text-white">{currentUser.name}</strong> ({currentUser.phone})
             </span>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveModule('BANK_STATEMENTS')}
-                className={`text-[11px] font-bold hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+                className="text-xs font-semibold text-[#0A84FF] hover:underline"
               >
                 🏛️ Statement Hub
               </button>
               <button
                 onClick={handleResetDataset}
-                className={`text-[11px] font-bold hover:underline ${isDark ? 'text-slate-400' : 'text-slate-600'}`}
+                className="text-xs font-semibold text-white/60 hover:text-white hover:underline"
               >
                 🔄 Reset XML
               </button>
               <button
                 onClick={handleLogout}
-                className="text-rose-500 font-bold hover:underline"
+                className="text-xs font-semibold text-[#FF453A] hover:underline"
               >
                 Sign Out 🚪
               </button>
@@ -277,7 +275,6 @@ export const App: React.FC = () => {
 
           <SpendHeader
             snapshot={snapshot}
-            isDark={isDark}
             activeTab={activeTab}
             activeModule={activeModule}
             onSelectTab={setActiveTab}
@@ -287,9 +284,9 @@ export const App: React.FC = () => {
             onOpenCopilot={() => setActiveTab('ASSISTANT')}
             onOpenUpload={() => setShowXmlUpload(true)}
             onOpenDiagnostics={() => setShowDiagnostics(true)}
-            onToggleTheme={handleToggleTheme}
             totalParsedCount={rawCount}
           />
+
 
 
           <div className="pb-28">
