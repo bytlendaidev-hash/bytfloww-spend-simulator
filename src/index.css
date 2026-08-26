@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,24 +6,112 @@
 
 @layer base {
   :root {
-    /* SYSTEM 2: TITANIUM PRISM (Ionized Platinum + Cyber Iris + Photon Cyan) */
-    --spatial-bg: #05080C;
-    --titanium-chrome: #F0F4F8;
-    --cyber-iris: #A855F7;
-    --cyber-iris-dark: #7C3AED;
-    --photon-cyan: #00E5FF;
+    /* ── SOVEREIGN SOLID GLOBAL THEME SYSTEM (DARK THEME DEFAULT) ────────── */
+    --spatial-bg: #0B0E14;
+    
+    /* ── PILLAR 1: SOVEREIGN JADE (INFLOW / SALARY / SURPLUS) ──────────── */
+    --color-jade-50: #E6FAF2;
+    --color-jade-100: #C2F4DF;
+    --color-jade-200: #8DE7C2;
+    --color-jade-300: #4FD69F;
+    --color-jade-400: #1EC882;
+    --color-jade-500: #00D084;
+    --color-jade-600: #00AB6B;
+    --color-jade-700: #00875A;
+    --color-jade-800: #006342;
+    --color-jade-900: #003D29;
+
+    /* ── PILLAR 2: SYNAPSE IRIS (AI ENGINE / FORENSICS / INTEGRITY) ───── */
+    --color-synapse-50: #F3F0FF;
+    --color-synapse-100: #E5DEFF;
+    --color-synapse-200: #CEBEFF;
+    --color-synapse-300: #AD93FD;
+    --color-synapse-400: #9171FB;
+    --color-synapse-500: #7C5CFC;
+    --color-synapse-600: #6842F5;
+    --color-synapse-700: #5B34EA;
+    --color-synapse-800: #4520B8;
+    --color-synapse-900: #2B1277;
+
+    /* ── PILLAR 3: CRIMSON PULSE (OUTFLOW / DEBITS / EXPENSES / EMIS) ─── */
+    --color-pulse-50: #FFF0F3;
+    --color-pulse-100: #FFE0E6;
+    --color-pulse-200: #FECDD6;
+    --color-pulse-300: #FF8AA5;
+    --color-pulse-400: #FF5C81;
+    --color-pulse-500: #FF3366;
+    --color-pulse-600: #E61C50;
+    --color-pulse-700: #D91E4E;
+    --color-pulse-800: #A30F36;
+    --color-pulse-900: #66001B;
+
+    /* ── PILLAR 4: AUREOLIN OCHRE (VAULT / LOANS / NET WORTH) ─────────── */
+    --color-ochre-50: #FEF9EE;
+    --color-ochre-100: #FDF0D2;
+    --color-ochre-200: #FCE0A5;
+    --color-ochre-300: #FACD6E;
+    --color-ochre-400: #F7B73E;
+    --color-ochre-500: #F5A623;
+    --color-ochre-600: #D9890F;
+    --color-ochre-700: #C67D0A;
+    --color-ochre-800: #8A5200;
+    --color-ochre-900: #5C3800;
+
+    /* ── PILLAR 5: ELECTRIC CYAN (TELEMETRY / EPFO / REALTIME SYNC) ───── */
+    --color-telemetry-50: #E6F8FB;
+    --color-telemetry-100: #C0F0F7;
+    --color-telemetry-200: #8CE3F0;
+    --color-telemetry-300: #47D0E6;
+    --color-telemetry-400: #1EBED9;
+    --color-telemetry-500: #00D8F6;
+    --color-telemetry-600: #00ADC7;
+    --color-telemetry-700: #0284C7;
+    --color-telemetry-800: #03628F;
+    --color-telemetry-900: #04202B;
+
+    /* ── PILLAR 6: OBSIDIAN SURFACES (DARK CANVASES & INSETS) ─────────── */
+    --obsidian-canvas: #0B0E14;
+    --obsidian-card: #131822;
+    --obsidian-elevated: #1A2230;
+    --obsidian-well: #1F293D;
+    --obsidian-border: #232D42;
+    --obsidian-border-strong: #33415C;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --text-subtle: #475569;
+    
+    /* Semantic aliases */
+    --quantum-mint: var(--color-jade-500);
+    --quantum-mint-700: var(--color-jade-700);
+    --cyber-amethyst: var(--color-synapse-500);
+    --cyber-amethyst-700: var(--color-synapse-700);
+    --electric-cyan: var(--color-telemetry-500);
+    --neon-coral: var(--color-pulse-500);
+    --solar-amber: var(--color-ochre-500);
+    --color-primary: var(--color-jade-500);
+    --color-ai: var(--color-synapse-500);
+    --color-debit: var(--color-pulse-500);
+    --color-vault: var(--color-ochre-500);
+    --color-telemetry: var(--color-telemetry-500);
+    
+    /* Legacy mapping */
+    --titanium-chrome: #F8FAFC;
+    --cyber-iris: #7C5CFC;
+    --cyber-iris-dark: #5B34EA;
+    --photon-cyan: #00D084;
     --magma-pulse: #FF3366;
-    --aerospace-slate: #0E141D;
-    --deep-vacuum: #05080C;
-    --spatial-accent: #00E5FF;
-    --spatial-accent-purple: #A855F7;
-    --spatial-accent-indigo: #6366F1;
+    --aerospace-slate: #0B0E14;
+    --deep-vacuum: #0B0E14;
+    --spatial-accent: #00D084;
+    --spatial-accent-purple: #7C5CFC;
+    --spatial-accent-indigo: #5B34EA;
   }
 
   body {
-    background-color: #05080C;
-    color: #F0F4F8;
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Satoshi', 'Plus Jakarta Sans', 'SF Pro Display', sans-serif;
+    background-color: #0B0E14;
+    color: #F8FAFC;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -37,267 +125,244 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: #F0F4F8;
+    color: #F8FAFC;
     letter-spacing: -0.02em;
     font-weight: 700;
   }
 }
 
 @layer components {
-  /* ── 1. THE TITANIUM PRISM SPATIAL GLASS BASE ───────────────────────── */
+  /* ── 1. SOLID SPATIAL WINDOW & CARDS (ZERO GRADIENTS) ──────────────── */
   .spatial-window {
-    background-color: rgba(14, 20, 29, 0.88);
-    backdrop-filter: blur(35px) saturate(210%);
-    -webkit-backdrop-filter: blur(35px) saturate(210%);
-    border: 1px solid rgba(0, 229, 255, 0.32);
-    box-shadow: 
-      0 16px 64px 0 rgba(0, 0, 0, 0.95),
-      0 0 50px 0 rgba(0, 229, 255, 0.14),
-      0 0 35px 0 rgba(168, 85, 247, 0.12),
-      inset 0 1px 1.5px 0 rgba(240, 244, 248, 0.40),
-      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.60);
+    background-color: #131822;
+    border: 1px solid #232D42;
+    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.75);
     border-radius: 24px;
   }
 
   .spatial-card {
-    background-color: rgba(14, 20, 29, 0.80);
-    backdrop-filter: blur(30px) saturate(210%);
-    -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(0, 229, 255, 0.22);
-    box-shadow: 
-      0 10px 36px 0 rgba(0, 0, 0, 0.70),
-      inset 0 1px 1px 0 rgba(240, 244, 248, 0.22);
+    background-color: #131822;
+    border: 1px solid #232D42;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.40);
     border-radius: 18px;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .spatial-card:hover {
-    background-color: rgba(20, 28, 40, 0.90);
-    border-color: rgba(168, 85, 247, 0.55);
-    transform: scale(1.01) translateY(-2px);
-    box-shadow: 
-      0 16px 48px 0 rgba(0, 0, 0, 0.80),
-      0 0 35px 0 rgba(0, 229, 255, 0.20),
-      0 0 25px 0 rgba(168, 85, 247, 0.20),
-      inset 0 1px 1px 0 rgba(240, 244, 248, 0.45);
+    background-color: #1A2230;
+    border-color: #33415C;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.60);
   }
 
-  /* ── 2. GAZE & TOUCH INTERACTIVE BUTTONS ────────────────────────────── */
+  /* ── 2. SOLID INTERACTIVE BUTTONS ──────────────────────────────────── */
   .spatial-btn {
-    background-color: rgba(14, 20, 29, 0.75);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(0, 229, 255, 0.25);
+    background-color: #1A2230;
+    border: 1px solid #232D42;
     border-radius: 9999px;
-    color: #F0F4F8;
+    color: #F8FAFC;
     font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: inset 0 1px 0 0 rgba(240, 244, 248, 0.20);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .spatial-btn:hover {
-    background-color: rgba(0, 229, 255, 0.15);
-    border-color: rgba(0, 229, 255, 0.60);
-    color: #FFFFFF;
-    transform: scale(1.02);
-    box-shadow: 
-      0 4px 16px 0 rgba(0, 0, 0, 0.40),
-      0 0 20px 0 rgba(0, 229, 255, 0.30),
-      inset 0 1px 1px 0 rgba(240, 244, 248, 0.40);
+    background-color: #1F293D;
+    border-color: #00D084;
+    color: #00D084;
+    transform: translateY(-1px);
   }
 
   .spatial-btn:active {
     transform: scale(0.98);
   }
 
-  /* Selected State: Signature Titanium Prism Iridescent Gradient */
+  /* Selected State: Solid Sovereign Jade Pill (Zero Gradient) */
   .spatial-btn-selected {
-    background: linear-gradient(135deg, #00E5FF 0%, #A855F7 50%, #F0F4F8 100%) !important;
-    border-color: #FFFFFF !important;
-    color: #05080C !important;
-    font-weight: 900 !important;
-    box-shadow: 
-      0 4px 28px 0 rgba(0, 229, 255, 0.55),
-      0 0 24px 0 rgba(168, 85, 247, 0.40),
-      0 2px 8px 0 rgba(0, 0, 0, 0.50),
-      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.80) !important;
-    transform: scale(1.02);
+    background-color: #00D084 !important;
+    border-color: #00D084 !important;
+    color: #0B0E14 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 12px 0 rgba(0, 208, 132, 0.35) !important;
   }
 
-  /* Titanium Prism Luxury Card Variant */
+  /* Solid Hero Card Variant */
   .spatial-card-gold, .spatial-card-prism {
-    background: linear-gradient(180deg, rgba(20, 28, 40, 0.92) 0%, rgba(10, 15, 22, 0.96) 100%);
-    backdrop-filter: blur(35px) saturate(210%);
-    -webkit-backdrop-filter: blur(35px) saturate(210%);
-    border: 1.5px solid rgba(0, 229, 255, 0.40);
-    box-shadow: 
-      0 16px 48px 0 rgba(0, 0, 0, 0.80),
-      0 0 40px 0 rgba(0, 229, 255, 0.18),
-      0 0 25px 0 rgba(168, 85, 247, 0.15),
-      inset 0 1px 1.5px 0 rgba(240, 244, 248, 0.40);
+    background-color: #131822;
+    border: 1.5px solid #00D084;
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.65);
     border-radius: 22px;
   }
 
-  /* ── 3. TAB BAR ORNAMENT (TITANIUM AEROSPACE CAPSULE) ───────────────── */
+  /* ── 3. TAB BAR ORNAMENT (SOLID CAPSULE) ────────────────────────────── */
   .spatial-ornament {
-    background-color: rgba(14, 20, 29, 0.90);
-    backdrop-filter: blur(30px) saturate(210%);
-    -webkit-backdrop-filter: blur(30px) saturate(210%);
-    border: 1px solid rgba(0, 229, 255, 0.30);
-    box-shadow: 
-      0 10px 36px 0 rgba(0, 0, 0, 0.70),
-      0 0 30px 0 rgba(0, 229, 255, 0.14),
-      inset 0 1px 1px 0 rgba(240, 244, 248, 0.35);
+    background-color: #131822;
+    border: 1px solid #232D42;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.60);
     border-radius: 9999px;
   }
 
-  /* ── 4. LIGHT THEME (BYTLEND CHAMPAGNE IVORY LUXURY) ────────────────── */
+  /* ── 4. SOLID LIGHT THEME (TITANIUM ALABASTER & SOVEREIGN JADE) ────── */
   html.light, body.light, .light {
-    --spatial-bg: #F8F9F6;
-    color: #171719 !important;
+    --spatial-bg: #F4F6F9;
+    
+    /* ── Light Mode Pillar Heroes ───────────────────────────────────────── */
+    --color-jade-500: #00875A;
+    --color-synapse-500: #5B34EA;
+    --color-pulse-500: #D91E4E;
+    --color-ochre-500: #C67D0A;
+    --color-telemetry-500: #0284C7;
+
+    /* ── Light Mode Surfaces (Titanium Alabaster) ───────────────────────── */
+    --obsidian-canvas: #F4F6F9;
+    --obsidian-card: #FFFFFF;
+    --obsidian-elevated: #FFFFFF;
+    --obsidian-well: #EAEEF4;
+    --obsidian-border: #D8DFEA;
+    --obsidian-border-strong: #B0BECE;
+    --text-primary: #0D141F;
+    --text-secondary: #4B586E;
+    --text-muted: #7A889E;
+    --text-subtle: #94A3B8;
+
+    /* Aliases */
+    --quantum-mint: #00875A;
+    --quantum-mint-700: #00875A;
+    --cyber-amethyst: #5B34EA;
+    --cyber-amethyst-700: #5B34EA;
+    --electric-cyan: #0284C7;
+    --neon-coral: #D91E4E;
+    --solar-amber: #C67D0A;
+    --color-primary: #00875A;
+    --color-ai: #5B34EA;
+    --color-debit: #D91E4E;
+    --color-vault: #C67D0A;
+    --color-telemetry: #0284C7;
+    color: #0D141F !important;
+    background-color: #F4F6F9 !important;
   }
 
   html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
   body.light h1, body.light h2, body.light h3, body.light h4, body.light h5, body.light h6,
   .light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
-    color: #171719 !important;
+    color: #0D141F !important;
   }
 
   .light .spatial-window {
-    background-color: rgba(255, 255, 255, 0.90) !important;
-    backdrop-filter: blur(35px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(35px) saturate(190%) !important;
-    border: 1px solid rgba(212, 155, 90, 0.35) !important;
-    box-shadow: 
-      0 16px 48px 0 rgba(184, 123, 61, 0.12),
-      0 2px 8px 0 rgba(0, 0, 0, 0.04),
-      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.90) !important;
-    color: #171719 !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #D8DFEA !important;
+    box-shadow: 0 16px 40px 0 rgba(15, 23, 42, 0.08) !important;
+    color: #0D141F !important;
   }
 
   .light .spatial-card {
-    background-color: rgba(255, 255, 255, 0.88) !important;
-    backdrop-filter: blur(30px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(190%) !important;
-    border: 1px solid rgba(212, 155, 90, 0.28) !important;
-    box-shadow: 
-      0 8px 32px 0 rgba(184, 123, 61, 0.09),
-      0 1px 3px 0 rgba(0, 0, 0, 0.04),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.95) !important;
-    color: #171719 !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #D8DFEA !important;
+    box-shadow: 0 2px 10px 0 rgba(15, 23, 42, 0.04) !important;
+    color: #0D141F !important;
   }
 
   .light .spatial-card:hover {
     background-color: #FFFFFF !important;
-    border-color: rgba(212, 155, 90, 0.55) !important;
-    box-shadow: 
-      0 16px 44px 0 rgba(184, 123, 61, 0.16),
-      0 0 25px 0 rgba(212, 155, 90, 0.12) !important;
+    border-color: #B0BECE !important;
+    box-shadow: 0 8px 24px 0 rgba(15, 23, 42, 0.08) !important;
   }
 
-  .light .spatial-card-gold {
-    background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%) !important;
-    backdrop-filter: blur(35px) saturate(190%) !important;
-    -webkit-backdrop-filter: blur(35px) saturate(190%) !important;
-    border: 1.5px solid rgba(212, 155, 90, 0.40) !important;
-    box-shadow: 
-      0 14px 44px 0 rgba(184, 123, 61, 0.14),
-      0 0 30px 0 rgba(212, 155, 90, 0.10),
-      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95) !important;
-    color: #171719 !important;
+  .light .spatial-card-gold, .light .spatial-card-prism {
+    background-color: #FFFFFF !important;
+    border: 1.5px solid #00875A !important;
+    box-shadow: 0 8px 24px 0 rgba(0, 135, 90, 0.12) !important;
+    color: #0D141F !important;
   }
 
   .light .spatial-btn {
-    background-color: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(212, 155, 90, 0.30) !important;
-    color: #1F242D !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #D8DFEA !important;
+    color: #0D141F !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   }
 
   .light .spatial-btn:hover {
-    background-color: rgba(212, 155, 90, 0.15) !important;
-    border-color: rgba(212, 155, 90, 0.60) !important;
-    color: #080A0D !important;
-    box-shadow: 0 4px 16px rgba(184, 123, 61, 0.18) !important;
+    background-color: #E6FAF2 !important;
+    border-color: #00875A !important;
+    color: #00875A !important;
   }
 
   .light .spatial-btn-selected {
-    background: linear-gradient(135deg, #E5A96A 0%, #F9E7B9 45%, #D49B5A 100%) !important;
-    border-color: #D49B5A !important;
-    color: #080A0D !important;
+    background-color: #00875A !important;
+    border-color: #00875A !important;
+    color: #FFFFFF !important;
     font-weight: 800 !important;
-    box-shadow: 
-      0 4px 22px 0 rgba(212, 155, 90, 0.40),
-      0 2px 6px 0 rgba(0, 0, 0, 0.08),
-      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.80) !important;
+    box-shadow: 0 2px 10px 0 rgba(0, 135, 90, 0.25) !important;
   }
 
   .light .spatial-ornament {
-    background-color: rgba(255, 255, 255, 0.92) !important;
-    border: 1px solid rgba(212, 155, 90, 0.32) !important;
-    box-shadow: 
-      0 8px 30px 0 rgba(184, 123, 61, 0.10),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.90) !important;
-    color: #171719 !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #D8DFEA !important;
+    box-shadow: 0 4px 16px 0 rgba(15, 23, 42, 0.06) !important;
+    color: #0D141F !important;
   }
 
   .light .text-white {
-    color: #171719 !important;
+    color: #0D141F !important;
   }
 
   .light .text-white\/60, .light .text-white\/50, .light .text-white\/40 {
-    color: #5F6672 !important;
+    color: #7A889E !important;
   }
 
   .light .text-white\/80, .light .text-white\/70 {
-    color: #2D333F !important;
+    color: #4B586E !important;
   }
 
   .light .border-white\/10, .light .border-white\/15, .light .border-white\/20 {
-    border-color: rgba(212, 155, 90, 0.25) !important;
+    border-color: #D8DFEA !important;
   }
 
   .light .bg-white\/5, .light .bg-white\/10 {
-    background-color: rgba(248, 246, 240, 0.75) !important;
+    background-color: #EAEEF4 !important;
   }
 
-  /* ── 4. MODALS & SHEETS (RESPONSIVE DESKTOP + MOBILE BOTTOM SHEET) ── */
+  /* ── 5. SOLID MODALS & SHEETS ──────────────────────────────────────── */
   .spatial-modal {
-    background-color: rgba(20, 26, 32, 0.90);
-    backdrop-filter: blur(40px) saturate(220%);
-    -webkit-backdrop-filter: blur(40px) saturate(220%);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 
-      0 24px 64px 0 rgba(0, 0, 0, 0.75),
-      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45);
+    background-color: #131822;
+    border: 1px solid #232D42;
+    box-shadow: 0 24px 64px 0 rgba(0, 0, 0, 0.85);
     border-radius: 24px;
   }
 
-  /* Mobile Bottom Sheet Modal Class (Slides up smoothly on Android/iOS) */
+  .light .spatial-modal {
+    background-color: #FFFFFF !important;
+    border: 1px solid #D8DFEA !important;
+    box-shadow: 0 24px 64px 0 rgba(15, 23, 42, 0.15) !important;
+  }
+
   .spatial-bottom-sheet {
-    background-color: rgba(18, 24, 30, 0.95);
-    backdrop-filter: blur(40px) saturate(220%);
-    -webkit-backdrop-filter: blur(40px) saturate(220%);
-    border-top: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 
-      0 -12px 48px 0 rgba(0, 0, 0, 0.8),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+    background-color: #131822;
+    border-top: 1px solid #232D42;
+    box-shadow: 0 -12px 48px 0 rgba(0, 0, 0, 0.85);
     border-top-left-radius: 28px;
     border-top-right-radius: 28px;
   }
 
-  /* Mobile Sticky Bottom Navigation (Android Native Navigation Feel) */
-  .spatial-bottom-nav {
-    background-color: rgba(12, 16, 23, 0.88);
-    backdrop-filter: blur(35px) saturate(210%);
-    -webkit-backdrop-filter: blur(35px) saturate(210%);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 -8px 32px 0 rgba(0, 0, 0, 0.5);
+  .light .spatial-bottom-sheet {
+    background-color: #FFFFFF !important;
+    border-top: 1px solid #D8DFEA !important;
+    box-shadow: 0 -12px 48px 0 rgba(15, 23, 42, 0.12) !important;
   }
 
-  /* Legacy aliases mapped to pure spatial tokens */
+  .spatial-bottom-nav {
+    background-color: #131822;
+    border-top: 1px solid #232D42;
+    box-shadow: 0 -8px 32px 0 rgba(0, 0, 0, 0.6);
+  }
+
+  .light .spatial-bottom-nav {
+    background-color: #FFFFFF !important;
+    border-top: 1px solid #D8DFEA !important;
+    box-shadow: 0 -8px 32px 0 rgba(15, 23, 42, 0.08) !important;
+  }
+
+  /* Legacy aliases */
   .glass-card-dark, .glass-card-light, .spatial-card-dark, .spatial-card-light {
     @apply spatial-card;
   }
@@ -319,6 +384,93 @@
 }
 
 @layer utilities {
+  /* ── EXPLICIT 6-PILLAR GLOBAL UTILITIES ────────────────────────────── */
+  /* Pillar 3: Crimson Pulse (Outflow, Debits, Expenses) */
+  .text-pulse-50 { color: var(--color-pulse-50) !important; }
+  .text-pulse-100 { color: var(--color-pulse-100) !important; }
+  .text-pulse-200 { color: var(--color-pulse-200) !important; }
+  .text-pulse-300 { color: var(--color-pulse-300) !important; }
+  .text-pulse-400 { color: var(--color-pulse-400) !important; }
+  .text-pulse-500 { color: var(--color-pulse-500) !important; }
+  .text-pulse-600 { color: var(--color-pulse-600) !important; }
+  .text-pulse-700 { color: var(--color-pulse-700) !important; }
+  .text-pulse-800 { color: var(--color-pulse-800) !important; }
+  .text-pulse-900 { color: var(--color-pulse-900) !important; }
+
+  .bg-pulse-50 { background-color: var(--color-pulse-50) !important; }
+  .bg-pulse-100 { background-color: var(--color-pulse-100) !important; }
+  .bg-pulse-200 { background-color: var(--color-pulse-200) !important; }
+  .bg-pulse-300 { background-color: var(--color-pulse-300) !important; }
+  .bg-pulse-400 { background-color: var(--color-pulse-400) !important; }
+  .bg-pulse-500 { background-color: var(--color-pulse-500) !important; }
+  .bg-pulse-600 { background-color: var(--color-pulse-600) !important; }
+  .bg-pulse-700 { background-color: var(--color-pulse-700) !important; }
+  .bg-pulse-800 { background-color: var(--color-pulse-800) !important; }
+  .bg-pulse-900 { background-color: var(--color-pulse-900) !important; }
+
+  .border-pulse-500 { border-color: var(--color-pulse-500) !important; }
+  .fill-pulse-500 { fill: var(--color-pulse-500) !important; }
+  .stroke-pulse-500 { stroke: var(--color-pulse-500) !important; }
+
+  /* Pillar 1: Sovereign Jade (Inflow, Salary, Surplus) */
+  .text-jade-50 { color: var(--color-jade-50) !important; }
+  .text-jade-100 { color: var(--color-jade-100) !important; }
+  .text-jade-200 { color: var(--color-jade-200) !important; }
+  .text-jade-300 { color: var(--color-jade-300) !important; }
+  .text-jade-400 { color: var(--color-jade-400) !important; }
+  .text-jade-500 { color: var(--color-jade-500) !important; }
+  .text-jade-600 { color: var(--color-jade-600) !important; }
+  .text-jade-700 { color: var(--color-jade-700) !important; }
+  .text-jade-800 { color: var(--color-jade-800) !important; }
+  .text-jade-900 { color: var(--color-jade-900) !important; }
+
+  .bg-jade-50 { background-color: var(--color-jade-50) !important; }
+  .bg-jade-100 { background-color: var(--color-jade-100) !important; }
+  .bg-jade-200 { background-color: var(--color-jade-200) !important; }
+  .bg-jade-300 { background-color: var(--color-jade-300) !important; }
+  .bg-jade-400 { background-color: var(--color-jade-400) !important; }
+  .bg-jade-500 { background-color: var(--color-jade-500) !important; }
+  .bg-jade-600 { background-color: var(--color-jade-600) !important; }
+  .bg-jade-700 { background-color: var(--color-jade-700) !important; }
+  .bg-jade-800 { background-color: var(--color-jade-800) !important; }
+  .bg-jade-900 { background-color: var(--color-jade-900) !important; }
+
+  .border-jade-500 { border-color: var(--color-jade-500) !important; }
+  .fill-jade-500 { fill: var(--color-jade-500) !important; }
+  .stroke-jade-500 { stroke: var(--color-jade-500) !important; }
+
+  /* Pillar 2: Synapse Iris (AI, Forensics, Intelligence) */
+  .text-synapse-500 { color: var(--color-synapse-500) !important; }
+  .bg-synapse-500 { background-color: var(--color-synapse-500) !important; }
+  .border-synapse-500 { border-color: var(--color-synapse-500) !important; }
+  .fill-synapse-500 { fill: var(--color-synapse-500) !important; }
+  .stroke-synapse-500 { stroke: var(--color-synapse-500) !important; }
+
+  /* Pillar 4: Aureolin Ochre (Vault, Loans, EMIs, Net Worth) */
+  .text-ochre-500 { color: var(--color-ochre-500) !important; }
+  .bg-ochre-500 { background-color: var(--color-ochre-500) !important; }
+  .border-ochre-500 { border-color: var(--color-ochre-500) !important; }
+  .fill-ochre-500 { fill: var(--color-ochre-500) !important; }
+  .stroke-ochre-500 { stroke: var(--color-ochre-500) !important; }
+
+  /* Pillar 5: Electric Cyan (Telemetry, EPFO, Bank Feeds) */
+  .text-telemetry-500 { color: var(--color-telemetry-500) !important; }
+  .bg-telemetry-500 { background-color: var(--color-telemetry-500) !important; }
+  .border-telemetry-500 { border-color: var(--color-telemetry-500) !important; }
+  .fill-telemetry-500 { fill: var(--color-telemetry-500) !important; }
+  .stroke-telemetry-500 { stroke: var(--color-telemetry-500) !important; }
+
+  /* Pillar 6: Obsidian Abyss & Titanium Alabaster Surfaces */
+  .bg-abyss-canvas { background-color: var(--obsidian-canvas) !important; }
+  .bg-abyss-card { background-color: var(--obsidian-card) !important; }
+  .bg-abyss-elevated { background-color: var(--obsidian-elevated) !important; }
+  .bg-abyss-well { background-color: var(--obsidian-well) !important; }
+  .border-abyss-border { border-color: var(--obsidian-border) !important; }
+  .border-abyss-borderStrong { border-color: var(--obsidian-border-strong) !important; }
+  .text-abyss-textPrimary { color: var(--text-primary) !important; }
+  .text-abyss-textSecondary { color: var(--text-secondary) !important; }
+  .text-abyss-textMuted { color: var(--text-muted) !important; }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -327,7 +479,6 @@
     scrollbar-width: none;
   }
   
-  /* Mobile Safe Area Padding */
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
@@ -335,51 +486,32 @@
     padding-top: max(1rem, env(safe-area-inset-top));
   }
 
-  /* Touch scrolling smoothness */
   .touch-scroll {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
 }
 
-/* ── SPATIAL MOTION (60FPS CUBIC-BEZIER) ────────────────────────────── */
-@keyframes spatialAtmosphere {
-  0%, 100% {
-    transform: scale(1) translate(0px, 0px);
-    opacity: 0.70;
-  }
-  50% {
-    transform: scale(1.06) translate(15px, -15px);
-    opacity: 0.85;
-  }
-}
-
-.animate-spatial-atmosphere {
-  animation: spatialAtmosphere 30s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
-}
-
 @keyframes emergenceIn {
   from {
     opacity: 0;
-    transform: scale(0.97) translateY(8px);
-    filter: blur(6px);
+    transform: scale(0.98) translateY(6px);
   }
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
-    filter: blur(0px);
   }
 }
 
 .animate-emergence {
-  animation: emergenceIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: emergenceIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
+  from { opacity: 0; transform: scale(0.99); }
   to { opacity: 1; transform: scale(1); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

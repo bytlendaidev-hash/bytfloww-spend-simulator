@@ -54,66 +54,66 @@ interface BankStatementModuleProps {
 
 
 // Micro-sparkline SVG paths for hero cards
-const EmeraldSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+const EmeraldSparkline: React.FC<{ isDark: boolean }> = () => (
   <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
     <path
       d="M0 20 Q 20 5, 40 18 T 80 8 T 100 3"
       fill="none"
-      stroke={isDark ? '#10B981' : '#059669'}
+      className="stroke-jade-500"
       strokeWidth="2.5"
       strokeLinecap="round"
     />
     <path
       d="M0 20 Q 20 5, 40 18 T 80 8 T 100 3 L 100 25 L 0 25 Z"
-      fill={isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(5, 150, 105, 0.10)'}
+      className="fill-jade-500 opacity-10"
     />
   </svg>
 );
 
-const RoseSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+const RoseSparkline: React.FC<{ isDark: boolean }> = () => (
   <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
     <path
       d="M0 8 Q 25 22, 50 10 T 80 20 T 100 15"
       fill="none"
-      stroke={isDark ? '#F43F5E' : '#E11D48'}
+      className="stroke-pulse-500"
       strokeWidth="2.5"
       strokeLinecap="round"
     />
     <path
       d="M0 8 Q 25 22, 50 10 T 80 20 T 100 15 L 100 25 L 0 25 Z"
-      fill={isDark ? 'rgba(244, 63, 94, 0.15)' : 'rgba(225, 29, 72, 0.10)'}
+      className="fill-pulse-500 opacity-10"
     />
   </svg>
 );
 
-const PurpleSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+const PurpleSparkline: React.FC<{ isDark: boolean }> = () => (
   <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
     <path
       d="M0 18 Q 30 22, 60 8 T 100 4"
       fill="none"
-      stroke={isDark ? '#A855F7' : '#7E22CE'}
+      className="stroke-synapse-500"
       strokeWidth="2.5"
       strokeLinecap="round"
     />
     <path
       d="M0 18 Q 30 22, 60 8 T 100 4 L 100 25 L 0 25 Z"
-      fill={isDark ? 'rgba(168, 85, 247, 0.15)' : 'rgba(126, 34, 206, 0.10)'}
+      className="fill-synapse-500 opacity-10"
     />
   </svg>
 );
 
-const CyanSparkline: React.FC<{ isDark: boolean }> = ({ isDark }) => (
+const CyanSparkline: React.FC<{ isDark: boolean }> = () => (
   <svg className="w-full h-8 overflow-visible mt-2" viewBox="0 0 100 25" preserveAspectRatio="none">
     <path
       d="M0 16 Q 30 18, 60 7 T 100 2"
       fill="none"
-      stroke={isDark ? '#00F2FE' : '#0284C7'}
+      className="stroke-telemetry-500"
       strokeWidth="2.5"
       strokeLinecap="round"
     />
     <path
       d="M0 16 Q 30 18, 60 7 T 100 2 L 100 25 L 0 25 Z"
-      fill={isDark ? 'rgba(0, 242, 254, 0.15)' : 'rgba(2, 132, 199, 0.10)'}
+      className="fill-telemetry-500 opacity-10"
     />
   </svg>
 );
@@ -389,17 +389,17 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
   return (
     <div className="space-y-6 animate-emergence">
-      {/* ── TOP MULTI-FILE UPLOAD WORKSPACE & DROPZONE (TITANIUM PRISM) ──── */}
+      {/* ── TOP MULTI-FILE UPLOAD WORKSPACE & DROPZONE ──── */}
       <div 
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={`p-6 sm:p-8 rounded-[24px] border-2 border-dashed transition-all relative overflow-hidden text-center ${
           isDragging 
-            ? 'border-[#00E5FF] bg-[#00E5FF]/20 shadow-[0_0_40px_rgba(0,229,255,0.35)]' 
+            ? 'border-jade-500 bg-jade-500/10 shadow-solid-md' 
             : hasData 
-            ? 'border-[#00E5FF]/30 bg-[#0E141D]/80 backdrop-blur-2xl' 
-            : 'border-[#00E5FF]/40 bg-[#0E141D]/90 backdrop-blur-[35px] shadow-[0_16px_48px_rgba(0,0,0,0.7)]'
+            ? 'border-abyss-border bg-abyss-card' 
+            : 'border-abyss-borderStrong bg-abyss-card shadow-solid-md'
         }`}
       >
         <input
@@ -413,7 +413,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="flex items-center justify-center">
-            <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-3xl shadow-xl transition-transform duration-200 bg-gradient-to-b from-[#1E2738] to-[#0A101A] border border-[#00E5FF]/50 text-[#00E5FF] shadow-[0_4px_24px_rgba(0,229,255,0.3)] ${
+            <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-3xl shadow-solid-md transition-transform duration-200 bg-abyss-well border border-jade-500/40 text-jade-500 ${
               isDragging ? 'scale-110' : ''
             }`}>
               📑
@@ -421,10 +421,10 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F0F4F8] flex items-center justify-center gap-2">
-              Byt<span className="bg-gradient-to-r from-[#00E5FF] via-[#A855F7] to-[#F0F4F8] bg-clip-text text-transparent font-black">Lend</span> Multi-Statement Forensics Hub
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-abyss-textPrimary flex items-center justify-center gap-2">
+              Byt<span className="text-jade-500 font-black">Lend</span> Multi-Statement Forensics Hub
             </h1>
-            <p className="text-xs sm:text-sm mt-1 max-w-lg mx-auto text-[#00E5FF] font-medium">
+            <p className="text-xs sm:text-sm mt-1 max-w-lg mx-auto text-abyss-textSecondary font-medium">
               Drag & drop bank statements (XLS, XLSX, CSV) to unlock AI capital intelligence, loan recycling, salary cycles, and P2P audit trails.
             </p>
           </div>
@@ -443,7 +443,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             {hasData && (
               <button
                 onClick={handleClearAll}
-                className="spatial-btn px-4 py-3 text-xs text-[#FF3366] font-semibold border-[#FF3366]/30"
+                className="spatial-btn px-4 py-3 text-xs text-pulse-500 font-semibold border-pulse-500/30"
               >
                 Clear All Files
               </button>
@@ -451,16 +451,16 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
         </div>
 
-        {/* Processing Progress Bar */}
+        {/* Processing Progress Bar (Solid Sovereign Jade) */}
         {isProcessing && (
           <div className="max-w-md mx-auto mt-6 space-y-2 animate-fade-in">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-[#00E5FF]">{processingStage}</span>
-              <span className="font-mono text-[#F0F4F8]/70">{processingProgress}%</span>
+              <span className="text-jade-500">{processingStage}</span>
+              <span className="font-mono text-abyss-textMuted">{processingProgress}%</span>
             </div>
-            <div className="w-full h-2.5 rounded-full bg-black/70 overflow-hidden border border-[#00E5FF]/30 shadow-[0_0_15px_rgba(0,229,255,0.25)]">
+            <div className="w-full h-2.5 rounded-full bg-abyss-canvas overflow-hidden border border-abyss-border">
               <div 
-                className="h-full bg-gradient-to-r from-[#00E5FF] via-[#A855F7] to-[#F0F4F8] transition-all duration-300 rounded-full"
+                className="h-full bg-jade-500 transition-all duration-300 rounded-full"
                 style={{ width: `${processingProgress}%` }}
               />
             </div>
@@ -469,7 +469,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
         {/* Error Message Alert */}
         {errorMessage && (
-          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-[14px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold text-center">
+          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-[14px] bg-pulse-500/10 border border-pulse-500/30 text-pulse-500 text-xs font-bold text-center">
             ⚠️ {errorMessage}
           </div>
         )}
@@ -480,14 +480,14 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <div className="spatial-card p-6 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-base text-[#0A84FF]">📑</span>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-white">Statement Source Files ({session.files.length})</h2>
+              <span className="text-base text-telemetry-500">📑</span>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-abyss-textPrimary">Statement Source Files ({session.files.length})</h2>
             </div>
             <div className="flex items-center gap-2 text-xs flex-wrap">
-              <span className="px-3 py-1 rounded-full font-semibold border bg-white/10 border-white/20 text-white">
+              <span className="px-3 py-1 rounded-full font-semibold border bg-abyss-well border-abyss-border text-abyss-textPrimary">
                 Coverage: {session.coverage.status.replace(/_/g, ' ')} ({session.coverage.continuityScore}% Quality)
               </span>
-              <span className="px-3 py-1 rounded-full font-semibold border bg-[#30D158]/20 text-[#30D158] border-[#30D158]/30">
+              <span className="px-3 py-1 rounded-full font-semibold border bg-jade-500/10 text-jade-500 border-jade-500/30">
                 {session.coverage.balanceContinuityStatus.replace(/_/g, ' ')}
               </span>
             </div>
@@ -498,34 +498,34 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             {session.files.map((file, idx) => (
               <div 
                 key={file.fileId || idx}
-                className="p-4 rounded-[14px] bg-white/5 border border-white/10 flex items-center justify-between gap-3"
+                className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border flex items-center justify-between gap-3"
               >
                 <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs">📄</span>
-                    <span className="text-xs font-bold text-white truncate max-w-[180px]">{file.fileName}</span>
+                    <span className="text-xs font-bold text-abyss-textPrimary truncate max-w-[180px]">{file.fileName}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-white/50">
-                    <span className="font-semibold text-white/80">{file.detectedBank}</span>
+                  <div className="flex items-center gap-2 text-[10px] text-abyss-textMuted">
+                    <span className="font-semibold text-abyss-textSecondary">{file.detectedBank}</span>
                     <span>•</span>
                     <span>{file.transactionCount} rows</span>
                     {file.duplicateTransactionCount > 0 && (
-                      <span className="text-[#FF9F0A] font-semibold">({file.duplicateTransactionCount} dupes)</span>
+                      <span className="text-ochre-500 font-semibold">({file.duplicateTransactionCount} dupes)</span>
                     )}
                   </div>
                   {file.statementStartDate && file.statementEndDate && (
-                    <div className="text-[9px] font-mono text-white/40">
+                    <div className="text-[9px] font-mono text-abyss-textMuted">
                       {file.statementStartDate} → {file.statementEndDate}
                     </div>
                   )}
                   {file.duplicateStatus === 'EXACT_FILE_DUPLICATE' && (
-                    <div className="text-[10px] font-bold text-[#FF9F0A]">⚠️ Exact Duplicate (Skipped)</div>
+                    <div className="text-[10px] font-bold text-ochre-500">⚠️ Exact Duplicate (Skipped)</div>
                   )}
                 </div>
 
                 <button
                   onClick={() => handleRemoveFile(idx)}
-                  className="p-1.5 rounded-full border border-white/10 hover:bg-white/20 text-white/50 hover:text-white transition"
+                  className="p-1.5 rounded-full border border-abyss-border hover:bg-abyss-elevated text-abyss-textMuted hover:text-abyss-textPrimary transition"
                   title="Remove this statement"
                 >
                   ✕
@@ -536,21 +536,21 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
           {/* Session Overview Stats Banner */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
-              <div className="text-[10px] font-bold uppercase text-white/50">Unique Valid Txns</div>
-              <div className="text-lg font-bold font-mono mt-0.5 text-white">{session.uniqueTransactions.length.toLocaleString('en-IN')}</div>
+            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Unique Valid Txns</div>
+              <div className="text-lg font-bold font-mono mt-0.5 text-abyss-textPrimary">{session.uniqueTransactions.length.toLocaleString('en-IN')}</div>
             </div>
-            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
-              <div className="text-[10px] font-bold uppercase text-white/50">Dupes Excluded</div>
-              <div className="text-lg font-bold font-mono mt-0.5 text-[#FF9F0A]">{session.duplicateTransactionsRemoved}</div>
+            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Dupes Excluded</div>
+              <div className="text-lg font-bold font-mono mt-0.5 text-ochre-500">{session.duplicateTransactionsRemoved}</div>
             </div>
-            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
-              <div className="text-[10px] font-bold uppercase text-white/50">Months Covered</div>
-              <div className="text-lg font-bold font-mono mt-0.5 text-[#0A84FF]">{session.coverage.totalMonths} mos</div>
+            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Months Covered</div>
+              <div className="text-lg font-bold font-mono mt-0.5 text-telemetry-500">{session.coverage.totalMonths} mos</div>
             </div>
-            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
-              <div className="text-[10px] font-bold uppercase text-white/50">Date Span</div>
-              <div className="text-xs font-bold font-mono mt-1 text-white truncate">{session.coverage.earliestDate} → {session.coverage.latestDate}</div>
+            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Date Span</div>
+              <div className="text-xs font-bold font-mono mt-1 text-abyss-textPrimary truncate">{session.coverage.earliestDate} → {session.coverage.latestDate}</div>
             </div>
           </div>
         </div>
@@ -589,12 +589,12 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-300 flex items-center gap-1.5 ${
                   activeSection === tab.id
                     ? 'spatial-btn-selected'
-                    : 'spatial-btn text-white/70'
+                    : 'spatial-btn text-abyss-textSecondary hover:text-abyss-textPrimary'
                 }`}
               >
                 <span>{tab.label}</span>
                 {tab.badge && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-bold uppercase bg-[#30D158]/20 text-[#30D158]">
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-bold uppercase bg-jade-500/20 text-jade-500">
                     {tab.badge}
                   </span>
                 )}
@@ -606,22 +606,22 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
               onClick={() => setShowReportModal(true)}
-              className="spatial-btn px-4 py-1.5 text-xs font-bold text-white flex items-center gap-1.5"
+              className="spatial-btn px-4 py-1.5 text-xs font-bold text-abyss-textPrimary flex items-center gap-1.5"
               title="Open Boardroom PDF Dossier & Export CSV"
             >
               <span>📄</span>
               <span>Export Dossier</span>
             </button>
-            <span className="text-xs font-semibold text-white/50 hidden sm:inline">Period:</span>
+            <span className="text-xs font-semibold text-abyss-textMuted hidden sm:inline">Period:</span>
             <select
               value={periodFilter}
               onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
-              className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white outline-none cursor-pointer"
+              className="text-xs font-bold px-3 py-1.5 rounded-full bg-abyss-well border border-abyss-border text-abyss-textPrimary outline-none cursor-pointer"
             >
-              <option value="ALL_TIME" className="bg-[#141A20] text-white">All Imported Data ({session.coverage.totalMonths} Mos)</option>
-              <option value="CURRENT_FY" className="bg-[#141A20] text-white">Current Financial Year (FY)</option>
+              <option value="ALL_TIME" className="bg-abyss-card text-abyss-textPrimary">All Imported Data ({session.coverage.totalMonths} Mos)</option>
+              <option value="CURRENT_FY" className="bg-abyss-card text-abyss-textPrimary">Current Financial Year (FY)</option>
               {availableFYs.map(fy => (
-                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`} className="bg-[#141A20] text-white">{fy}</option>
+                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`} className="bg-abyss-card text-abyss-textPrimary">{fy}</option>
               ))}
             </select>
           </div>
@@ -636,126 +636,126 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             {/* 1. Total Inflow */}
             <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase text-[#30D158] tracking-wider">Total Inflow</span>
+                <span className="text-[10px] font-bold uppercase text-jade-500 tracking-wider">Total Inflow</span>
                 <span className="text-xs">↗️</span>
               </div>
-              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-[#30D158] tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-jade-500 tracking-tight">
                 ₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 18 Q 20 8, 40 16 T 80 6 T 100 4" fill="none" stroke="#30D158" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 18 Q 20 8, 40 16 T 80 6 T 100 4" fill="none" className="stroke-jade-500" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-abyss-textMuted flex items-center justify-between">
                 <span>{forensicData.totalTransactions} txns</span>
-                <span className="text-[#30D158] font-bold">+100%</span>
+                <span className="text-jade-500 font-bold">+100%</span>
               </div>
             </div>
 
             {/* 2. Total Outflow */}
             <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase text-[#FF453A] tracking-wider">Total Outflow</span>
+                <span className="text-[10px] font-bold uppercase text-pulse-500 tracking-wider">Total Outflow</span>
                 <span className="text-xs">↘️</span>
               </div>
-              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-[#FF453A] tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-pulse-500 tracking-tight">
                 ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 6 Q 20 18, 40 10 T 80 20 T 100 16" fill="none" stroke="#FF453A" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 6 Q 20 18, 40 10 T 80 20 T 100 16" fill="none" className="stroke-pulse-500" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-abyss-textMuted flex items-center justify-between">
                 <span>Outflow</span>
-                <span className="text-[#FF453A] font-bold">-100%</span>
+                <span className="text-pulse-500 font-bold">-100%</span>
               </div>
             </div>
 
             {/* 3. True Lifestyle Spend */}
             <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase text-white/70 tracking-wider">Lifestyle Spend</span>
+                <span className="text-[10px] font-bold uppercase text-abyss-textSecondary tracking-wider">Lifestyle Spend</span>
                 <span className="text-xs">🛍️</span>
               </div>
-              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-white tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-abyss-textPrimary tracking-tight">
                 ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 14 Q 25 20, 50 10 T 75 14 T 100 8" fill="none" stroke="#0A84FF" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 14 Q 25 20, 50 10 T 75 14 T 100 8" fill="none" className="stroke-telemetry-500" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-abyss-textMuted flex items-center justify-between">
                 <span>Food & Retail</span>
-                <span className="font-bold text-white">{forensicData.trueLifestyleShare.toFixed(1)}%</span>
+                <span className="font-bold text-abyss-textPrimary">{forensicData.trueLifestyleShare.toFixed(1)}%</span>
               </div>
             </div>
 
             {/* 4. Money Movement & Debt */}
             <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase text-[#6366F1] tracking-wider">Money Movement</span>
+                <span className="text-[10px] font-bold uppercase text-synapse-500 tracking-wider">Money Movement</span>
                 <span className="text-xs">🔄</span>
               </div>
-              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-[#6366F1] tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-synapse-500 tracking-tight">
                 ₹{forensicData.moneyMovementTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 10 Q 30 4, 60 16 T 90 8 T 100 12" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 10 Q 30 4, 60 16 T 90 8 T 100 12" fill="none" className="stroke-synapse-500" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-abyss-textMuted flex items-center justify-between">
                 <span>Transfers & Debt</span>
-                <span className="font-bold text-[#6366F1]">{forensicData.moneyMovementShare.toFixed(1)}%</span>
+                <span className="font-bold text-synapse-500">{forensicData.moneyMovementShare.toFixed(1)}%</span>
               </div>
             </div>
 
             {/* 5. Corporate Earned Salary */}
             <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase text-[#0A84FF] tracking-wider">Corporate Salary</span>
+                <span className="text-[10px] font-bold uppercase text-telemetry-500 tracking-wider">Corporate Salary</span>
                 <span className="text-xs">💼</span>
               </div>
-              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-white tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-abyss-textPrimary tracking-tight">
                 ₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 16 Q 20 6, 40 14 T 80 4 T 100 2" fill="none" stroke="#0A84FF" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 16 Q 20 6, 40 14 T 80 4 T 100 2" fill="none" className="stroke-telemetry-500" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-abyss-textMuted flex items-center justify-between">
                 <span>Verified Payroll</span>
-                <span className="text-white font-bold">17 Cycles</span>
+                <span className="text-abyss-textPrimary font-bold">17 Cycles</span>
               </div>
             </div>
 
             {/* 6. Period Net Cash Flow */}
             <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">Net Cash Flow</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-abyss-textMuted">Net Cash Flow</span>
                 <span className="text-xs">{forensicData.netCashFlow >= 0 ? '📈' : '📉'}</span>
               </div>
-              <div className={`text-base sm:text-xl font-bold font-mono mt-1 tracking-tight ${forensicData.netCashFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+              <div className={`text-base sm:text-xl font-bold font-mono mt-1 tracking-tight ${forensicData.netCashFlow >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
                 {forensicData.netCashFlow >= 0 ? '+' : ''}₹{forensicData.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 12 Q 30 18, 50 8 T 80 14 T 100 16" fill="none" stroke={forensicData.netCashFlow >= 0 ? '#30D158' : '#FF453A'} strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 12 Q 30 18, 50 8 T 80 14 T 100 16" fill="none" className={forensicData.netCashFlow >= 0 ? 'stroke-jade-500' : 'stroke-pulse-500'} strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
               <div className="text-[10px] font-medium flex items-center justify-between">
-                <span className="text-white/50">Period Delta</span>
-                <span className={`font-bold px-1.5 py-0.2 rounded-full ${forensicData.netCashFlow >= 0 ? 'bg-[#30D158]/20 text-[#30D158]' : 'bg-[#FF453A]/20 text-[#FF453A]'}`}>
+                <span className="text-abyss-textMuted">Period Delta</span>
+                <span className={`font-bold px-1.5 py-0.2 rounded-full ${forensicData.netCashFlow >= 0 ? 'bg-jade-500/20 text-jade-500' : 'bg-pulse-500/20 text-pulse-500'}`}>
                   {forensicData.netCashFlow >= 0 ? 'SURPLUS' : 'DEFICIT'}
                 </span>
               </div>
@@ -763,19 +763,19 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
 
           {/* Quick Where ₹100 Went Preview */}
-          <Where100WentChart liveResult={session.analytics} isDark={true} />
+          <Where100WentChart liveResult={session.analytics} isDark={isDark} />
 
           {/* Top Problems and Immediate Action Plan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="spatial-card p-6 space-y-4">
-              <h3 className="text-sm font-bold uppercase text-[#FF453A] flex items-center gap-2">
+              <h3 className="text-sm font-bold uppercase text-pulse-500 flex items-center gap-2">
                 <span>⚠️</span>
                 <span>Top Forensic Vulnerabilities</span>
               </h3>
               <div className="space-y-2">
                 {forensicData.topProblems.map((prob, idx) => (
-                  <div key={idx} className="p-3.5 rounded-[12px] bg-[#FF453A]/10 border border-[#FF453A]/20 text-white/90 text-xs font-semibold flex items-start gap-2.5">
-                    <span className="font-mono text-[#FF453A] font-bold">{idx + 1}.</span>
+                  <div key={idx} className="p-3.5 rounded-[12px] bg-pulse-500/10 border border-pulse-500/20 text-abyss-textPrimary text-xs font-semibold flex items-start gap-2.5">
+                    <span className="font-mono text-pulse-500 font-bold">{idx + 1}.</span>
                     <span>{prob}</span>
                   </div>
                 ))}
@@ -783,14 +783,14 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             </div>
 
             <div className="spatial-card p-6 space-y-4">
-              <h3 className="text-sm font-bold uppercase text-[#30D158] flex items-center gap-2">
+              <h3 className="text-sm font-bold uppercase text-jade-500 flex items-center gap-2">
                 <span>🎯</span>
                 <span>Prioritized Action Plan</span>
               </h3>
               <div className="space-y-2">
                 {forensicData.topActions.map((act, idx) => (
-                  <div key={idx} className="p-3.5 rounded-[12px] bg-[#30D158]/10 border border-[#30D158]/20 text-white/90 text-xs font-semibold flex items-start gap-2.5">
-                    <span className="font-mono text-[#30D158] font-bold">{idx + 1}.</span>
+                  <div key={idx} className="p-3.5 rounded-[12px] bg-jade-500/10 border border-jade-500/20 text-abyss-textPrimary text-xs font-semibold flex items-start gap-2.5">
+                    <span className="font-mono text-jade-500 font-bold">{idx + 1}.</span>
                     <span>{act}</span>
                   </div>
                 ))}
@@ -843,7 +843,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {hasData && activeSection === 'VARIANCE_HEATMAP' && (
         <VarianceHeatmapView
           transactions={session.uniqueTransactions}
-          isDark={true}
+          isDark={isDark}
         />
       )}
 
@@ -852,7 +852,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <FireRunwayTracker
           dataset={forensicData}
           transactions={session.uniqueTransactions}
-          isDark={true}
+          isDark={isDark}
         />
       )}
 
@@ -861,13 +861,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <PredictiveRunwayChart
           dataset={forensicData}
           transactions={session.uniqueTransactions}
-          isDark={true}
+          isDark={isDark}
         />
       )}
 
       {/* ── 2. SECTION: WHERE EVERY ₹100 WENT ──────────────────────────── */}
       {hasData && activeSection === 'WHERE_100_WENT' && (
-        <Where100WentChart liveResult={session.analytics} isDark={true} />
+        <Where100WentChart liveResult={session.analytics} isDark={isDark} />
       )}
 
       {/* ── 3. SECTION: LOAN & DEBT FORENSICS ──────────────────────────── */}
@@ -876,52 +876,52 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           {/* Summary Cards for Loans */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Total Borrowed</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#30D158]">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Total Borrowed</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-jade-500">
                 ₹{forensicData.lenders.reduce((s, l) => s + l.totalBorrowed, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.borrowCount, 0)} disbursals</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.borrowCount, 0)} disbursals</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Total Repaid</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF453A]">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Total Repaid</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-pulse-500">
                 ₹{forensicData.lenders.reduce((s, l) => s + l.totalRepaid, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.repayCount, 0)} repayments</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.repayCount, 0)} repayments</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Net Debt Delta</div>
-              <div className={`text-lg sm:text-xl font-bold font-mono mt-1 ${forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Net Debt Delta</div>
+              <div className={`text-lg sm:text-xl font-bold font-mono mt-1 ${forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
                 {forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? '+' : ''}₹{forensicData.lenders.reduce((s, l) => s + l.netDelta, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Borrowed vs Repaid</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Borrowed vs Repaid</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Serviced Lenders</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF9F0A]">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Serviced Lenders</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-ochre-500">
                 {forensicData.lenders.length} Entities
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Active / Serviced</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Active / Serviced</div>
             </div>
           </div>
 
           <div className="spatial-card p-6 space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <h2 className="text-base font-bold flex items-center gap-2 text-white">
+                <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
                   <span>🏦</span>
                   <span>Lender & Debt Servicing Matrix ({forensicData.lenders.length} Lenders)</span>
                 </h2>
-                <p className="text-xs text-white/50 mt-0.5">
+                <p className="text-xs text-abyss-textSecondary mt-0.5">
                   Tracking loan credits vs repayments and revolving loan recycling ratios.
                 </p>
               </div>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
+            <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
-                  <tr className="border-b border-white/10">
+                <thead className="bg-abyss-well text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
+                  <tr className="border-b border-abyss-border">
                     <th className="p-3.5">Lender / Facility</th>
                     <th className="p-3.5 text-right">Total Borrowed</th>
                     <th className="p-3.5 text-right">Total Repaid</th>
@@ -931,38 +931,38 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     <th className="p-3.5 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-abyss-border">
                   {forensicData.lenders.map((l) => (
-                    <tr key={l.id} className="hover:bg-white/5 transition-colors">
-                      <td className="p-3.5 font-semibold text-white">
+                    <tr key={l.id} className="hover:bg-abyss-elevated transition-colors">
+                      <td className="p-3.5 font-semibold text-abyss-textPrimary">
                         <div className="flex items-center gap-2.5">
                           <BrandLogoBadge entityName={l.name} size="sm" />
                           <div>
-                            <div className="font-bold text-white">{l.name}</div>
-                            <div className="text-[10px] text-white/40">{l.productType}</div>
+                            <div className="font-bold text-abyss-textPrimary">{l.name}</div>
+                            <div className="text-[10px] text-abyss-textMuted">{l.productType}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="p-3.5 text-right font-mono font-bold text-[#30D158]">
+                      <td className="p-3.5 text-right font-mono font-bold text-jade-500">
                         ₹{l.totalBorrowed.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="p-3.5 text-right font-mono font-bold text-[#FF453A]">
+                      <td className="p-3.5 text-right font-mono font-bold text-pulse-500">
                         ₹{l.totalRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className={`p-3.5 text-right font-mono font-bold ${l.netDelta >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+                      <td className={`p-3.5 text-right font-mono font-bold ${l.netDelta >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
                         {l.netDelta >= 0 ? '+' : ''}₹{l.netDelta.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="p-3.5 text-center font-mono text-[11px] text-white/70">
+                      <td className="p-3.5 text-center font-mono text-[11px] text-abyss-textSecondary">
                         {l.borrowCount} / {l.repayCount}
                       </td>
                       <td className="p-3.5 text-center">
                         <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
-                          l.recyclingRisk === 'HIGH' ? 'bg-[#FF453A]/20 text-[#FF453A]' : l.recyclingRisk === 'MODERATE' ? 'bg-[#FF9F0A]/20 text-[#FF9F0A]' : 'bg-[#30D158]/20 text-[#30D158]'
+                          l.recyclingRisk === 'HIGH' ? 'bg-pulse-500/20 text-pulse-500' : l.recyclingRisk === 'MODERATE' ? 'bg-ochre-500/20 text-ochre-500' : 'bg-jade-500/20 text-jade-500'
                         }`}>
                           {l.recyclingRisk}
                         </span>
                       </td>
-                      <td className="p-3.5 text-center font-mono text-[10px] text-white/50">
+                      <td className="p-3.5 text-center font-mono text-[10px] text-abyss-textMuted">
                         {l.status}
                       </td>
                     </tr>
@@ -980,7 +980,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           transactions={session.uniqueTransactions}
           selectedDate={calendarSelectedDate}
           onSelectDate={setCalendarSelectedDate}
-          isDark={true}
+          isDark={isDark}
           onFilterLedgerToDate={(date) => {
             setCalendarSelectedDate(date);
             setActiveSection('LEDGER');
@@ -992,7 +992,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {hasData && activeSection === 'LEDGER' && (
         <TransactionExplorer 
           liveResult={session.analytics} 
-          isDark={true} 
+          isDark={isDark} 
           initialDate={calendarSelectedDate}
           onDateChange={setCalendarSelectedDate}
         />
@@ -1002,7 +1002,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {hasData && activeSection === 'PEOPLE' && (
         <P2PSocialGraphView
           transactions={session.uniqueTransactions}
-          isDark={true}
+          isDark={isDark}
         />
       )}
 
@@ -1012,44 +1012,44 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           {/* Summary Cards for Velocity */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Total Period Inflow</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#30D158]">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Total Period Inflow</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-jade-500">
                 ₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Avg: ₹{Math.round(forensicData.totalCredits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Avg: ₹{Math.round(forensicData.totalCredits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Total Period Outflow</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF453A]">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Total Period Outflow</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-pulse-500">
                 ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Avg: ₹{Math.round(forensicData.totalDebits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Avg: ₹{Math.round(forensicData.totalDebits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Net Period Cash Flow</div>
-              <div className={`text-lg sm:text-xl font-bold font-mono mt-1 ${forensicData.netCashFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Net Period Cash Flow</div>
+              <div className={`text-lg sm:text-xl font-bold font-mono mt-1 ${forensicData.netCashFlow >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
                 {forensicData.netCashFlow >= 0 ? '+' : ''}₹{forensicData.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Overall Surplus/Deficit</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Overall Surplus/Deficit</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Monthly Balance Health</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-white">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Monthly Balance Health</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-abyss-textPrimary">
                 {forensicData.monthlyCashFlow.filter(m => !m.isDeficit).length} Surplus / {forensicData.monthlyCashFlow.filter(m => m.isDeficit).length} Deficit
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Across {forensicData.monthlyCashFlow.length} recorded months</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Across {forensicData.monthlyCashFlow.length} recorded months</div>
             </div>
           </div>
 
           <div className="spatial-card p-6 space-y-4">
-            <h2 className="text-base font-bold flex items-center gap-2 text-white">
+            <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
               <span>📈</span>
               <span>Monthly Cash Flow Velocity Table</span>
             </h2>
-            <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
+            <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
-                <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
-                  <tr className="border-b border-white/10">
+                <thead className="bg-abyss-well text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
+                  <tr className="border-b border-abyss-border">
                     <th className="p-3.5">Month</th>
                     <th className="p-3.5">FY</th>
                     <th className="p-3.5 text-right">Credits</th>
@@ -1061,22 +1061,22 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     <th className="p-3.5 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-abyss-border">
                   {forensicData.monthlyCashFlow.map((m) => (
-                    <tr key={m.monthKey} className="hover:bg-white/5 transition-colors">
-                      <td className="p-3.5 font-bold text-white">{m.monthName}</td>
-                      <td className="p-3.5 font-mono text-[10px] text-white/40">{m.financialYear}</td>
-                      <td className="p-3.5 text-right font-mono text-[#30D158]">₹{m.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3.5 text-right font-mono text-[#FF453A]">₹{m.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className={`p-3.5 text-right font-mono font-bold ${m.netCashFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+                    <tr key={m.monthKey} className="hover:bg-abyss-elevated transition-colors">
+                      <td className="p-3.5 font-bold text-abyss-textPrimary">{m.monthName}</td>
+                      <td className="p-3.5 font-mono text-[10px] text-abyss-textMuted">{m.financialYear}</td>
+                      <td className="p-3.5 text-right font-mono text-jade-500">₹{m.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-pulse-500">₹{m.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className={`p-3.5 text-right font-mono font-bold ${m.netCashFlow >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
                         ₹{m.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="p-3.5 text-right font-mono text-white/80">₹{m.salary.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3.5 text-right font-mono text-[#FF453A]/80">₹{m.loanRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3.5 text-right font-mono text-white/70">₹{m.lifestyleSpend.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-abyss-textSecondary">₹{m.salary.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-pulse-500/80">₹{m.loanRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-abyss-textSecondary">₹{m.lifestyleSpend.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
                       <td className="p-3.5 text-center">
                         <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
-                          m.isDeficit ? 'bg-[#FF453A]/20 text-[#FF453A]' : 'bg-[#30D158]/20 text-[#30D158]'
+                          m.isDeficit ? 'bg-pulse-500/20 text-pulse-500' : 'bg-jade-500/20 text-jade-500'
                         }`}>
                           {m.isDeficit ? 'DEFICIT' : 'SURPLUS'}
                         </span>
@@ -1093,27 +1093,27 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {/* ── 7. SECTION: 7 FINANCIAL HEALTH RATIOS ────────────────────────── */}
       {hasData && activeSection === 'RATIOS' && (
         <div className="spatial-card p-6 space-y-4">
-          <h2 className="text-base font-bold flex items-center gap-2 text-white">
+          <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
             <span>⚖️</span>
             <span>7 Financial Health & Risk Ratios</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {forensicData.ratios.map((r, idx) => (
-              <div key={idx} className="p-5 rounded-[16px] bg-white/5 border border-white/10 space-y-2">
+              <div key={idx} className="p-5 rounded-[16px] bg-abyss-well border border-abyss-border space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white">{r.ratioName}</span>
+                  <span className="text-xs font-bold text-abyss-textPrimary">{r.ratioName}</span>
                   <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
-                    r.status === 'CRITICAL' ? 'bg-[#FF453A]/20 text-[#FF453A]' : r.status === 'MODERATE' ? 'bg-[#FF9F0A]/20 text-[#FF9F0A]' : 'bg-[#30D158]/20 text-[#30D158]'
+                    r.status === 'CRITICAL' ? 'bg-pulse-500/20 text-pulse-500' : r.status === 'MODERATE' ? 'bg-ochre-500/20 text-ochre-500' : 'bg-jade-500/20 text-jade-500'
                   }`}>
                     {r.status}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold font-mono text-white">{r.currentValue}%</span>
-                  <span className="text-[10px] text-white/40">Benchmark: {r.benchmark}</span>
+                  <span className="text-2xl font-bold font-mono text-abyss-textPrimary">{r.currentValue}%</span>
+                  <span className="text-[10px] text-abyss-textMuted">Benchmark: {r.benchmark}</span>
                 </div>
-                <div className="text-[10px] text-white/50">{r.formula}</div>
-                <div className="text-xs text-white/80 leading-relaxed">{r.assessment}</div>
+                <div className="text-[10px] text-abyss-textMuted">{r.formula}</div>
+                <div className="text-xs text-abyss-textSecondary leading-relaxed">{r.assessment}</div>
               </div>
             ))}
           </div>
@@ -1126,37 +1126,37 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           {/* Summary Cards for Debits */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Total Outflow</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF453A]">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Total Outflow</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-pulse-500">
                 ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">100% of Reconciled Outflow</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">100% of Reconciled Outflow</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/70">True Lifestyle Spend</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-white">
+              <div className="text-[10px] font-bold uppercase text-abyss-textSecondary">True Lifestyle Spend</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-abyss-textPrimary">
                 ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/50 mt-0.5">{forensicData.trueLifestyleShare.toFixed(1)}% of Debits</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">{forensicData.trueLifestyleShare.toFixed(1)}% of Debits</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-[#6366F1]">Money Movement</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#6366F1]">
+              <div className="text-[10px] font-bold uppercase text-synapse-500">Money Movement</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-synapse-500">
                 ₹{forensicData.moneyMovementTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-white/50 mt-0.5">{forensicData.moneyMovementShare.toFixed(1)}% (Transfers & Debt)</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">{forensicData.moneyMovementShare.toFixed(1)}% (Transfers & Debt)</div>
             </div>
             <div className="spatial-card p-4 sm:p-5">
-              <div className="text-[10px] font-bold uppercase text-white/50">Categories Tracked</div>
-              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-white">
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Categories Tracked</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-abyss-textPrimary">
                 {forensicData.debitBreakdown.length} Categories
               </div>
-              <div className="text-[10px] text-white/40 mt-0.5">Ranked by volume</div>
+              <div className="text-[10px] text-abyss-textMuted mt-0.5">Ranked by volume</div>
             </div>
           </div>
 
           <div className="spatial-card p-6 space-y-4">
-            <h2 className="text-base font-bold flex items-center gap-2 text-white">
+            <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
               <span>💳</span>
               <span>14-Category Debit Breakdown</span>
             </h2>
@@ -1164,15 +1164,15 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               {forensicData.debitBreakdown.map((d) => (
                 <div key={d.rank} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold flex items-center gap-2 text-white">
+                    <span className="font-bold flex items-center gap-2 text-abyss-textPrimary">
                       <span>{d.icon}</span>
                       <span>{d.category}</span>
-                      {d.isLifestyle && <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white font-bold">LIFESTYLE</span>}
+                      {d.isLifestyle && <span className="text-[9px] px-2 py-0.5 rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border font-bold">LIFESTYLE</span>}
                     </span>
-                    <span className="font-mono font-bold text-white">₹{d.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({d.percentage.toFixed(1)}%)</span>
+                    <span className="font-mono font-bold text-abyss-textPrimary">₹{d.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({d.percentage.toFixed(1)}%)</span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                    <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(1, d.percentage)}%` }} />
+                  <div className="w-full h-2 rounded-full bg-abyss-well overflow-hidden border border-abyss-border">
+                    <div className="h-full rounded-full bg-pulse-500" style={{ width: `${Math.max(1, d.percentage)}%` }} />
                   </div>
                 </div>
               ))}
@@ -1187,65 +1187,65 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           <div className="spatial-card p-6 space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <h2 className="text-base font-bold flex items-center gap-2 text-white">
+                <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
                   <span>💰</span>
                   <span>Inflow & Ingress Decomposition</span>
                 </h2>
-                <p className="text-xs text-white/50 mt-0.5">
+                <p className="text-xs text-abyss-textSecondary mt-0.5">
                   Strict segregation of Earned Corporate Salary, EPFO / PF Capital Withdrawals, and Borrowed Debt Disbursals.
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-white/50">Earned Salary</div>
-                <div className="text-lg font-bold font-mono mt-1 text-[#30D158]">₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-white/40 mt-0.5">17 Payroll Cycles</div>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Earned Salary</div>
+                <div className="text-lg font-bold font-mono mt-1 text-jade-500">₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">17 Payroll Cycles</div>
               </div>
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-[#0A84FF]">EPFO / PF Claims</div>
-                <div className="text-lg font-bold font-mono mt-1 text-[#0A84FF]">₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-white/40 mt-0.5">Statutory Inflow</div>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-telemetry-500">EPFO / PF Claims</div>
+                <div className="text-lg font-bold font-mono mt-1 text-telemetry-500">₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">Statutory Inflow</div>
               </div>
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-[#30D158]">Savings Bank Interest</div>
-                <div className="text-lg font-bold font-mono mt-1 text-[#30D158]">₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-                <div className="text-[10px] text-white/40 mt-0.5">{forensicData.bankInterestCredits.length} Credits</div>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-jade-500">Savings Bank Interest</div>
+                <div className="text-lg font-bold font-mono mt-1 text-jade-500">₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">{forensicData.bankInterestCredits.length} Credits</div>
               </div>
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-[#FF453A]">Bank Fees & Charges</div>
-                <div className="text-lg font-bold font-mono mt-1 text-[#FF453A]">₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-                <div className="text-[10px] text-white/40 mt-0.5">{forensicData.bankChargesCount} Deductions</div>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-pulse-500">Bank Fees & Charges</div>
+                <div className="text-lg font-bold font-mono mt-1 text-pulse-500">₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">{forensicData.bankChargesCount} Deductions</div>
               </div>
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-[#FF9F0A]">Loan Disbursals</div>
-                <div className="text-lg font-bold font-mono mt-1 text-[#FF9F0A]">₹{forensicData.loanCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-white/40 mt-0.5">Borrowed Debt</div>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-ochre-500">Loan Disbursals</div>
+                <div className="text-lg font-bold font-mono mt-1 text-ochre-500">₹{forensicData.loanCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">Borrowed Debt</div>
               </div>
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-white/50">Refunds & Reversals</div>
-                <div className="text-lg font-bold font-mono mt-1 text-white">₹{forensicData.refundsReversalsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-white/40 mt-0.5">Non-operating</div>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Refunds & Reversals</div>
+                <div className="text-lg font-bold font-mono mt-1 text-abyss-textPrimary">₹{forensicData.refundsReversalsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">Non-operating</div>
               </div>
             </div>
 
             {/* Dedicated EPFO / PF Ledger Table */}
-            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+            <div className="mt-6 pt-4 border-t border-abyss-border space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-base text-[#0A84FF]">🏛️</span>
-                  <h3 className="text-sm font-bold text-white">Provident Fund (EPFO) Claims & Capital Withdrawals</h3>
+                  <span className="text-base text-telemetry-500">🏛️</span>
+                  <h3 className="text-sm font-bold text-abyss-textPrimary">Provident Fund (EPFO) Claims & Capital Withdrawals</h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-[#0A84FF]">
+                <span className="text-xs font-mono font-bold text-telemetry-500">
                   Total: ₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN')}
                 </span>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
+              <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
-                    <tr className="border-b border-white/10">
+                  <thead className="bg-abyss-well text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
+                    <tr className="border-b border-abyss-border">
                       <th className="p-3.5">Date</th>
                       <th className="p-3.5">Narration / Claim Reference</th>
                       <th className="p-3.5 text-right">Amount</th>
@@ -1253,24 +1253,24 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                       <th className="p-3.5 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-abyss-border">
                     {session.uniqueTransactions.filter(t => t.category === 'EPFO_PF').map((epfTx) => (
-                      <tr key={epfTx.id} className="hover:bg-white/5 transition-colors">
-                        <td className="p-3.5 font-mono text-[11px] text-white/50 whitespace-nowrap">{epfTx.transactionDate}</td>
+                      <tr key={epfTx.id} className="hover:bg-abyss-elevated transition-colors">
+                        <td className="p-3.5 font-mono text-[11px] text-abyss-textMuted whitespace-nowrap">{epfTx.transactionDate}</td>
                         <td className="p-3.5 font-semibold max-w-[300px]">
-                          <div className="truncate text-white">{epfTx.rawNarration}</div>
+                          <div className="truncate text-abyss-textPrimary">{epfTx.rawNarration}</div>
                           {epfTx.referenceNumber && (
-                            <div className="text-[10px] font-mono text-white/40">Ref / UTR: {epfTx.referenceNumber}</div>
+                            <div className="text-[10px] font-mono text-abyss-textMuted">Ref / UTR: {epfTx.referenceNumber}</div>
                           )}
                         </td>
-                        <td className="p-3.5 text-right font-mono font-bold text-[#0A84FF] text-sm">
+                        <td className="p-3.5 text-right font-mono font-bold text-telemetry-500 text-sm">
                           +₹{epfTx.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </td>
-                        <td className="p-3.5 text-right font-mono text-white/60">
+                        <td className="p-3.5 text-right font-mono text-abyss-textSecondary">
                           {epfTx.balanceAfter != null ? `₹${epfTx.balanceAfter.toLocaleString('en-IN')}` : '—'}
                         </td>
                         <td className="p-3.5 text-center">
-                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#0A84FF]/20 text-[#0A84FF] border border-[#0A84FF]/30">
+                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-telemetry-500/20 text-telemetry-500 border border-telemetry-500/30">
                             SETTLED
                           </span>
                         </td>
@@ -1282,21 +1282,21 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             </div>
 
             {/* Dedicated Bank Savings Interest Audit Table */}
-            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+            <div className="mt-6 pt-4 border-t border-abyss-border space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-base text-[#30D158]">💰</span>
-                  <h3 className="text-sm font-bold text-white">Bank Savings Account Interest Added by Bank</h3>
+                  <span className="text-base text-jade-500">💰</span>
+                  <h3 className="text-sm font-bold text-abyss-textPrimary">Bank Savings Account Interest Added by Bank</h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-[#30D158]">
+                <span className="text-xs font-mono font-bold text-jade-500">
                   Total Interest Earned: ₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
+              <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
-                    <tr className="border-b border-white/10">
+                  <thead className="bg-abyss-well text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
+                    <tr className="border-b border-abyss-border">
                       <th className="p-3.5">Payout Date</th>
                       <th className="p-3.5">Quarter Period</th>
                       <th className="p-3.5">Bank Narration</th>
@@ -1304,17 +1304,17 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                       <th className="p-3.5 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-abyss-border">
                     {forensicData.bankInterestCredits.map((intTx, idx) => (
-                      <tr key={idx} className="hover:bg-white/5 transition-colors">
-                        <td className="p-3.5 font-mono text-[11px] text-white/50 whitespace-nowrap">{intTx.date}</td>
-                        <td className="p-3.5 font-bold text-white">{intTx.quarterLabel}</td>
-                        <td className="p-3.5 font-mono text-[10px] text-white/40">{intTx.narration}</td>
-                        <td className="p-3.5 text-right font-mono font-bold text-[#30D158] text-sm">
+                      <tr key={idx} className="hover:bg-abyss-elevated transition-colors">
+                        <td className="p-3.5 font-mono text-[11px] text-abyss-textMuted whitespace-nowrap">{intTx.date}</td>
+                        <td className="p-3.5 font-bold text-abyss-textPrimary">{intTx.quarterLabel}</td>
+                        <td className="p-3.5 font-mono text-[10px] text-abyss-textMuted">{intTx.narration}</td>
+                        <td className="p-3.5 text-right font-mono font-bold text-jade-500 text-sm">
                           +₹{intTx.amount.toFixed(2)}
                         </td>
                         <td className="p-3.5 text-center">
-                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30">
+                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-jade-500/20 text-jade-500 border border-jade-500/30">
                             CREDITED
                           </span>
                         </td>
@@ -1326,21 +1326,21 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             </div>
 
             {/* Dedicated Bank Fees & Charges Deducted Audit Table */}
-            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
+            <div className="mt-6 pt-4 border-t border-abyss-border space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-base text-[#FF453A]">🏦</span>
-                  <h3 className="text-sm font-bold text-white">Bank Service Charges & Penalty Fees Deducted</h3>
+                  <span className="text-base text-pulse-500">🏦</span>
+                  <h3 className="text-sm font-bold text-abyss-textPrimary">Bank Service Charges & Penalty Fees Deducted</h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-[#FF453A]">
+                <span className="text-xs font-mono font-bold text-pulse-500">
                   Total Bank Charges: ₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
+              <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
-                    <tr className="border-b border-white/10">
+                  <thead className="bg-abyss-well text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
+                    <tr className="border-b border-abyss-border">
                       <th className="p-3.5">Deduction Date</th>
                       <th className="p-3.5">Fee / Charge Classification</th>
                       <th className="p-3.5">Bank Narration</th>
@@ -1348,18 +1348,18 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                       <th className="p-3.5 text-center">Impact</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-abyss-border">
                     {forensicData.bankChargesList.map((chgTx, idx) => (
-                      <tr key={idx} className="hover:bg-white/5 transition-colors">
-                        <td className="p-3.5 font-mono text-[11px] text-white/50 whitespace-nowrap">{chgTx.date}</td>
-                        <td className="p-3.5 font-bold text-white">{chgTx.chargeType}</td>
-                        <td className="p-3.5 font-mono text-[10px] text-white/40">{chgTx.narration}</td>
-                        <td className="p-3.5 text-right font-mono font-bold text-[#FF453A] text-sm">
+                      <tr key={idx} className="hover:bg-abyss-elevated transition-colors">
+                        <td className="p-3.5 font-mono text-[11px] text-abyss-textMuted whitespace-nowrap">{chgTx.date}</td>
+                        <td className="p-3.5 font-bold text-abyss-textPrimary">{chgTx.chargeType}</td>
+                        <td className="p-3.5 font-mono text-[10px] text-abyss-textMuted">{chgTx.narration}</td>
+                        <td className="p-3.5 text-right font-mono font-bold text-pulse-500 text-sm">
                           -₹{chgTx.amount.toFixed(2)}
                         </td>
                         <td className="p-3.5 text-center">
                           <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                            chgTx.amount >= 500 ? 'bg-[#FF453A]/20 text-[#FF453A] border border-[#FF453A]/30' : 'bg-[#FF9F0A]/20 text-[#FF9F0A] border border-[#FF9F0A]/30'
+                            chgTx.amount >= 500 ? 'bg-pulse-500/20 text-pulse-500 border border-pulse-500/30' : 'bg-ochre-500/20 text-ochre-500 border border-ochre-500/30'
                           }`}>
                             {chgTx.amount >= 500 ? 'HIGH PENALTY' : 'NOMINAL FEE'}
                           </span>
@@ -1377,26 +1377,26 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {/* ── 10. SECTION: RECONCILIATION AUDIT NOTES ───────────────────────── */}
       {hasData && activeSection === 'AUDIT' && (
         <div className="spatial-card p-6 space-y-4">
-          <h2 className="text-base font-bold flex items-center gap-2 text-white">
+          <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
             <span>🛡️</span>
             <span>Forensic Ledger Audit & Integrity Notes</span>
           </h2>
           <div className="space-y-3">
-            <div className="p-5 rounded-[16px] bg-white/5 border border-white/10 text-xs leading-relaxed space-y-1.5">
-              <div className="font-bold text-[#30D158]">1. Cryptographic File Fingerprinting (SHA-256)</div>
-              <p className="text-white/70">
+            <div className="p-5 rounded-[16px] bg-abyss-well border border-abyss-border text-xs leading-relaxed space-y-1.5">
+              <div className="font-bold text-jade-500">1. Cryptographic File Fingerprinting (SHA-256)</div>
+              <p className="text-abyss-textSecondary">
                 All uploaded statement files are cryptographically fingerprinted using client-side SHA-256. Exact duplicate files uploaded concurrently or in separate sessions are rejected with zero double-counting.
               </p>
             </div>
-            <div className="p-5 rounded-[16px] bg-white/5 border border-white/10 text-xs leading-relaxed space-y-1.5">
-              <div className="font-bold text-[#0A84FF]">2. Single Source of Truth Ledger Reconciliation</div>
-              <p className="text-white/70">
+            <div className="p-5 rounded-[16px] bg-abyss-well border border-abyss-border text-xs leading-relaxed space-y-1.5">
+              <div className="font-bold text-telemetry-500">2. Single Source of Truth Ledger Reconciliation</div>
+              <p className="text-abyss-textSecondary">
                 Opening Balance (₹{forensicData.openingBalance?.toFixed(2) || '0.00'}) + Total Inflow (₹{forensicData.totalCredits.toFixed(2)}) - Total Outflow (₹{forensicData.totalDebits.toFixed(2)}) = Closing Balance (₹{forensicData.closingBalance?.toFixed(2) || '0.00'}).
               </p>
             </div>
-            <div className="p-5 rounded-[16px] bg-white/5 border border-white/10 text-xs leading-relaxed space-y-1.5">
-              <div className="font-bold text-[#30D158]">3. Cross-File Lineage & Provenance</div>
-              <p className="text-white/70">
+            <div className="p-5 rounded-[16px] bg-abyss-well border border-abyss-border text-xs leading-relaxed space-y-1.5">
+              <div className="font-bold text-jade-500">3. Cross-File Lineage & Provenance</div>
+              <p className="text-abyss-textSecondary">
                 Every transaction retains exact file origin tracking. Overlapping statements generated zero artificial duplicate transactions in master aggregates.
               </p>
             </div>
@@ -1409,20 +1409,20 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <div className="space-y-4">
           <div className="spatial-card p-6 space-y-4">
             {/* Header with Engine Status & API Key Toggle */}
-            <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-abyss-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xl shadow-lg">
+                <div className="w-10 h-10 rounded-full bg-abyss-well border border-abyss-border flex items-center justify-center text-xl shadow-solid-sm">
                   🤖
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base font-bold text-white">AI Forensic Copilot</h2>
-                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#30D158] animate-pulse" />
+                    <h2 className="text-base font-bold text-abyss-textPrimary">AI Forensic Copilot</h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-jade-500/20 text-jade-500 border border-jade-500/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-jade-500 animate-pulse" />
                       Gemini 2.5 Flash Active
                     </span>
                   </div>
-                  <p className="text-xs text-white/50 mt-0.5">
+                  <p className="text-xs text-abyss-textMuted mt-0.5">
                     Real-data personal financial auditor querying {session.uniqueTransactions.length.toLocaleString('en-IN')} ledger transactions
                   </p>
                 </div>
@@ -1431,7 +1431,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowApiKeyModal(!showApiKeyModal)}
-                  className="spatial-btn px-3.5 py-1.5 text-xs font-semibold text-white/80"
+                  className="spatial-btn px-3.5 py-1.5 text-xs font-semibold text-abyss-textSecondary hover:text-abyss-textPrimary"
                   title="Configure Gemini API Key"
                 >
                   <span>🔑</span>
@@ -1446,7 +1446,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                       timestamp: 'Just now',
                     }
                   ])}
-                  className="spatial-btn px-3.5 py-1.5 text-xs font-semibold text-white/80"
+                  className="spatial-btn px-3.5 py-1.5 text-xs font-semibold text-abyss-textSecondary hover:text-abyss-textPrimary"
                 >
                   Clear History
                 </button>
@@ -1455,13 +1455,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
             {/* API Key Modal / Drawer */}
             {showApiKeyModal && (
-              <div className="p-4 rounded-[16px] bg-white/10 border border-white/20 space-y-3">
+              <div className="p-4 rounded-[16px] bg-abyss-well border border-abyss-border space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-bold flex items-center gap-2 text-white">
+                  <div className="text-xs font-bold flex items-center gap-2 text-abyss-textPrimary">
                     <span>⚡</span>
                     <span>Google Gemini API Key Configuration</span>
                   </div>
-                  <button onClick={() => setShowApiKeyModal(false)} className="text-xs text-white/50 hover:text-white">✕</button>
+                  <button onClick={() => setShowApiKeyModal(false)} className="text-xs text-abyss-textMuted hover:text-abyss-textPrimary">✕</button>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -1469,7 +1469,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     value={geminiApiKey}
                     onChange={(e) => setGeminiApiKey(e.target.value)}
                     placeholder="Enter your Gemini API key..."
-                    className="flex-1 px-4 py-2.5 rounded-full text-xs font-mono bg-white/10 border border-white/20 text-white placeholder:text-white/30 outline-none focus:border-white"
+                    className="flex-1 px-4 py-2.5 rounded-full text-xs font-mono bg-abyss-elevated border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500"
                   />
                   <button
                     onClick={() => {
@@ -1485,7 +1485,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     Save Key
                   </button>
                 </div>
-                <div className="text-[10px] text-white/50">
+                <div className="text-[10px] text-abyss-textMuted">
                   Your API key is kept securely in your browser session for live forensic analysis.
                 </div>
               </div>
@@ -1493,7 +1493,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
             {/* Suggested Forensic Query Pills */}
             <div className="space-y-2">
-              <div className="text-[10px] font-bold uppercase text-white/50 tracking-wider">Suggested Forensic Queries</div>
+              <div className="text-[10px] font-bold uppercase text-abyss-textMuted tracking-wider">Suggested Forensic Queries</div>
               <div className="flex flex-wrap gap-2">
                 {[
                   'Where is my money going most in a single month?',
@@ -1508,7 +1508,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     key={idx}
                     disabled={isAiTyping}
                     onClick={() => handleSendChatMessage(promptText)}
-                    className="spatial-btn px-3.5 py-1.5 text-xs text-white/80 hover:text-white"
+                    className="spatial-btn px-3.5 py-1.5 text-xs text-abyss-textSecondary hover:text-abyss-textPrimary"
                   >
                     {promptText}
                   </button>
@@ -1517,7 +1517,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             </div>
 
             {/* Chat Messages Log */}
-            <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 min-h-[350px] max-h-[500px] overflow-y-auto space-y-4">
+            <div className="p-4 rounded-[20px] bg-abyss-well border border-abyss-border min-h-[350px] max-h-[500px] overflow-y-auto space-y-4">
               {chatMessages.map((msg) => (
                 <div
                   key={msg.id}
@@ -1526,14 +1526,14 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                   <div
                     className={`p-4 rounded-[18px] text-xs leading-relaxed max-w-[90%] ${
                       msg.role === 'assistant'
-                        ? 'bg-white/10 text-white border border-white/15'
-                        : 'bg-white text-black font-semibold'
+                        ? 'bg-abyss-card text-abyss-textPrimary border border-abyss-border shadow-solid-sm'
+                        : 'bg-synapse-500 text-white font-medium shadow-solid-sm'
                     }`}
                   >
-                    <div className="whitespace-pre-line prose prose-invert prose-xs max-w-none">
+                    <div className="whitespace-pre-line prose prose-xs max-w-none">
                       {msg.text}
                     </div>
-                    <div className={`text-[9px] mt-2 opacity-60 font-mono flex items-center justify-between gap-4 ${msg.role === 'assistant' ? '' : 'text-right'}`}>
+                    <div className={`text-[9px] mt-2 opacity-70 font-mono flex items-center justify-between gap-4 ${msg.role === 'assistant' ? '' : 'text-right text-white/80'}`}>
                       <span>{msg.role === 'assistant' ? 'BytFloww Copilot (Gemini 2.5 Flash)' : 'You'}</span>
                       <span>{msg.timestamp}</span>
                     </div>
@@ -1542,7 +1542,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               ))}
 
               {isAiTyping && (
-                <div className="flex items-center gap-2 p-3.5 rounded-[14px] bg-white/10 border border-white/15 text-white text-xs animate-pulse">
+                <div className="flex items-center gap-2 p-3.5 rounded-[14px] bg-abyss-card border border-abyss-border text-abyss-textPrimary text-xs animate-pulse">
                   <span className="animate-spin text-sm">⚙️</span>
                   <span className="font-semibold">Querying Gemini 2.5 Flash & calculating ledger facts...</span>
                 </div>
@@ -1563,7 +1563,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                 disabled={isAiTyping}
                 onChange={(e) => setChatInput(e.target.value)}
                 placeholder="Ask any question about your transactions, interest, salary, lenders, or daily spend..."
-                className="flex-1 px-4 py-3 rounded-full text-xs bg-white/10 border border-white/20 text-white focus:border-white placeholder:text-white/40 outline-none transition"
+                className="flex-1 px-4 py-3 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary focus:border-jade-500 placeholder:text-abyss-textMuted outline-none transition"
               />
               <button
                 type="submit"
@@ -1584,7 +1584,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <ForensicReportModal
           dataset={forensicData}
           transactions={session.uniqueTransactions}
-          isDark={true}
+          isDark={isDark}
           onClose={() => setShowReportModal(false)}
         />
       )}

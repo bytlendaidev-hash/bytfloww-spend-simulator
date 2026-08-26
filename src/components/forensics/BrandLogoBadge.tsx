@@ -77,8 +77,8 @@ export function resolveBrandTheme(rawName: string): BrandTheme {
   const abbr = (clean.substring(0, 3) || 'TX').toUpperCase();
 
   return {
-    bg: 'bg-slate-700',
-    text: 'text-white',
+    bg: 'bg-abyss-well',
+    text: 'text-abyss-textPrimary',
     icon: '💳',
     abbr,
     name: rawName || 'Transaction Entity',

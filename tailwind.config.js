@@ -8,79 +8,201 @@ export default {
   theme: {
     extend: {
       colors: {
-        // SYSTEM 2: TITANIUM PRISM (Ionized Platinum + Cyber Iris + Photon Cyan)
-        prism: {
-          titanium: '#F0F4F8',
-          cyberIris: '#A855F7',
-          cyberIrisDark: '#7C3AED',
-          photonCyan: '#00E5FF',
-          photonCyanDark: '#00B4D8',
-          magmaPulse: '#FF3366',
-          aerospaceSlate: '#0E141D',
-          aerospaceCard: '#131A24',
-          aerospaceHover: '#1A2433',
-          deepVacuum: '#05080C',
-          border: 'rgba(0, 229, 255, 0.30)',
-          borderHover: 'rgba(168, 85, 247, 0.50)',
-          glowCyan: 'rgba(0, 229, 255, 0.40)',
-          glowIris: 'rgba(168, 85, 247, 0.35)',
+        // ── 1. SOVEREIGN JADE (Primary Hero, Inflow, Surplus) ──────────
+        jade: {
+          50: 'var(--color-jade-50, #E6FAF2)',
+          100: 'var(--color-jade-100, #C2F4DF)',
+          200: 'var(--color-jade-200, #8DE7C2)',
+          300: 'var(--color-jade-300, #4FD69F)',
+          400: 'var(--color-jade-400, #1EC882)',
+          500: 'var(--color-jade-500, #00D084)', // Dark/Light Dynamic Hero
+          600: 'var(--color-jade-600, #00AB6B)',
+          700: 'var(--color-jade-700, #00875A)', // Light Hero
+          800: 'var(--color-jade-800, #006342)',
+          900: 'var(--color-jade-900, #003D29)',
+          DEFAULT: 'var(--color-jade-500, #00D084)',
         },
-        // BytLend Palette Aliases
+
+        // ── 2. SYNAPSE IRIS (AI Engine, Forensics, Auto-Categories) ───
+        synapse: {
+          50: 'var(--color-synapse-50, #F3F0FF)',
+          100: 'var(--color-synapse-100, #E5DEFF)',
+          200: 'var(--color-synapse-200, #CEBEFF)',
+          300: 'var(--color-synapse-300, #AD93FD)',
+          400: 'var(--color-synapse-400, #9171FB)',
+          500: 'var(--color-synapse-500, #7C5CFC)', // Dark/Light Dynamic AI Hero
+          600: 'var(--color-synapse-600, #6842F5)',
+          700: 'var(--color-synapse-700, #5B34EA)', // Light AI Hero
+          800: 'var(--color-synapse-800, #4520B8)',
+          900: 'var(--color-synapse-900, #2B1277)',
+          DEFAULT: 'var(--color-synapse-500, #7C5CFC)',
+        },
+
+        // ── 3. CRIMSON PULSE (Outflow, Expenses, Debits, Subscriptions) ─
+        pulse: {
+          50: 'var(--color-pulse-50, #FFF0F3)',
+          100: 'var(--color-pulse-100, #FFE0E6)',
+          200: 'var(--color-pulse-200, #FECDD6)',
+          300: 'var(--color-pulse-300, #FF8AA5)',
+          400: 'var(--color-pulse-400, #FF5C81)',
+          500: 'var(--color-pulse-500, #FF3366)', // Dark/Light Dynamic Spend Hero
+          600: 'var(--color-pulse-600, #E61C50)',
+          700: 'var(--color-pulse-700, #D91E4E)', // Light Spend Hero
+          800: 'var(--color-pulse-800, #A30F36)',
+          900: 'var(--color-pulse-900, #66001B)',
+          DEFAULT: 'var(--color-pulse-500, #FF3366)',
+        },
+
+        // ── 4. AUREOLIN OCHRE (Net Worth, Vault, Investments) ─────────
+        ochre: {
+          50: 'var(--color-ochre-50, #FEF9EE)',
+          100: 'var(--color-ochre-100, #FDF0D2)',
+          200: 'var(--color-ochre-200, #FCE0A5)',
+          300: 'var(--color-ochre-300, #FACD6E)',
+          400: 'var(--color-ochre-400, #F7B73E)',
+          500: 'var(--color-ochre-500, #F5A623)', // Dark/Light Dynamic Net Worth Hero
+          600: 'var(--color-ochre-600, #D9890F)',
+          700: 'var(--color-ochre-700, #C67D0A)', // Light Net Worth Hero
+          800: 'var(--color-ochre-800, #8A5200)',
+          900: 'var(--color-ochre-900, #5C3800)',
+          DEFAULT: 'var(--color-ochre-500, #F5A623)',
+        },
+
+        // ── 5. ELECTRIC CYAN (Telemetry, Real-time Sync, Bank Feeds) ──
+        telemetry: {
+          50: 'var(--color-telemetry-50, #E6F8FB)',
+          100: 'var(--color-telemetry-100, #C0F0F7)',
+          200: 'var(--color-telemetry-200, #8CE3F0)',
+          300: 'var(--color-telemetry-300, #47D0E6)',
+          400: 'var(--color-telemetry-400, #1EBED9)',
+          500: 'var(--color-telemetry-500, #00D8F6)', // Dark/Light Dynamic Telemetry Hero
+          600: 'var(--color-telemetry-600, #00ADC7)',
+          700: 'var(--color-telemetry-700, #0284C7)', // Light Telemetry Hero
+          800: 'var(--color-telemetry-800, #03628F)',
+          900: 'var(--color-telemetry-900, #04202B)',
+          DEFAULT: 'var(--color-telemetry-500, #00D8F6)',
+        },
+
+        // ── 6. OBSIDIAN ABYSS (Dark Mode Surfaces & Structure) ────────
+        abyss: {
+          canvas: 'var(--obsidian-canvas, #0B0E14)',
+          card: 'var(--obsidian-card, #131822)',
+          elevated: 'var(--obsidian-elevated, #1A2230)',
+          well: 'var(--obsidian-well, #1F293D)',
+          border: 'var(--obsidian-border, #232D42)',
+          borderStrong: 'var(--obsidian-border-strong, #33415C)',
+          textPrimary: 'var(--text-primary, #F8FAFC)',
+          textSecondary: 'var(--text-secondary, #94A3B8)',
+          textMuted: 'var(--text-muted, #64748B)',
+          DEFAULT: 'var(--obsidian-canvas, #0B0E14)',
+        },
+
+        // ── 7. TITANIUM ALABASTER (Light Mode Surfaces & Structure) ───
+        alabaster: {
+          canvas: '#F4F6F9',
+          card: '#FFFFFF',
+          elevated: '#FFFFFF',
+          well: '#EAEEF4',
+          border: '#D8DFEA',
+          borderStrong: '#B0BECE',
+          textPrimary: '#0D141F',
+          textSecondary: '#4B586E',
+          textMuted: '#7A889E',
+          DEFAULT: '#F4F6F9',
+        },
+
+        // Backward compatibility mappings
+        quantum: {
+          50: '#E6FAF2',
+          100: '#C2F4DF',
+          200: '#8DE7C2',
+          300: '#4FD69F',
+          400: '#1EC882',
+          500: '#00D084',
+          600: '#00AB6B',
+          700: '#00875A',
+          800: '#006342',
+          900: '#003D29',
+          DEFAULT: '#00D084',
+        },
+        amethyst: {
+          50: '#F3F0FF',
+          100: '#E5DEFF',
+          200: '#CEBEFF',
+          300: '#AD93FD',
+          400: '#9171FB',
+          500: '#7C5CFC',
+          600: '#6842F5',
+          700: '#5B34EA',
+          800: '#4520B8',
+          900: '#2B1277',
+          DEFAULT: '#7C5CFC',
+        },
+        coral: {
+          50: '#FFF0F3',
+          100: '#FFE0E6',
+          200: '#FECDD6',
+          300: '#FF8AA5',
+          400: '#FF5C81',
+          500: '#FF3366',
+          600: '#E61C50',
+          700: '#D91E4E',
+          800: '#A30F36',
+          900: '#66001B',
+          DEFAULT: '#FF3366',
+        },
+        amber: {
+          50: '#FEF9EE',
+          100: '#FDF0D2',
+          200: '#FCE0A5',
+          300: '#FACD6E',
+          400: '#F7B73E',
+          500: '#F5A623',
+          600: '#D9890F',
+          700: '#C67D0A',
+          800: '#8A5200',
+          900: '#5C3800',
+          DEFAULT: '#F5A623',
+        },
+        obsidian: {
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#64748B',
+          600: '#475569',
+          700: '#1E293B',
+          800: '#131822',
+          850: '#1A2230',
+          900: '#0B0E14',
+          950: '#05070B',
+          DEFAULT: '#0B0E14',
+        },
         bytlend: {
-          gold: '#00E5FF', // Primary action accent mapped to Photon Cyan
-          goldLight: '#F0F4F8', // Titanium Chrome
-          goldDark: '#7C3AED', // Deep Cyber Iris
-          goldMuted: '#A855F7', // Cyber Iris
-          goldChampagne: '#00E5FF',
-          goldGlow: 'rgba(0, 229, 255, 0.45)',
-          obsidian: '#05080C',
-          obsidianCanvas: '#05080C',
-          obsidianSurface: '#0E141D',
-          obsidianCard: '#131A24',
-          obsidianHover: '#1A2433',
-          obsidianBorder: 'rgba(0, 229, 255, 0.30)',
-          obsidianBorderHover: 'rgba(168, 85, 247, 0.50)',
+          gold: '#00D084',
+          goldLight: '#F8FAFC',
+          goldDark: '#00875A',
+          goldMuted: '#7C5CFC',
+          goldChampagne: '#00D8F6',
+          obsidian: '#0B0E14',
+          obsidianCanvas: '#0B0E14',
+          obsidianSurface: '#131822',
+          obsidianCard: '#131822',
+          obsidianHover: '#1A2230',
         },
-        // Semantic Theme Aliases
         theme: {
-          bg: '#05080C',
-          bgDark: '#020406',
-          card: '#0E141D',
-          cardSubtle: '#131A24',
-          cardBorder: 'rgba(0, 229, 255, 0.30)',
-          cardBorderHover: 'rgba(168, 85, 247, 0.50)',
-          cyan: '#00E5FF',
-          cyanGlow: 'rgba(0, 229, 255, 0.40)',
-          purple: '#A855F7',
-          purpleGlow: 'rgba(168, 85, 247, 0.35)',
+          bg: '#0B0E14',
+          bgDark: '#05070B',
+          card: '#131822',
+          cardSubtle: '#1A2230',
+          cyan: '#00D8F6',
+          purple: '#7C5CFC',
           magenta: '#FF3366',
-          gold: '#00E5FF',
-          goldGlow: 'rgba(0, 229, 255, 0.40)',
+          gold: '#F5A623',
           textMuted: '#94A3B8',
           textSubtle: '#64748B',
         },
-        noctis: {
-          bg: '#080C0E',
-          card: '#121417',
-          cardBorder: 'rgba(255, 255, 255, 0.08)',
-          item: '#142027',
-          subtle: 'rgba(255, 255, 255, 0.05)',
-        },
-        // Spatial Computing Glass System
-        spatial: {
-          bgLight: '#F8FAFC',
-          bgDark: '#080D11',
-          glassLight: 'rgba(255, 255, 255, 0.72)',
-          glassLightCard: 'rgba(255, 255, 255, 0.85)',
-          glassDark: 'rgba(14, 23, 30, 0.72)',
-          glassDarkCard: 'rgba(16, 24, 32, 0.85)',
-          glassUltraThinDark: 'rgba(255, 255, 255, 0.03)',
-          glassUltraThinLight: 'rgba(255, 255, 255, 0.45)',
-          borderLight: 'rgba(226, 232, 240, 0.8)',
-          borderDark: 'rgba(255, 255, 255, 0.08)',
-          borderLightHighlight: 'rgba(255, 255, 255, 0.95)',
-          borderDarkHighlight: 'rgba(255, 255, 255, 0.15)',
-        }
       },
       borderRadius: {
         'spatial-sm': '12px',
@@ -94,43 +216,17 @@ export default {
         heading: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
         mono: ['JetBrains Mono', 'SF Mono', 'monospace'],
       },
-      backgroundImage: {
-        'mesh-light': 'radial-gradient(circle at 10% 0%, rgba(16, 185, 129, 0.07) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.06) 0%, transparent 40%), radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.04) 0%, transparent 40%), #F8FAFC',
-        'mesh-dark': 'radial-gradient(circle at 15% 0%, rgba(0, 200, 150, 0.14) 0%, transparent 40%), radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.14) 0%, transparent 45%), radial-gradient(circle at 10% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 40%), radial-gradient(circle at 90% 90%, rgba(0, 242, 254, 0.10) 0%, transparent 45%), #080D11',
-        'viridian-gradient': 'linear-gradient(135deg, #059669 0%, #10B981 50%, #00C896 100%)',
-        'selvex-gradient': 'linear-gradient(135deg, #4F46E5 0%, #6366F1 50%, #818CF8 100%)',
-        'ambric-gradient': 'linear-gradient(135deg, #D97706 0%, #F59E0B 50%, #FBBF24 100%)',
-        'hero-emerald': 'linear-gradient(135deg, #064E3B 0%, #065F46 50%, #047857 100%)',
-        'hero-emerald-dark': 'linear-gradient(135deg, #04211B 0%, #06352C 50%, #074639 100%)',
-      },
       boxShadow: {
-        'spatial-sm': '0 2px 8px -1px rgba(0, 0, 0, 0.06), 0 1px 3px 0 rgba(0, 0, 0, 0.04)',
-        'spatial-md': '0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
-        'spatial-lg': '0 20px 40px -12px rgba(0, 0, 0, 0.18), 0 4px 12px -2px rgba(0, 0, 0, 0.08)',
-        'spatial-floating': '0 24px 60px -15px rgba(0, 0, 0, 0.25), 0 8px 24px -6px rgba(0, 0, 0, 0.12)',
-        'spatial-overlay': '0 32px 80px -20px rgba(0, 0, 0, 0.5), 0 12px 32px -8px rgba(0, 0, 0, 0.2)',
-        'spatial-dark-sm': '0 4px 16px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.08)',
-        'spatial-dark-md': '0 12px 32px -6px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
-        'spatial-dark-lg': '0 24px 56px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.12)',
-        'spatial-dark-floating': '0 30px 70px -15px rgba(0, 0, 0, 0.95), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
-        'card-light': '0 2px 12px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03)',
-        'card-light-hover': '0 12px 28px -4px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.04)',
-        'card-dark': '0 10px 30px -10px rgba(0, 0, 0, 0.7)',
-        'card-dark-hover': '0 20px 40px -15px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 200, 150, 0.15)',
-        'glow-viridian': '0 0 25px rgba(0, 200, 150, 0.35)',
-        'glow-selvex': '0 0 25px rgba(99, 102, 241, 0.35)',
-        'glow-ambric': '0 0 25px rgba(245, 158, 11, 0.3)',
+        'solid-sm': '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+        'solid-md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'solid-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'solid-card-dark': '0 10px 30px -10px rgba(0, 0, 0, 0.7)',
+        'solid-card-light': '0 2px 12px -2px rgba(15, 23, 42, 0.06)',
+        'spatial-sm': '0 2px 8px -1px rgba(0, 0, 0, 0.06)',
+        'spatial-md': '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
+        'spatial-lg': '0 20px 40px -12px rgba(0, 0, 0, 0.18)',
       },
-      backdropBlur: {
-        'xs': '4px',
-        'sm': '8px',
-        'md': '16px',
-        'lg': '24px',
-        'xl': '36px',
-        '2xl': '50px',
-      }
     },
   },
   plugins: [],
 }
-

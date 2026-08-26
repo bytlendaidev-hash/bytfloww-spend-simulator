@@ -101,33 +101,33 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <div className="min-h-[82vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
-      <div className="spatial-card-prism w-full max-w-md p-8 sm:p-10 text-center space-y-6">
+      <div className="spatial-card w-full max-w-md p-8 sm:p-10 text-center space-y-6">
         {/* Brand Icon Badge */}
         <div className="flex justify-center">
           <BytLendLogo size="lg" />
         </div>
 
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F0F4F8] flex items-center justify-center">
-            Byt<span className="bg-gradient-to-r from-[#00E5FF] via-[#A855F7] to-[#F0F4F8] bg-clip-text text-transparent font-black">Lend</span>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-abyss-textPrimary flex items-center justify-center">
+            Byt<span className="text-jade-500 font-black">Lend</span>
           </h1>
-          <p className="text-xs text-[#00E5FF] font-bold uppercase tracking-widest">
+          <p className="text-xs text-jade-500 font-bold uppercase tracking-widest">
             Autonomous AI Capital Forensics
           </p>
-          <p className="text-[11px] text-white/50 pt-0.5">
-            Titanium Prism • Algorithmic Spend Intelligence
+          <p className="text-[11px] text-abyss-textMuted pt-0.5">
+            Sovereign Jade & Synapse Iris Intelligence
           </p>
         </div>
 
         {/* Auth Mode Tabs Pill */}
-        <div className="p-1 rounded-full bg-white/5 border border-white/10 flex">
+        <div className="p-1 rounded-full bg-abyss-well border border-abyss-border flex">
           <button
             type="button"
             onClick={() => { setAuthMode('EMAIL'); setErrorMessage(''); setStep('INPUT'); }}
-            className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${
+            className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all duration-200 ${
               authMode === 'EMAIL'
                 ? 'spatial-btn-selected'
-                : 'text-white/60 hover:text-white'
+                : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
             }`}
           >
             📧 Email Login
@@ -135,10 +135,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <button
             type="button"
             onClick={() => { setAuthMode('PHONE'); setErrorMessage(''); setStep('INPUT'); }}
-            className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${
+            className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all duration-200 ${
               authMode === 'PHONE'
                 ? 'spatial-btn-selected'
-                : 'text-white/60 hover:text-white'
+                : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
             }`}
           >
             📱 Mobile OTP
@@ -149,7 +149,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {authMode === 'EMAIL' && (
           <form onSubmit={handleEmailLogin} className="space-y-4 text-left">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-white/60">
+              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-abyss-textMuted">
                 Work / Personal Email
               </label>
               <input
@@ -158,12 +158,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
+                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
               />
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-white/60">
+              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-abyss-textMuted">
                 Password
               </label>
               <input
@@ -172,12 +172,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
+                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
               />
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-[12px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold text-center">
+              <div className="p-3 rounded-[12px] bg-pulse-500/15 border border-pulse-500/30 text-pulse-500 text-xs font-bold text-center">
                 ⚠️ {errorMessage}
               </div>
             )}
@@ -190,7 +190,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               {loading ? (
                 <span>Authenticating...</span>
               ) : (
-                <span>Sign In to Spatial OS →</span>
+                <span>Sign In to System →</span>
               )}
             </button>
           </form>
@@ -201,11 +201,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <form onSubmit={step === 'INPUT' ? handleSendOtp : handleVerifyOtp} className="space-y-4 text-left">
             {step === 'INPUT' ? (
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-white/60">
+                <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-abyss-textMuted">
                   Indian Mobile Number
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="px-3.5 py-3.5 rounded-[14px] text-xs font-bold bg-white/10 border border-white/15 text-white/80">
+                  <span className="px-3.5 py-3.5 rounded-[14px] text-xs font-bold bg-abyss-well border border-abyss-border text-abyss-textPrimary">
                     +91
                   </span>
                   <input
@@ -215,20 +215,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                     placeholder="98765 43210"
-                    className="flex-1 px-4 py-3.5 rounded-[14px] text-xs font-mono bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
+                    className="flex-1 px-4 py-3.5 rounded-[14px] text-xs font-mono bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
                   />
                 </div>
               </div>
             ) : (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-white/60">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-abyss-textMuted">
                     Enter 6-Digit OTP
                   </label>
                   <button
                     type="button"
                     onClick={() => setStep('INPUT')}
-                    className="text-[10px] font-bold text-[#0A84FF] hover:underline"
+                    className="text-[10px] font-bold text-telemetry-500 hover:underline"
                   >
                     Change Number
                   </button>
@@ -240,13 +240,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
                   placeholder="123456"
-                  className="w-full px-4 py-3.5 rounded-[14px] text-base font-mono font-bold tracking-widest text-center bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
+                  className="w-full px-4 py-3.5 rounded-[14px] text-base font-mono font-bold tracking-widest text-center bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 transition"
                 />
               </div>
             )}
 
             {errorMessage && (
-              <div className="p-3 rounded-[12px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold text-center">
+              <div className="p-3 rounded-[12px] bg-pulse-500/15 border border-pulse-500/30 text-pulse-500 text-xs font-bold text-center">
                 ⚠️ {errorMessage}
               </div>
             )}
@@ -267,35 +267,35 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </form>
         )}
 
-        {/* Quick Demo Access */}
-        <div className="pt-4 border-t border-[#D49B5A]/25 space-y-3">
-          <div className="text-[10px] font-bold uppercase text-[#D49B5A]/80 tracking-wider">
+        {/* Quick Access */}
+        <div className="pt-4 border-t border-abyss-border space-y-3">
+          <div className="text-[10px] font-bold uppercase text-jade-500 tracking-wider">
             Quick One-Click Access (Authorized Session)
           </div>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => handleGuestAccess('BANK_STATEMENTS')}
-              className="spatial-btn p-3 text-xs text-white border-[#D49B5A]/30"
+              className="spatial-btn p-3 text-xs text-abyss-textPrimary border-jade-500/30"
             >
-              <div className="font-bold text-[#F9E7B9]">🏛️ Statement Hub</div>
-              <div className="text-[9px] text-white/50 mt-0.5 font-normal">Forensics Engine</div>
+              <div className="font-bold text-jade-500">🏛️ Statement Hub</div>
+              <div className="text-[9px] text-abyss-textMuted mt-0.5 font-normal">Forensics Engine</div>
             </button>
 
             <button
               type="button"
               onClick={() => handleGuestAccess('SMS_INTELLIGENCE')}
-              className="spatial-btn p-3 text-xs text-white border-[#D49B5A]/30"
+              className="spatial-btn p-3 text-xs text-abyss-textPrimary border-synapse-500/30"
             >
-              <div className="font-bold text-[#F9E7B9]">📱 SMS Simulator</div>
-              <div className="text-[9px] text-white/50 mt-0.5 font-normal">Android XML Parser</div>
+              <div className="font-bold text-synapse-400 light:text-synapse-700">📱 SMS Simulator</div>
+              <div className="text-[9px] text-abyss-textMuted mt-0.5 font-normal">Android XML Parser</div>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Brand Trust Badges from Official Spec */}
-      <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-bold tracking-[0.2em] text-[#D49B5A] uppercase">
+      {/* Brand Trust Badges */}
+      <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-bold tracking-[0.2em] text-jade-500 uppercase">
         <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
           🛡️ TRUSTED
         </span>
@@ -303,7 +303,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           🔒 SECURE
         </span>
         <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
-          📈 SMART AI
+          ✨ SMART AI
         </span>
         <span className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition">
           ⚡ FAST

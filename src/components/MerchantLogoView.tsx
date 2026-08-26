@@ -135,10 +135,10 @@ const DOMAIN_REGISTRY: Record<string, string> = {
   'HATHWAY': 'hathway.com',
 };
 
-// Deterministic Brand Colors
+// Deterministic Solid Brand Colors from Design Tokens
 const BRAND_COLORS = [
-  '#00BFA5', '#3B82F6', '#8B5CF6', '#EC4899', '#F97316',
-  '#10B981', '#06B6D4', '#6366F1', '#EF4444', '#EAB308',
+  '#00D084', '#7C5CFC', '#00D8F6', '#FF3366', '#F5A623',
+  '#00E5FF', '#10B981', '#6366F1', '#F43F5E', '#F59E0B',
 ];
 
 export const MerchantLogoView: React.FC<MerchantLogoViewProps> = ({
@@ -195,7 +195,7 @@ export const MerchantLogoView: React.FC<MerchantLogoViewProps> = ({
     <div
       style={{ width: size, height: size, minWidth: size, minHeight: size }}
       className={`relative flex items-center justify-center overflow-hidden border transition-all ${shapeClass} ${
-        isDark ? 'bg-[#12232B] border-white/10' : 'bg-slate-100 border-slate-200'
+        isDark ? 'bg-abyss-well border-abyss-border' : 'bg-alabaster-well border-alabaster-border'
       } ${className}`}
     >
       {logoUrl && !imgError ? (

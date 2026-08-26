@@ -46,24 +46,18 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-emergence">
-      <div className={`w-full max-w-2xl max-h-[90vh] rounded-[36px] border shadow-2xl flex flex-col overflow-hidden transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/95 border-emerald-500/30 text-white shadow-2xl shadow-black/80' : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-2xl'
-      }`}>
+      <div className="spatial-modal w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className={`p-6 sm:p-7 border-b flex items-center justify-between ${
-          isDark ? 'border-white/[0.06] bg-[#142027]' : 'border-slate-100 bg-slate-50/70'
-        }`}>
+        <div className="p-6 sm:p-7 border-b border-abyss-border flex items-center justify-between bg-abyss-well">
           <div className="flex items-center gap-3">
-            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl font-black shadow-sm ${
-              isDark ? 'bg-rose-500/15 text-rose-400 border border-rose-500/25' : 'bg-rose-50 text-rose-600 border border-rose-200'
-            }`}>
+            <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl font-black shadow-sm bg-pulse-500/15 text-pulse-500 border border-pulse-500/25">
               💳
             </div>
             <div>
-              <h3 className={`text-lg font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className="text-lg font-black tracking-tight text-abyss-textPrimary">
                 {card.institution || 'Axis Bank'} Credit Card
               </h3>
-              <p className={`text-xs font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              <p className="text-xs font-mono font-medium text-abyss-textMuted">
                 VISA PLATINUM • Ending *{card.accountMask || '2261'}
               </p>
             </div>
@@ -71,30 +65,24 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
 
           <button
             onClick={onClose}
-            className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-black transition-all duration-150 ${
-              isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-            }`}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-black border border-abyss-border hover:bg-abyss-elevated text-abyss-textMuted transition-all duration-150"
           >
             ✕
           </button>
         </div>
 
         {/* Scope Switcher: Selected Period vs Lifetime */}
-        <div className={`px-6 pt-3 pb-2.5 flex items-center justify-between border-b ${
-          isDark ? 'border-white/[0.06] bg-[#0E151A]' : 'border-slate-100 bg-slate-50/50'
-        }`}>
-          <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+        <div className="px-6 pt-3 pb-2.5 flex items-center justify-between border-b border-abyss-border bg-abyss-card">
+          <span className="text-[11px] font-bold text-abyss-textMuted">
             Financial Scope:
           </span>
-          <div className={`flex rounded-2xl p-1 border ${isDark ? 'bg-[#142027] border-white/[0.08]' : 'bg-slate-200 border-slate-300'}`}>
+          <div className="flex rounded-2xl p-1 border bg-abyss-well border-abyss-border">
             <button
               onClick={() => setViewScope('PERIOD')}
               className={`px-3.5 py-1 rounded-xl text-xs font-black transition-all ${
                 viewScope === 'PERIOD'
-                  ? isDark 
-                    ? 'bg-brand-viridian text-slate-950 shadow-sm'
-                    : 'bg-brand-600 text-white shadow-sm'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-700'
+                  ? 'bg-jade-500 text-abyss-canvas shadow-solid-sm'
+                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
               }`}
             >
               📅 Selected Period ({periodCardEvents.length})
@@ -103,10 +91,8 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
               onClick={() => setViewScope('LIFETIME')}
               className={`px-3.5 py-1 rounded-xl text-xs font-black transition-all ${
                 viewScope === 'LIFETIME'
-                  ? isDark 
-                    ? 'bg-brand-viridian text-slate-950 shadow-sm'
-                    : 'bg-brand-600 text-white shadow-sm'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-700'
+                  ? 'bg-jade-500 text-abyss-canvas shadow-solid-sm'
+                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
               }`}
             >
               📜 Lifetime History ({allCardEvents.length})
@@ -117,10 +103,10 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
         {/* Modal Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar">
           {/* 1. PHYSICAL CARD UI PREVIEW */}
-          <div className="p-6 rounded-[28px] bg-[#3D0B16] border border-rose-700/40 text-white relative overflow-hidden shadow-md">
+          <div className="p-6 rounded-[28px] bg-pulse-900 border border-pulse-700/40 text-white relative overflow-hidden shadow-solid-md">
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black tracking-widest uppercase text-rose-200">
+                <span className="text-xs font-black tracking-widest uppercase text-pulse-200">
                   {card.institution ? card.institution.toUpperCase() : 'AXIS BANK'}
                 </span>
                 <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">
@@ -131,24 +117,24 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
             </div>
 
             {/* Chip */}
-            <div className="my-5 w-11 h-8 rounded-lg bg-amber-400 border border-amber-600 flex items-center justify-center shadow-sm">
-              <div className="w-8 h-5 border border-amber-800/40 rounded flex items-center justify-center">
-                <div className="w-4 h-3 border border-amber-800/40 rounded-sm" />
+            <div className="my-5 w-11 h-8 rounded-lg bg-ochre-400 border border-ochre-600 flex items-center justify-center shadow-sm">
+              <div className="w-8 h-5 border border-ochre-800/40 rounded flex items-center justify-center">
+                <div className="w-4 h-3 border border-ochre-800/40 rounded-sm" />
               </div>
             </div>
 
             {/* Card Number */}
-            <div className="font-mono text-base sm:text-lg tracking-widest font-black my-2 text-rose-100">
+            <div className="font-mono text-base sm:text-lg tracking-widest font-black my-2 text-pulse-100">
               •••• •••• •••• {card.accountMask || '2261'}
             </div>
 
             <div className="flex items-end justify-between pt-2 text-xs relative z-10 border-t border-white/15">
               <div>
-                <div className="text-[9px] uppercase tracking-wider text-rose-300 font-bold">CARDHOLDER</div>
+                <div className="text-[9px] uppercase tracking-wider text-pulse-300 font-bold">CARDHOLDER</div>
                 <div className="font-bold tracking-wider">VALUED MEMBER</div>
               </div>
               <div className="text-right">
-                <div className="text-[9px] uppercase tracking-wider text-rose-300 font-bold">VALID THRU</div>
+                <div className="text-[9px] uppercase tracking-wider text-pulse-300 font-bold">VALID THRU</div>
                 <div className="font-mono font-bold">12/28</div>
               </div>
             </div>
@@ -156,67 +142,55 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
 
           {/* 2. LIMIT & UTILIZATION METRICS */}
           <div className="grid grid-cols-3 gap-3">
-            <div className={`p-4 rounded-2xl border text-center ${
-              isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <span className={`text-[10px] font-bold uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Total Limit</span>
-              <div className={`text-base font-black font-mono mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <div className="p-4 rounded-2xl border text-center bg-abyss-well border-abyss-border">
+              <span className="text-[10px] font-bold uppercase text-abyss-textMuted">Total Limit</span>
+              <div className="text-base font-black font-mono mt-1 text-abyss-textPrimary">
                 ₹{totalLimit.toLocaleString('en-IN')}
               </div>
             </div>
 
-            <div className={`p-4 rounded-2xl border text-center ${
-              isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <span className={`text-[10px] font-bold uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <div className="p-4 rounded-2xl border text-center bg-abyss-well border-abyss-border">
+              <span className="text-[10px] font-bold uppercase text-abyss-textMuted">
                 {viewScope === 'PERIOD' ? 'Period Spend' : 'Billed Statement'}
               </span>
-              <div className="text-base font-black font-mono text-rose-600 dark:text-rose-400 mt-1">
+              <div className="text-base font-black font-mono text-pulse-500 mt-1">
                 ₹{spentAmount.toLocaleString('en-IN')}
               </div>
             </div>
 
-            <div className={`p-4 rounded-2xl border text-center ${
-              isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <span className={`text-[10px] font-bold uppercase ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Available Limit</span>
-              <div className={`text-base font-black font-mono mt-1 ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>
+            <div className="p-4 rounded-2xl border text-center bg-abyss-well border-abyss-border">
+              <span className="text-[10px] font-bold uppercase text-abyss-textMuted">Available Limit</span>
+              <div className="text-base font-black font-mono mt-1 text-jade-500">
                 ₹{availableLimit.toLocaleString('en-IN')}
               </div>
             </div>
           </div>
 
           {/* Utilization Bar */}
-          <div className={`p-4 rounded-2xl border space-y-2 ${
-            isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
-          }`}>
+          <div className="p-4 rounded-2xl border space-y-2 bg-abyss-well border-abyss-border">
             <div className="flex justify-between text-xs font-bold">
-              <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>Credit Utilization</span>
-              <span className={`font-mono font-black ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>{utilizationPct}% (Healthy &lt; 30%)</span>
+              <span className="text-abyss-textSecondary">Credit Utilization</span>
+              <span className="font-mono font-black text-jade-500">{utilizationPct}% (Healthy &lt; 30%)</span>
             </div>
-            <div className={`h-2.5 rounded-full overflow-hidden ${isDark ? 'bg-black/40' : 'bg-slate-200'}`}>
+            <div className="h-2.5 rounded-full overflow-hidden bg-abyss-canvas">
               <div
                 style={{ width: `${Math.max(3, utilizationPct)}%` }}
-                className="h-full bg-brand-500 rounded-full"
+                className="h-full bg-jade-500 rounded-full"
               />
             </div>
           </div>
 
           {/* 3. GRACE PERIOD ADVISOR BANNER */}
-          <div className={`p-4 rounded-2xl border flex items-start gap-3.5 ${
-            isDark ? 'bg-[#062420] border-brand-viridian/30 text-white' : 'bg-emerald-50/90 border-brand-200 text-slate-900 shadow-sm'
-          }`}>
+          <div className="p-4 rounded-2xl border flex items-start gap-3.5 bg-jade-500/10 border-jade-500/30 text-abyss-textPrimary">
             <span className="text-2xl">🔥</span>
             <div className="space-y-1 text-xs">
-              <div className={`font-black uppercase tracking-wider flex items-center gap-2 ${isDark ? 'text-brand-viridian' : 'text-brand-800'}`}>
+              <div className="font-black uppercase tracking-wider flex items-center gap-2 text-jade-500">
                 <span>46 Days Interest-Free Runway</span>
-                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${
-                  isDark ? 'bg-brand-viridian/20 text-brand-viridian border-brand-viridian/30' : 'bg-emerald-100 text-brand-800 border-brand-300'
-                }`}>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-black border bg-jade-500/20 text-jade-500 border-jade-500/30">
                   SWIPE TODAY
                 </span>
               </div>
-              <p className={isDark ? 'text-slate-300' : 'text-slate-700'}>
+              <p className="text-abyss-textSecondary">
                 Your fresh billing cycle opened on the 15th. Swiping this card today gives you maximum 46 days of free liquidity until due date (05th of next month).
               </p>
             </div>
@@ -225,16 +199,14 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
           {/* 4. RECONCILED CARD TRANSACTIONS */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h4 className={`text-xs font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              <h4 className="text-xs font-black uppercase tracking-wider text-abyss-textMuted">
                 {viewScope === 'PERIOD' ? 'Period Card Transactions' : 'All-Time Card Transactions'} ({activeEvents.length})
               </h4>
-              <span className={`text-[11px] font-bold ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>Live SMS Extracted</span>
+              <span className="text-[11px] font-bold text-jade-500">Live SMS Extracted</span>
             </div>
 
             {activeEvents.length === 0 ? (
-              <div className={`p-6 rounded-2xl border text-center text-xs ${
-                isDark ? 'bg-[#142027] border-white/[0.06] text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'
-              }`}>
+              <div className="p-6 rounded-2xl border text-center text-xs bg-abyss-well border-abyss-border text-abyss-textMuted">
                 No card debits found in selected scope.
               </div>
             ) : (
@@ -245,29 +217,25 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
                     onClose();
                     onSelectEvent(ev);
                   }}
-                  className={`p-3.5 rounded-2xl cursor-pointer border transition-all duration-150 flex items-center justify-between ${
-                    isDark 
-                      ? 'bg-[#142027] border-white/[0.06] hover:border-brand-viridian/40 hover:bg-[#1a2832]' 
-                      : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm'
-                  }`}
+                  className="p-3.5 rounded-2xl cursor-pointer border transition-all duration-150 flex items-center justify-between bg-abyss-well border-abyss-border hover:border-jade-500/40 hover:bg-abyss-elevated"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <MerchantLogoView merchantName={ev.merchant} size={36} isDark={isDark} shape="rounded" />
                     <div className="min-w-0">
-                      <div className={`text-xs font-black truncate max-w-[220px] ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      <div className="text-xs font-black truncate max-w-[220px] text-abyss-textPrimary">
                         {ev.merchant}
                       </div>
-                      <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <div className="text-[10px] font-medium text-abyss-textMuted">
                         {ev.dateFormatted} • {ev.category}
                       </div>
                     </div>
                   </div>
 
                   <div className="text-right flex-shrink-0 pl-2">
-                    <div className="text-xs font-black font-mono text-rose-600 dark:text-rose-400">
+                    <div className="text-xs font-black font-mono text-pulse-500">
                       -₹{ev.amount.toLocaleString('en-IN')}
                     </div>
-                    <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <div className="text-[10px] font-medium text-abyss-textMuted">
                       Card Swipe
                     </div>
                   </div>
@@ -280,4 +248,3 @@ export const CreditCardDrilldownModal: React.FC<CreditCardDrilldownModalProps> =
     </div>
   );
 };
-

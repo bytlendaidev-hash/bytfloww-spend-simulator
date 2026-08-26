@@ -9,9 +9,10 @@ interface SpendTrendsTabProps {
 
 export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
   snapshot,
+  isDark = true,
 }) => {
   // Aggregate real daily spend from snapshot events
-  const debits = snapshot.filteredEvents.filter(e => e.direction === 'OUTFLOW' && e.economicType !== 'REFUND');
+  const debits = (snapshot.filteredEvents || []).filter(e => e.direction === 'OUTFLOW' && e.economicType !== 'REFUND');
   const daySpendMap = new Map<number, number>();
 
   for (const d of debits) {
@@ -26,7 +27,7 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
     return { day: dayNum, spend };
   });
 
-  const maxDaySpend = Math.max(1, ...days.map(d => d.spend), snapshot.highestSpendDay);
+  const maxDaySpend = Math.max(1, ...days.map(d => d.spend), snapshot.highestSpendDay || 1);
   const lowestDaySpend = Math.min(...days.filter(d => d.spend > 0).map(d => d.spend), snapshot.totalSpend > 0 ? 6 : 0);
 
   // Compute cumulative spending curve points
@@ -38,7 +39,6 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
     return { x, y, total: runningTotal };
   });
 
-  const svgPathD = `M 0 110 ` + cumulativePoints.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L 400 120 L 0 120 Z`;
   const svgLineD = `M 0 110 ` + cumulativePoints.map(p => `L ${p.x} ${p.y}`).join(' ');
 
   return (
@@ -47,23 +47,23 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
       <div className="spatial-card p-6 sm:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base text-[#0A84FF]">📊</span>
-            <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
+            <span className="text-base text-jade-500">📊</span>
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-abyss-textPrimary">
               Daily Spending Activity
             </h3>
           </div>
-          <span className="text-xs text-white/50 font-medium">
+          <span className="text-xs text-jade-500 font-medium">
             {daysInPeriod} days tracked ({snapshot.periodLabel})
           </span>
         </div>
 
         {/* 31 Bars Chart Container */}
         <div className="pt-4">
-          <div className="h-44 flex items-end justify-between gap-1.5 border-b border-white/10 pb-1 relative">
-            <div className="absolute top-0 left-0 text-[10px] text-white/40 font-mono">
+          <div className="h-44 flex items-end justify-between gap-1.5 border-b border-abyss-border pb-1 relative">
+            <div className="absolute top-0 left-0 text-[10px] text-abyss-textMuted font-mono">
               ₹{maxDaySpend.toLocaleString('en-IN')}
             </div>
-            <div className="absolute top-1/2 left-0 text-[10px] text-white/40 font-mono">
+            <div className="absolute top-1/2 left-0 text-[10px] text-abyss-textMuted font-mono">
               ₹{Math.round(maxDaySpend / 2).toLocaleString('en-IN')}
             </div>
 
@@ -75,12 +75,12 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
                 <div key={d.day} className="flex-1 flex flex-col items-center h-full justify-end group relative">
                   <div
                     style={{ height: `${heightPct}%` }}
-                    className={`w-full rounded-t-sm transition-all duration-300 ${
+                    className={`w-full rounded-t-sm transition-all duration-200 ${
                       isPeak 
-                        ? 'bg-gradient-to-t from-[#0A84FF] to-[#30D158] shadow-[0_0_12px_rgba(10,132,255,0.6)]' 
+                        ? 'bg-jade-500' 
                         : d.spend > 0 
-                        ? 'bg-white/30 hover:bg-white/60' 
-                        : 'bg-white/5'
+                        ? 'bg-jade-500/40 hover:bg-jade-500' 
+                        : 'bg-abyss-well'
                     }`}
                     title={`Day ${d.day}: ₹${d.spend.toLocaleString('en-IN')}`}
                   />
@@ -91,31 +91,30 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
         </div>
       </div>
 
-      {/* ── 2. CUMULATIVE SPENDING AREA CHART ───────────────────────────── */}
+      {/* ── 2. CUMULATIVE SPENDING TRAJECTORY ───────────────────────────── */}
       <div className="spatial-card p-6 sm:p-8 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base text-[#30D158]">📈</span>
-            <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
+            <span className="text-base text-synapse-500">📈</span>
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-abyss-textPrimary">
               Cumulative Spending Trajectory
             </h3>
           </div>
-          <span className="text-xs font-mono font-bold text-white">
+          <span className="text-xs font-mono font-bold text-jade-500">
             Total: ₹{snapshot.totalSpend.toLocaleString('en-IN')}
           </span>
         </div>
 
-        {/* SVG Area Chart */}
+        {/* SVG Line Chart (Solid Zero Gradient) */}
         <div className="pt-2">
           <svg className="w-full h-40" viewBox="0 0 400 120">
-            <path d={svgPathD} fill="rgba(10, 132, 255, 0.15)" />
-            <path d={svgLineD} fill="none" stroke="#0A84FF" strokeWidth="2.5" />
-            <circle cx="400" cy={cumulativePoints[cumulativePoints.length - 1]?.y || 20} r="4.5" fill="#0A84FF" stroke="#FFFFFF" strokeWidth="2" />
+            <path d={svgLineD} fill="none" className="stroke-jade-500" strokeWidth="2.5" />
+            <circle cx="400" cy={cumulativePoints[cumulativePoints.length - 1]?.y || 20} r="4.5" className="fill-jade-500 stroke-abyss-canvas" strokeWidth="2" />
           </svg>
 
-          <div className="flex justify-between text-[11px] font-mono pt-2 font-medium text-white/50">
+          <div className="flex justify-between text-[11px] font-mono pt-2 font-medium text-abyss-textMuted">
             <span>Day 1: ₹0</span>
-            <span>Day {daysInPeriod}: ₹{snapshot.totalSpend.toLocaleString('en-IN')}</span>
+            <span className="text-jade-500">Day {daysInPeriod}: ₹{snapshot.totalSpend.toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
@@ -123,33 +122,33 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
       {/* ── 3. VELOCITY & SPENDING BOUNDS ───────────────────────────────── */}
       <div className="spatial-card p-6 sm:p-8 space-y-4">
         <div className="flex items-center gap-2">
-          <span className="text-base text-[#6366F1]">🌀</span>
-          <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
+          <span className="text-base text-synapse-500">🌀</span>
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-abyss-textPrimary">
             Velocity & Spending Bounds
           </h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Daily Avg */}
-          <div className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10">
-            <span className="text-xs font-bold uppercase tracking-wider text-white/50 block">Daily Avg Velocity</span>
-            <div className="text-lg sm:text-2xl font-bold font-mono text-white mt-1">
+          <div className="p-4 sm:p-5 rounded-[14px] bg-abyss-well border border-abyss-border">
+            <span className="text-xs font-bold uppercase tracking-wider text-abyss-textMuted block">Daily Avg Velocity</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-jade-500 mt-1">
               ₹{snapshot.dailyAvgSpend.toLocaleString('en-IN')}
             </div>
           </div>
 
           {/* Highest Day */}
-          <div className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10">
-            <span className="text-xs font-bold uppercase tracking-wider text-white/50 block">Peak Spending Day</span>
-            <div className="text-lg sm:text-2xl font-bold font-mono text-[#FF453A] mt-1">
+          <div className="p-4 sm:p-5 rounded-[14px] bg-abyss-well border border-abyss-border">
+            <span className="text-xs font-bold uppercase tracking-wider text-abyss-textMuted block">Peak Spending Day</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-pulse-500 mt-1">
               ₹{snapshot.highestSpendDay.toLocaleString('en-IN')}
             </div>
           </div>
 
           {/* Lowest Day */}
-          <div className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10">
-            <span className="text-xs font-bold uppercase tracking-wider text-white/50 block">Floor Spending Day</span>
-            <div className="text-lg sm:text-2xl font-bold font-mono text-white mt-1">
+          <div className="p-4 sm:p-5 rounded-[14px] bg-abyss-well border border-abyss-border">
+            <span className="text-xs font-bold uppercase tracking-wider text-abyss-textMuted block">Floor Spending Day</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-abyss-textPrimary mt-1">
               ₹{lowestDaySpend.toLocaleString('en-IN')}
             </div>
           </div>

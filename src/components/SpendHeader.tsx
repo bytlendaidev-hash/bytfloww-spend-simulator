@@ -5,6 +5,7 @@ interface SpendHeaderProps {
   snapshot: SpendSnapshot;
   activeTab: SpendTab;
   activeModule?: ActiveModule;
+  isDark?: boolean;
   onSelectTab: (tab: SpendTab) => void;
   onSelectModule?: (module: ActiveModule) => void;
   onSelectPeriod: (periodKey: string) => void;
@@ -49,20 +50,20 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Left Title and Subtitle */}
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-[14px] bg-gradient-to-b from-[#1E2738] to-[#0A101A] border border-[#00E5FF]/40 flex items-center justify-center text-[#00E5FF] text-lg font-bold shadow-[0_4px_16px_rgba(0,229,255,0.25)]">
-            ✨
+          <div className="w-11 h-11 rounded-[14px] bg-abyss-card dark:bg-abyss-card light:bg-white border border-jade-500/40 flex items-center justify-center text-jade-500 text-lg font-bold shadow-solid-sm">
+            ⚡
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F0F4F8] flex items-center gap-1.5">
-              Capital <span className="bg-gradient-to-r from-[#00E5FF] via-[#A855F7] to-[#F0F4F8] bg-clip-text text-transparent font-black">Intelligence</span>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-abyss-textPrimary flex items-center gap-1.5">
+              Capital <span className="text-jade-500 font-black">Intelligence</span>
             </h1>
-            <p className="text-xs text-[#00E5FF] font-medium">
+            <p className="text-xs text-jade-600 dark:text-jade-400 font-medium">
               {totalParsedCount.toLocaleString('en-IN')} Ledger Transactions Reconciled • {snapshot.periodKey}
             </p>
           </div>
         </div>
 
-        {/* Right Action Icons (Gaze Interactive) */}
+        {/* Right Action Icons */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Spatial Environment Switcher */}
           <button
@@ -74,8 +75,8 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
               localStorage.setItem('bytfloww_spatial_env', nextEnv);
               window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: nextEnv }));
             }}
-            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5 border-[#00E5FF]/30 text-[#F0F4F8]"
-            title="Switch Titanium Prism Space"
+            className="spatial-btn px-3.5 py-2 text-xs flex items-center gap-1.5 border-jade-500/30"
+            title="Switch Theme Space"
           >
             <span>✨</span>
             <span className="hidden sm:inline">Theme Space</span>
@@ -84,17 +85,17 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Ask AI Copilot Button */}
           <button
             onClick={onOpenCopilot}
-            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#A855F7]/40 text-[#D8B4FE] shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-synapse-500/40 text-synapse-500 dark:text-synapse-400 bg-synapse-900/20 light:bg-synapse-50"
             title="Ask BytLend AI Copilot"
           >
-            <span>💬</span>
+            <span>✨</span>
             <span>AI Copilot</span>
           </button>
 
           {/* Filter Modal Trigger */}
           <button
             onClick={onOpenFilter}
-            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-[#00E5FF]/30 text-[#F0F4F8]"
+            className="spatial-btn px-4 py-2 text-xs flex items-center gap-1.5 border-telemetry-500/30 text-telemetry-500"
             title="Filter Transactions"
           >
             <span>⚡</span>
@@ -104,7 +105,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Diagnostics Button */}
           <button
             onClick={onOpenDiagnostics}
-            className="spatial-btn w-9 h-9 flex items-center justify-center text-sm border-[#00E5FF]/30 text-[#F0F4F8]"
+            className="spatial-btn w-9 h-9 flex items-center justify-center text-sm border-jade-500/30"
             title="Security Diagnostics"
           >
             🛡️
@@ -112,7 +113,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
         </div>
       </div>
 
-      {/* ── ROW 1: DATE HORIZON FILTER PILLS (SWIPEABLE HORIZONTAL BAR) ── */}
+      {/* ── ROW 1: DATE HORIZON FILTER PILLS ─────────────────────────── */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-2 px-2 sm:mx-0 sm:px-0">
         {dateRanges.map((range) => {
           const isSelected = snapshot.periodKey === range.key || (range.key === '2026-08' && snapshot.periodKey === '2026-08');
@@ -120,7 +121,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             <button
               key={range.key}
               onClick={() => onSelectPeriod(range.key)}
-              className={`px-3.5 sm:px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0 ${
+              className={`px-3.5 sm:px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${
                 isSelected
                   ? 'spatial-btn-selected rounded-full'
                   : 'spatial-btn'
@@ -132,7 +133,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
         })}
       </div>
 
-      {/* ── ROW 2: MAIN TAB BAR ORNAMENT (VISIONOS SEGMENTED CONTROL) ──── */}
+      {/* ── ROW 2: MAIN TAB BAR ORNAMENT (SEGMENTED CONTROL) ──────────── */}
       <div className="flex items-center gap-1.5 p-1.5 spatial-ornament overflow-x-auto no-scrollbar max-w-full -mx-2 px-2 sm:mx-0 sm:px-1.5">
         {mainTabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -140,10 +141,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id)}
-              className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 rounded-full text-xs font-semibold whitespace-nowrap shrink-0 transition-all duration-200 ${
                 isActive
                   ? 'spatial-btn-selected'
-                  : 'text-white/70 hover:text-white hover:bg-white/15'
+                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well/40'
               }`}
             >
               <span>{tab.icon}</span>

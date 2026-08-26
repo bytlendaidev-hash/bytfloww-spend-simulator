@@ -1,6 +1,6 @@
 /**
  * TransactionExplorer — Full Master Transaction Ledger with Search, Filters, and Spend Calendar Analytical Workspace.
- * Includes dynamic live summary cards computing whole credits sum, debits sum, net flow, and transaction metrics.
+ * 100% Solid zero-gradient theme tokens.
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -47,9 +47,9 @@ const TAXONOMY_LABELS: Partial<Record<ClassificationTaxonomy, string>> = {
 };
 
 const CONFIDENCE_COLORS = {
-  HIGH: 'text-[#30D158]',
-  MEDIUM: 'text-[#FF9F0A]',
-  LOW: 'text-[#FF453A]',
+  HIGH: 'text-jade-500',
+  MEDIUM: 'text-ochre-500',
+  LOW: 'text-pulse-500',
 };
 
 export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({ 
@@ -154,8 +154,8 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
     return (
       <div className="spatial-card p-8 text-center">
         <div className="text-4xl mb-3">📑</div>
-        <div className="text-sm font-bold text-white mb-1">Transaction Explorer</div>
-        <div className="text-xs text-white/50">
+        <div className="text-sm font-bold text-abyss-textPrimary mb-1">Transaction Explorer</div>
+        <div className="text-xs text-abyss-textMuted">
           Upload your bank statement to explore all transactions with powerful search, filter, and drill-down.
         </div>
       </div>
@@ -180,7 +180,7 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
             className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === tab.id
                 ? 'spatial-btn-selected'
-                : 'spatial-btn text-white/70'
+                : 'spatial-btn text-abyss-textSecondary'
             }`}
           >
             <span>{tab.label}</span>
@@ -188,7 +188,7 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
                 activeTab === tab.id 
                   ? 'bg-black/15 text-black' 
-                  : 'bg-white/10 text-white/60'
+                  : 'bg-abyss-well text-abyss-textMuted'
               }`}>
                 {tab.count.toLocaleString('en-IN')}
               </span>
@@ -203,7 +203,7 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
           transactions={txns}
           selectedDate={selectedDate}
           onSelectDate={handleSelectDate}
-          isDark={true}
+          isDark={isDark}
           onFilterLedgerToDate={(date) => {
             handleSelectDate(date);
             setActiveTab('ALL');
@@ -221,24 +221,24 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
         <div className="space-y-4">
           {/* Active Date Filter Banner if filtered from calendar */}
           {selectedDate && (
-            <div className="p-4 rounded-[16px] bg-[#30D158]/15 border border-[#30D158]/30 flex items-center justify-between gap-3 text-white">
+            <div className="p-4 rounded-[16px] bg-jade-500/15 border border-jade-500/30 flex items-center justify-between gap-3 text-abyss-textPrimary">
               <div className="flex items-center gap-2">
                 <span className="text-base">📅</span>
                 <div>
-                  <span className="text-xs font-bold font-mono text-[#30D158]">Filtered to Date: {selectedDate}</span>
-                  <span className="text-xs text-white/60 ml-2">({filtered.length} transactions found)</span>
+                  <span className="text-xs font-bold font-mono text-jade-500">Filtered to Date: {selectedDate}</span>
+                  <span className="text-xs text-abyss-textMuted ml-2">({filtered.length} transactions found)</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setActiveTab('CALENDAR')}
-                  className="spatial-btn px-3 py-1 text-xs font-semibold text-white"
+                  className="spatial-btn px-3 py-1 text-xs font-semibold text-abyss-textPrimary"
                 >
                   View in Calendar
                 </button>
                 <button
                   onClick={() => handleSelectDate(null)}
-                  className="spatial-btn px-3 py-1 text-xs font-semibold text-[#FF453A] flex items-center gap-1"
+                  className="spatial-btn px-3 py-1 text-xs font-semibold text-pulse-500 flex items-center gap-1"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Clear Filter</span>
@@ -251,11 +251,11 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
           <div className="spatial-card p-6 space-y-4">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div>
-                <h2 className="text-base font-bold flex items-center gap-2 text-white">
+                <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
                   <span>📑</span>
                   <span>Master Transaction Ledger</span>
                 </h2>
-                <p className="text-xs text-white/50 mt-0.5">
+                <p className="text-xs text-abyss-textMuted mt-0.5">
                   {txns.length.toLocaleString('en-IN')} total transactions • Showing {Math.min(visibleCount, filtered.length)} of {filtered.length.toLocaleString('en-IN')} filtered
                 </p>
               </div>
@@ -267,11 +267,11 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                     className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
                       dirFilter === d
                         ? d === 'CREDIT' 
-                          ? 'bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30 font-bold'
+                          ? 'bg-jade-500/20 text-jade-500 border border-jade-500/30 font-bold'
                           : d === 'DEBIT' 
-                          ? 'bg-[#FF453A]/20 text-[#FF453A] border border-[#FF453A]/30 font-bold'
+                          ? 'bg-pulse-500/20 text-pulse-500 border border-pulse-500/30 font-bold'
                           : 'spatial-btn-selected'
-                        : 'spatial-btn text-white/60'
+                        : 'spatial-btn text-abyss-textMuted'
                     }`}
                   >
                     {d}
@@ -282,51 +282,51 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
 
             {/* Dynamic Summary Metric Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-[#30D158] flex items-center justify-between">
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-jade-500 flex items-center justify-between">
                   <span>Total Inflow</span>
-                  <span className="text-[9px] font-mono text-white/50">{summary.creditCount} txns</span>
+                  <span className="text-[9px] font-mono text-abyss-textMuted">{summary.creditCount} txns</span>
                 </div>
-                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-[#30D158]">
+                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-jade-500">
                   ₹{summary.creditSum.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[10px] text-white/40 mt-0.5">
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">
                   {summary.totalCount > 0 ? `${((summary.creditCount / summary.totalCount) * 100).toFixed(1)}% of volume` : '0%'}
                 </div>
               </div>
 
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-[#FF453A] flex items-center justify-between">
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-pulse-500 flex items-center justify-between">
                   <span>Total Outflow</span>
-                  <span className="text-[9px] font-mono text-white/50">{summary.debitCount} txns</span>
+                  <span className="text-[9px] font-mono text-abyss-textMuted">{summary.debitCount} txns</span>
                 </div>
-                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-[#FF453A]">
+                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-pulse-500">
                   ₹{summary.debitSum.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[10px] text-white/40 mt-0.5">
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">
                   {summary.totalCount > 0 ? `${((summary.debitCount / summary.totalCount) * 100).toFixed(1)}% of volume` : '0%'}
                 </div>
               </div>
 
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-white/50 flex items-center justify-between">
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted flex items-center justify-between">
                   <span>Net Cash Flow</span>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${summary.netFlow >= 0 ? 'bg-[#30D158]/20 text-[#30D158]' : 'bg-[#FF453A]/20 text-[#FF453A]'}`}>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${summary.netFlow >= 0 ? 'bg-jade-500/20 text-jade-500' : 'bg-pulse-500/20 text-pulse-500'}`}>
                     {summary.netFlow >= 0 ? 'SURPLUS' : 'DEFICIT'}
                   </span>
                 </div>
-                <div className={`text-base sm:text-lg font-bold font-mono mt-1 ${summary.netFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+                <div className={`text-base sm:text-lg font-bold font-mono mt-1 ${summary.netFlow >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
                   {summary.netFlow >= 0 ? '+' : ''}₹{summary.netFlow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
-                <div className="text-[10px] text-white/40 mt-0.5">Inflow minus Outflow</div>
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">Inflow minus Outflow</div>
               </div>
 
-              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
-                <div className="text-[10px] font-bold uppercase text-white/50">Filtered Ledger</div>
-                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-[#0A84FF]">
-                  {summary.totalCount.toLocaleString('en-IN')} <span className="text-xs font-normal text-white/40">/ {txns.length}</span>
+              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Filtered Ledger</div>
+                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-telemetry-500">
+                  {summary.totalCount.toLocaleString('en-IN')} <span className="text-xs font-normal text-abyss-textMuted">/ {txns.length}</span>
                 </div>
-                <div className="text-[10px] text-white/40 mt-0.5">
+                <div className="text-[10px] text-abyss-textMuted mt-0.5">
                   Avg: ₹{Math.round(summary.avgTxn).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -335,18 +335,18 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
             {/* Search + Amount Filters */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
               <div className="col-span-2">
-                <div className="text-[10px] font-bold uppercase text-white/50 mb-1">Search narration / entity / ref no</div>
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Search narration / entity / ref no</div>
                 <input
-                  className="px-4 py-2.5 rounded-full text-xs bg-white/10 border border-white/20 text-white placeholder:text-white/40 outline-none w-full focus:border-white transition"
+                  className="px-4 py-2.5 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none w-full focus:border-jade-500 transition"
                   placeholder="Search EPFO, Swiggy, Salary, UTR, Ref No..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
               </div>
               <div>
-                <div className="text-[10px] font-bold uppercase text-white/50 mb-1">Min Amount (₹)</div>
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Min Amount (₹)</div>
                 <input
-                  className="px-4 py-2.5 rounded-full text-xs bg-white/10 border border-white/20 text-white placeholder:text-white/40 outline-none w-full focus:border-white transition"
+                  className="px-4 py-2.5 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none w-full focus:border-jade-500 transition"
                   placeholder="0"
                   value={minAmt}
                   onChange={e => setMinAmt(e.target.value)}
@@ -354,9 +354,9 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                 />
               </div>
               <div>
-                <div className="text-[10px] font-bold uppercase text-white/50 mb-1">Max Amount (₹)</div>
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Max Amount (₹)</div>
                 <input
-                  className="px-4 py-2.5 rounded-full text-xs bg-white/10 border border-white/20 text-white placeholder:text-white/40 outline-none w-full focus:border-white transition"
+                  className="px-4 py-2.5 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none w-full focus:border-jade-500 transition"
                   placeholder="Any"
                   value={maxAmt}
                   onChange={e => setMaxAmt(e.target.value)}
@@ -372,7 +372,7 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                 className={`px-3 py-1 rounded-full text-[10px] font-semibold transition border ${
                   taxFilter === 'ALL'
                     ? 'spatial-btn-selected'
-                    : 'spatial-btn text-white/60'
+                    : 'spatial-btn text-abyss-textMuted'
                 }`}
               >
                 All Categories ({txns.length})
@@ -387,7 +387,7 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                     className={`px-3 py-1 rounded-full text-[10px] font-semibold transition border ${
                       taxFilter === tax
                         ? 'spatial-btn-selected'
-                        : 'spatial-btn text-white/60'
+                        : 'spatial-btn text-abyss-textMuted'
                     }`}
                   >
                     {label} ({count})
@@ -398,11 +398,11 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
           </div>
 
           {/* Transaction Table */}
-          <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
+          <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[700px] text-left text-xs border-collapse">
-                <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
-                  <tr className="border-b border-white/10">
+                <thead className="bg-abyss-card text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
+                  <tr className="border-b border-abyss-border">
                     <th className="p-3.5">Date</th>
                     <th className="p-3.5">Narration & Entity</th>
                     <th className="p-3.5">Category</th>
@@ -412,11 +412,11 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                     <th className="p-3.5 text-center">Confidence</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-abyss-border">
                   {visible.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="p-8 text-center">
-                        <div className="text-xs text-white/40">No transactions match your filters.</div>
+                        <div className="text-xs text-abyss-textMuted">No transactions match your filters.</div>
                       </td>
                     </tr>
                   ) : (
@@ -424,38 +424,38 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                       <tr
                         key={tx.id}
                         onClick={() => setSelectedTx(selectedTx?.id === tx.id ? null : tx)}
-                        className={`text-xs cursor-pointer transition-colors hover:bg-white/5 ${
-                          selectedTx?.id === tx.id ? 'bg-white/10' : ''
+                        className={`text-xs cursor-pointer transition-colors hover:bg-abyss-elevated ${
+                          selectedTx?.id === tx.id ? 'bg-abyss-elevated' : ''
                         }`}
                       >
-                        <td className="p-3.5 font-mono text-[10px] whitespace-nowrap text-white/50">
+                        <td className="p-3.5 font-mono text-[10px] whitespace-nowrap text-abyss-textMuted">
                           {tx.transactionDate}
                         </td>
                         <td className="p-3.5 max-w-[280px]">
                           <div className="flex items-center gap-2.5">
                             <BrandLogoBadge entityName={tx.entityName || tx.rawNarration} size="sm" />
                             <div className="min-w-0">
-                              <div className="font-semibold text-white truncate">{tx.entityName}</div>
-                              <div className="text-[10px] text-white/40 truncate">{tx.rawNarration.substring(0, 60)}</div>
+                              <div className="font-semibold text-abyss-textPrimary truncate">{tx.entityName}</div>
+                              <div className="text-[10px] text-abyss-textMuted truncate">{tx.rawNarration.substring(0, 60)}</div>
                             </div>
                           </div>
                         </td>
                         <td className="p-3.5">
-                          <span className="text-[10px] font-bold text-white/80">
+                          <span className="text-[10px] font-bold text-abyss-textSecondary">
                             {TAXONOMY_LABELS[tx.category as ClassificationTaxonomy] || tx.category}
                           </span>
                         </td>
                         <td className="p-3.5 text-right font-mono">
                           {tx.debit ? (
-                            <span className="text-[#FF453A] font-bold">₹{tx.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                          ) : <span className="text-white/20">—</span>}
+                            <span className="text-pulse-500 font-bold">₹{tx.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                          ) : <span className="text-abyss-textMuted/40">—</span>}
                         </td>
                         <td className="p-3.5 text-right font-mono">
                           {tx.credit ? (
-                            <span className="text-[#30D158] font-bold">₹{tx.credit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                          ) : <span className="text-white/20">—</span>}
+                            <span className="text-jade-500 font-bold">₹{tx.credit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                          ) : <span className="text-abyss-textMuted/40">—</span>}
                         </td>
-                        <td className="p-3.5 text-right font-mono text-[10px] text-white/60">
+                        <td className="p-3.5 text-right font-mono text-[10px] text-abyss-textMuted">
                           {tx.balanceAfter != null ? `₹${tx.balanceAfter.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
                         </td>
                         <td className="p-3.5 text-center">
@@ -472,10 +472,10 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
 
             {/* Load More */}
             {visible.length < filtered.length && (
-              <div className="p-4 text-center border-t border-white/5">
+              <div className="p-4 text-center border-t border-abyss-border">
                 <button
                   onClick={() => setVisibleCount(v => v + 50)}
-                  className="spatial-btn px-6 py-2 rounded-full text-xs font-semibold text-white/80 hover:text-white"
+                  className="spatial-btn px-6 py-2 rounded-full text-xs font-semibold text-abyss-textSecondary hover:text-abyss-textPrimary"
                 >
                   Load 50 more ({filtered.length - visible.length} remaining)
                 </button>
@@ -490,11 +490,11 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                 <div className="flex items-center gap-3">
                   <BrandLogoBadge entityName={selectedTx.entityName || selectedTx.rawNarration} size="md" />
                   <div>
-                    <div className="text-sm font-bold text-white">{selectedTx.entityName}</div>
-                    <div className="text-[10px] mt-0.5 font-mono text-white/50">{selectedTx.transactionDate} • {selectedTx.channel}</div>
+                    <div className="text-sm font-bold text-abyss-textPrimary">{selectedTx.entityName}</div>
+                    <div className="text-[10px] mt-0.5 font-mono text-abyss-textMuted">{selectedTx.transactionDate} • {selectedTx.channel}</div>
                   </div>
                 </div>
-                <div className={`text-xl font-bold font-mono ${selectedTx.direction === 'CREDIT' ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
+                <div className={`text-xl font-bold font-mono ${selectedTx.direction === 'CREDIT' ? 'text-jade-500' : 'text-pulse-500'}`}>
                   {selectedTx.direction === 'CREDIT' ? '+' : '-'}₹{selectedTx.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                 </div>
               </div>
@@ -508,32 +508,32 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
                   { label: 'Reference', value: selectedTx.referenceNumber || 'N/A' },
                   { label: 'Balance After', value: selectedTx.balanceAfter != null ? `₹${selectedTx.balanceAfter.toLocaleString('en-IN')}` : 'N/A' },
                 ].map(({ label, value }) => (
-                  <div key={label} className="p-3 rounded-[12px] bg-white/5 border border-white/10">
-                    <div className="text-[10px] font-bold uppercase text-white/40">{label}</div>
-                    <div className="text-xs font-semibold mt-0.5 text-white">{value}</div>
+                  <div key={label} className="p-3 rounded-[12px] bg-abyss-well border border-abyss-border">
+                    <div className="text-[10px] font-bold uppercase text-abyss-textMuted">{label}</div>
+                    <div className="text-xs font-semibold mt-0.5 text-abyss-textPrimary">{value}</div>
                   </div>
                 ))}
               </div>
 
               <div>
-                <div className="text-[10px] font-bold uppercase text-white/40 mb-1">Full Narration</div>
-                <div className="text-[11px] font-mono p-3 rounded-[12px] bg-black/40 border border-white/10 text-white/80">
+                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Full Narration</div>
+                <div className="text-[11px] font-mono p-3 rounded-[12px] bg-abyss-canvas border border-abyss-border text-abyss-textSecondary">
                   {selectedTx.rawNarration || selectedTx.narration}
                 </div>
               </div>
 
               {/* Semantic Flags */}
               <div className="flex flex-wrap gap-1.5">
-                {(selectedTx.financialType === 'INCOME') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30">INCOME</span>}
-                {(selectedTx.category === 'EPFO_PF') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#0A84FF]/20 text-[#0A84FF] border border-[#0A84FF]/30">EPFO / PF WITHDRAWAL</span>}
-                {(selectedTx.financialType === 'DEBT_DISBURSEMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#FF9F0A]/20 text-[#FF9F0A] border border-[#FF9F0A]/30">LOAN CREDIT (NOT INCOME)</span>}
-                {(selectedTx.financialType === 'DEBT_REPAYMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#FF453A]/20 text-[#FF453A] border border-[#FF453A]/30">LOAN REPAYMENT</span>}
-                {(selectedTx.category === 'CREDIT_CARD_PAYMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-white/10 text-white border border-white/20">CC PAYMENT</span>}
-                {(selectedTx.category === 'WALLET_MOVEMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-white/10 text-white border border-white/20">WALLET MOVEMENT</span>}
-                {(selectedTx.financialType === 'CASH_WITHDRAWAL') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-white/10 text-white border border-white/20">ATM CASH</span>}
-                {selectedTx.isEconomicExpense && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-white/15 text-white border border-white/25">LIFESTYLE SPEND</span>}
-                {(selectedTx.category === 'PERSONAL_TRANSFER') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#6366F1]/20 text-[#6366F1] border border-[#6366F1]/30">PERSONAL TRANSFER</span>}
-                {(selectedTx.category === 'SELF_TRANSFER') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-white/10 text-white border border-white/20">SELF TRANSFER</span>}
+                {(selectedTx.financialType === 'INCOME') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-jade-500/20 text-jade-500 border border-jade-500/30">INCOME</span>}
+                {(selectedTx.category === 'EPFO_PF') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-telemetry-500/20 text-telemetry-500 border border-telemetry-500/30">EPFO / PF WITHDRAWAL</span>}
+                {(selectedTx.financialType === 'DEBT_DISBURSEMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-ochre-500/20 text-ochre-500 border border-ochre-500/30">LOAN CREDIT (NOT INCOME)</span>}
+                {(selectedTx.financialType === 'DEBT_REPAYMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-pulse-500/20 text-pulse-500 border border-pulse-500/30">LOAN REPAYMENT</span>}
+                {(selectedTx.category === 'CREDIT_CARD_PAYMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">CC PAYMENT</span>}
+                {(selectedTx.category === 'WALLET_MOVEMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">WALLET MOVEMENT</span>}
+                {(selectedTx.financialType === 'CASH_WITHDRAWAL') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">ATM CASH</span>}
+                {selectedTx.isEconomicExpense && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">LIFESTYLE SPEND</span>}
+                {(selectedTx.category === 'PERSONAL_TRANSFER') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-synapse-500/20 text-synapse-400 light:text-synapse-700 border border-synapse-500/30">PERSONAL TRANSFER</span>}
+                {(selectedTx.category === 'SELF_TRANSFER') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">SELF TRANSFER</span>}
               </div>
             </div>
           )}

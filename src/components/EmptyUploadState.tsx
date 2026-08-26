@@ -49,15 +49,15 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
     <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
       <div className="spatial-card w-full max-w-xl p-8 sm:p-12 text-center space-y-6">
         {/* Brand Icon Badge */}
-        <div className="w-16 h-16 rounded-[20px] mx-auto flex items-center justify-center bg-white/10 border border-white/20 text-white shadow-md">
+        <div className="w-16 h-16 rounded-[20px] mx-auto flex items-center justify-center bg-abyss-well border border-abyss-border text-jade-500 shadow-solid-sm">
           <span className="text-3xl">📥</span>
         </div>
 
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-abyss-textPrimary mb-2">
             Import SMS Backup XML
           </h2>
-          <p className="text-xs sm:text-sm max-w-md mx-auto text-white/60 leading-relaxed font-medium">
+          <p className="text-xs sm:text-sm max-w-md mx-auto text-abyss-textMuted leading-relaxed font-medium">
             Import an Android SMS Backup XML file to extract real bank accounts, spending categories, merchant intelligence, and loan commitments.
           </p>
         </div>
@@ -68,10 +68,10 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`p-8 sm:p-10 rounded-[20px] border-2 border-dashed cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`p-8 sm:p-10 rounded-[20px] border-2 border-dashed cursor-pointer transition-all duration-200 ${
             isDragging
-              ? 'border-white bg-white/20 scale-[1.01]'
-              : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10'
+              ? 'border-jade-500 bg-jade-500/10 scale-[1.01]'
+              : 'border-abyss-border bg-abyss-well hover:border-jade-500/40 hover:bg-abyss-elevated'
           }`}
         >
           <input
@@ -87,23 +87,23 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
           />
 
           <div className="text-4xl mb-3">📁</div>
-          <div className="text-sm font-bold text-white">
+          <div className="text-sm font-bold text-abyss-textPrimary">
             {isDragging ? 'Drop your .xml file here' : 'Click to Browse or Drag & Drop'}
           </div>
-          <div className="text-xs mt-1 text-white/40 font-medium">
+          <div className="text-xs mt-1 text-abyss-textMuted font-medium">
             Supports standard Android SMS Backup & Restore XML files
           </div>
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-[12px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold animate-fade-in flex items-center justify-center gap-2">
+          <div className="p-3.5 rounded-[12px] bg-pulse-500/15 border border-pulse-500/30 text-pulse-500 text-xs font-bold animate-fade-in flex items-center justify-center gap-2">
             <span>⚠️</span>
             <span>{error}</span>
           </div>
         )}
 
         {isProcessing && (
-          <div className="flex items-center justify-center gap-3 text-xs font-bold text-[#30D158] animate-pulse">
+          <div className="flex items-center justify-center gap-3 text-xs font-bold text-jade-500 animate-pulse">
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             <span>Parsing Real Indian Bank Messages...</span>
           </div>
@@ -111,9 +111,9 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
 
         {/* ── DIVIDER / SAMPLE BUTTON ─────────────────────────────────── */}
         <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center border-t border-white/10" />
+          <div className="absolute inset-0 flex items-center border-t border-abyss-border" />
           <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-            <span className="px-3 font-bold bg-[#12161A] text-white/40 rounded-full">
+            <span className="px-3 font-bold bg-abyss-card text-abyss-textMuted rounded-full">
               or test with pre-loaded dataset
             </span>
           </div>
@@ -121,14 +121,14 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
 
         <button
           onClick={() => onXmlLoaded(SAMPLE_SMS_XML)}
-          className="spatial-btn w-full py-4 text-xs font-bold text-white flex items-center justify-center gap-2"
+          className="spatial-btn w-full py-4 text-xs font-bold text-abyss-textPrimary flex items-center justify-center gap-2"
         >
           <span>⚡</span>
           <span>Load 3,979 Real SMS Dataset (sms_20260804131919.xml)</span>
         </button>
 
         {/* Privacy Note */}
-        <div className="pt-4 border-t border-white/10 text-xs text-white/40 flex items-center justify-center gap-2">
+        <div className="pt-4 border-t border-abyss-border text-xs text-abyss-textMuted flex items-center justify-center gap-2">
           <span>🔒</span>
           <span>100% Client-Side Privacy: SMS parsed locally in browser memory.</span>
         </div>

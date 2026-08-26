@@ -54,29 +54,23 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-emergence">
-      <div className={`w-full max-w-md rounded-[32px] border p-6 sm:p-7 flex flex-col gap-4 shadow-2xl transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/95 border-emerald-500/30 text-white shadow-2xl shadow-black/80' : 'bg-white/95 border-slate-200/90 text-slate-900 shadow-2xl'
-      }`}>
+      <div className="spatial-modal w-full max-w-md p-6 sm:p-7 flex flex-col gap-4">
         
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-sm ${
-              isDark ? 'bg-brand-viridian/15 text-brand-viridian border border-brand-viridian/30' : 'bg-brand-50 text-brand-700 border border-brand-200'
-            }`}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm bg-jade-500/15 text-jade-500 border border-jade-500/30">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
-              <h3 className={`text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>Import SMS XML Backup</h3>
-              <span className={`text-[10px] font-medium font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Android SMS Backup & Restore XML</span>
+              <h3 className="text-sm font-black tracking-tight text-abyss-textPrimary">Import SMS XML Backup</h3>
+              <span className="text-[10px] font-medium font-mono text-abyss-textMuted">Android SMS Backup & Restore XML</span>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className={`p-1.5 rounded-full transition-all duration-150 ${
-              isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-            }`}
+            className="p-1.5 rounded-full border border-abyss-border hover:bg-abyss-elevated text-abyss-textMuted transition-all duration-150"
           >
             <X className="w-4 h-4" />
           </button>
@@ -85,8 +79,8 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
         {/* Dropzone / Upload Area */}
         <label className={`border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-150 ${
           fileName 
-            ? isDark ? 'border-brand-viridian/50 bg-brand-viridian/10' : 'border-brand-600/50 bg-emerald-50/70'
-            : isDark ? 'border-white/10 hover:border-brand-viridian/40 bg-white/[0.02]' : 'border-slate-300 hover:border-brand-500 bg-slate-50'
+            ? 'border-jade-500/50 bg-jade-500/10'
+            : 'border-abyss-border hover:border-jade-500/40 bg-abyss-well'
         }`}>
           <input
             type="file"
@@ -94,13 +88,13 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
             onChange={handleFileUpload}
             className="hidden"
           />
-          <FileCode className={`w-8 h-8 mb-2 ${fileName ? (isDark ? 'text-brand-viridian' : 'text-brand-700') : 'text-slate-400'}`} />
-          <span className={`text-xs font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{fileName || 'Choose SMS XML File'}</span>
-          <span className={`text-[10px] font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>or drag & drop file here</span>
+          <FileCode className={`w-8 h-8 mb-2 ${fileName ? 'text-jade-500' : 'text-abyss-textMuted'}`} />
+          <span className="text-xs font-black text-abyss-textPrimary">{fileName || 'Choose SMS XML File'}</span>
+          <span className="text-[10px] font-medium mt-0.5 text-abyss-textMuted">or drag & drop file here</span>
         </label>
 
         {error && (
-          <div className="flex items-center gap-1.5 text-xs text-rose-600 bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20">
+          <div className="flex items-center gap-1.5 text-xs text-pulse-500 bg-pulse-500/10 p-2.5 rounded-xl border border-pulse-500/20">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -109,12 +103,10 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
         {/* Text Area for Direct Paste */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Or paste raw XML snippet:</span>
+            <span className="text-abyss-textMuted">Or paste raw XML snippet:</span>
             <button
               onClick={handleLoadSample}
-              className={`font-black flex items-center gap-1 text-[11px] hover:underline ${
-                isDark ? 'text-brand-viridian' : 'text-brand-700'
-              }`}
+              className="font-black flex items-center gap-1 text-[11px] text-jade-500 hover:underline"
             >
               <RefreshCw className="w-3 h-3" /> Load Sample XML
             </button>
@@ -126,20 +118,14 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
               setFileName('pasted_xml_snippet.xml');
             }}
             placeholder="<smses><sms address='AX-HDFCBK' date='...' body='...' /></smses>"
-            className={`w-full h-24 p-2.5 rounded-xl border text-[11px] font-mono focus:outline-none focus:border-brand-500 resize-none ${
-              isDark ? 'bg-[#142027] border-white/[0.08] text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
-            }`}
+            className="w-full h-24 p-2.5 rounded-xl border text-[11px] font-mono focus:outline-none focus:border-jade-500 resize-none bg-abyss-well border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted"
           ></textarea>
         </div>
 
         {/* Action Button */}
         <button
           onClick={handleProcess}
-          className={`w-full py-3 rounded-2xl font-black text-xs transition-all duration-150 active:scale-95 shadow-md flex items-center justify-center gap-2 ${
-            isDark 
-              ? 'bg-brand-viridian text-slate-950 hover:bg-brand-viridianDark shadow-brand-viridian/25' 
-              : 'bg-brand-600 text-white hover:bg-brand-700 shadow-brand-600/20'
-          }`}
+          className="spatial-btn-selected w-full py-3 rounded-2xl font-black text-xs transition-all duration-150 active:scale-95 flex items-center justify-center gap-2"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Execute Simulation Pipeline</span>
@@ -149,4 +135,3 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
     </div>
   );
 };
-

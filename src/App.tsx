@@ -36,7 +36,7 @@ import { CreditCardDrilldownModal } from './components/CreditCardDrilldownModal'
 
 export const App: React.FC = () => {
   const [isDark, setIsDark] = useState<boolean>(() => {
-    const savedTheme = localStorage.getItem('bytfloww_theme');
+    const savedTheme = localStorage.getItem('bytfloww_theme_mode') || localStorage.getItem('bytfloww_theme');
     return savedTheme !== 'light';
   });
   const [activeModule, setActiveModule] = useState<ActiveModule>('SMS_INTELLIGENCE');
@@ -78,15 +78,6 @@ export const App: React.FC = () => {
       }
     }
   }, []);
-
-  const handleToggleTheme = () => {
-    setIsDark(prev => {
-      const next = !prev;
-      localStorage.setItem('bytfloww_theme', next ? 'dark' : 'light');
-      return next;
-    });
-  };
-
 
   // Filter State
   const [filterState, setFilterState] = useState<FilterState>({
@@ -161,6 +152,31 @@ export const App: React.FC = () => {
     setRawCount(0);
   };
 
+  // Sync isDark with document.documentElement & body classes and storage
+  useEffect(() => {
+    const mode = isDark ? 'dark' : 'light';
+    localStorage.setItem('bytfloww_theme_mode', mode);
+    localStorage.setItem('bytfloww_theme', mode);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      document.body.classList.remove('dark');
+      document.body.classList.add('light');
+    }
+    const env = isDark ? 'titanium_prism' : 'bytlend_champagne';
+    localStorage.setItem('bytfloww_spatial_env', env);
+    window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: env }));
+  }, [isDark]);
+
+  const handleToggleTheme = () => {
+    setIsDark(prev => !prev);
+  };
+
   const selectedMerchantData = snapshot?.topMerchants.find(m => m.name.toLowerCase() === selectedMerchantName?.toLowerCase());
 
   const periodEvents = React.useMemo(() => {
@@ -177,30 +193,32 @@ export const App: React.FC = () => {
       onSwitchModule={setActiveModule}
       currentUser={currentUser}
       onLogout={handleLogout}
+      isDark={isDark}
+      onToggleTheme={handleToggleTheme}
     >
       {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ──────────────────────── */}
       {!currentUser ? (
         <LoginScreen
-          isDark={true}
+          isDark={isDark}
           onLoginSuccess={handleLoginSuccess}
         />
       ) : activeModule === 'BANK_STATEMENTS' ? (
         /* ── 2. SEPARATE MODULE: BANK STATEMENT FORENSICS HUB ──────────── */
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1 text-xs">
-            <span className="font-semibold text-white/60">
-              Session: <strong className="text-white">{currentUser.name}</strong> ({currentUser.phone})
+            <span className="font-semibold text-abyss-textMuted">
+              Session: <strong className="text-abyss-textPrimary">{currentUser.name}</strong> ({currentUser.phone})
             </span>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveModule('SMS_INTELLIGENCE')}
-                className="text-xs font-semibold text-[#0A84FF] hover:underline"
+                className="text-xs font-semibold text-telemetry-500 hover:underline"
               >
                 📱 Open SMS Simulator
               </button>
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold text-[#FF453A] hover:underline"
+                className="text-xs font-semibold text-pulse-500 hover:underline"
               >
                 Sign Out 🚪
               </button>
@@ -208,7 +226,7 @@ export const App: React.FC = () => {
           </div>
 
           <BankStatementModule
-            isDark={true}
+            isDark={isDark}
             onMergeTransactions={(newTxs) => {
               setEvents((prev) => [...newTxs, ...prev]);
             }}
@@ -220,26 +238,26 @@ export const App: React.FC = () => {
         /* ── 3. IF SMS MODULE & NO XML: SHOW CLEAN UPLOAD SCREEN ─────── */
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2 text-xs">
-            <span className="font-semibold text-white/60">
-              Logged in as: <strong className="text-white">{currentUser.name}</strong> ({currentUser.phone})
+            <span className="font-semibold text-abyss-textMuted">
+              Logged in as: <strong className="text-abyss-textPrimary">{currentUser.name}</strong> ({currentUser.phone})
             </span>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveModule('BANK_STATEMENTS')}
-                className="text-xs font-semibold text-[#0A84FF] hover:underline"
+                className="text-xs font-semibold text-telemetry-500 hover:underline"
               >
                 🏛️ Open Statement Hub
               </button>
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold text-[#FF453A] hover:underline"
+                className="text-xs font-semibold text-pulse-500 hover:underline"
               >
                 Sign Out 🚪
               </button>
             </div>
           </div>
           <EmptyUploadState
-            isDark={true}
+            isDark={isDark}
             onXmlLoaded={handleXmlParsed}
             isProcessing={isProcessing}
           />
@@ -248,25 +266,25 @@ export const App: React.FC = () => {
         /* ── 4. IF SMS XML LOADED: SHOW SPEND INTELLIGENCE DASHBOARD ─── */
         <>
           <div className="flex items-center justify-between mb-3 px-1 text-xs">
-            <span className="font-semibold text-white/60">
-              Session: <strong className="text-white">{currentUser.name}</strong> ({currentUser.phone})
+            <span className="font-semibold text-abyss-textMuted">
+              Session: <strong className="text-abyss-textPrimary">{currentUser.name}</strong> ({currentUser.phone})
             </span>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActiveModule('BANK_STATEMENTS')}
-                className="text-xs font-semibold text-[#0A84FF] hover:underline"
+                className="text-xs font-semibold text-telemetry-500 hover:underline"
               >
                 🏛️ Statement Hub
               </button>
               <button
                 onClick={handleResetDataset}
-                className="text-xs font-semibold text-white/60 hover:text-white hover:underline"
+                className="text-xs font-semibold text-abyss-textMuted hover:text-abyss-textPrimary hover:underline"
               >
                 🔄 Reset XML
               </button>
               <button
                 onClick={handleLogout}
-                className="text-xs font-semibold text-[#FF453A] hover:underline"
+                className="text-xs font-semibold text-pulse-500 hover:underline"
               >
                 Sign Out 🚪
               </button>
@@ -277,6 +295,7 @@ export const App: React.FC = () => {
             snapshot={snapshot}
             activeTab={activeTab}
             activeModule={activeModule}
+            isDark={isDark}
             onSelectTab={setActiveTab}
             onSelectModule={setActiveModule}
             onSelectPeriod={handleSelectPeriod}
@@ -287,8 +306,6 @@ export const App: React.FC = () => {
             totalParsedCount={rawCount}
           />
 
-
-
           <div className="pb-28">
             {activeTab === 'OVERVIEW' && (
               <SpendOverviewTab
@@ -298,16 +315,18 @@ export const App: React.FC = () => {
                 onNavigateToTab={(tab) => setActiveTab(tab)}
                 onOpenDebrief={() => setShowDebrief(true)}
                 onSelectMerchant={(mName) => setSelectedMerchantName(mName)}
+                onSelectCategory={(cat) => setSelectedDrilldownCategory(cat)}
                 onSelectAccount={(acc) => setSelectedDrilldownAccount(acc)}
                 onSelectCreditCard={(card) => setSelectedCreditCard(card)}
-                onSelectCategory={(cat) => setSelectedDrilldownCategory(cat)}
               />
             )}
 
             {activeTab === 'TRANSACTIONS' && (
               <SpendTransactionsTab
-                events={events}
+                events={periodEvents}
+                snapshot={snapshot}
                 isDark={isDark}
+                filterState={filterState}
                 onSelectEvent={(ev) => setSelectedEvent(ev)}
                 onSplitBill={(ev) => setSplitEvent(ev)}
               />
@@ -315,17 +334,15 @@ export const App: React.FC = () => {
 
             {activeTab === 'CATEGORIES' && (
               <SpendCategoriesTab
-                categories={snapshot.categoryDistribution}
-                events={events}
+                snapshot={snapshot}
                 isDark={isDark}
-                totalSpend={snapshot.totalSpend}
-                onSelectEvent={(ev) => setSelectedEvent(ev)}
+                onSelectCategory={(cat) => setSelectedDrilldownCategory(cat)}
               />
             )}
 
             {activeTab === 'MERCHANTS' && (
               <SpendMerchantsTab
-                merchants={snapshot.topMerchants}
+                snapshot={snapshot}
                 isDark={isDark}
                 onSelectMerchant={(mName) => setSelectedMerchantName(mName)}
               />
@@ -333,11 +350,9 @@ export const App: React.FC = () => {
 
             {activeTab === 'COMMITMENTS' && (
               <SpendCommitmentsTab
-                commitments={snapshot.commitments}
+                snapshot={snapshot}
                 isDark={isDark}
-                totalEmis={snapshot.totalEmis}
-                totalSubscriptions={snapshot.totalSubscriptions}
-                totalBills={snapshot.totalBills}
+                onSelectEvent={(ev) => setSelectedEvent(ev)}
               />
             )}
 
@@ -349,137 +364,37 @@ export const App: React.FC = () => {
               />
             )}
 
-            {activeTab === 'STATEMENTS' && (
-              <BankStatementModule
-                isDark={isDark}
-                onMergeTransactions={(newEvents) => {
-                  setEvents(prev => [...newEvents, ...prev]);
-                  if (currentXml) {
-                    handleXmlParsed(currentXml, selectedPeriodKey);
-                  }
-                }}
-                onSelectEvent={(ev) => setSelectedEvent(ev)}
-              />
-            )}
-
             {activeTab === 'BUDGETS' && (
               <BudgetManagerScreen
-                categories={snapshot.categoryDistribution}
-                totalSpend={snapshot.totalSpend}
+                snapshot={snapshot}
                 isDark={isDark}
+                onBack={() => setActiveTab('OVERVIEW')}
               />
             )}
 
             {activeTab === 'SUBSCRIPTIONS' && (
               <SubscriptionManagerScreen
-                commitments={snapshot.commitments}
-                totalSubscriptions={snapshot.totalSubscriptions}
+                snapshot={snapshot}
                 isDark={isDark}
+                onBack={() => setActiveTab('OVERVIEW')}
               />
             )}
 
             {activeTab === 'ACCOUNTS' && (
               <AccountManagementScreen
-                accounts={snapshot.accounts}
-                creditCards={snapshot.creditCards}
-                events={events}
+                snapshot={snapshot}
                 isDark={isDark}
-                onSelectAccount={(acc) => setSelectedDrilldownAccount(acc)}
+                onBack={() => setActiveTab('OVERVIEW')}
               />
             )}
 
             {activeTab === 'ASSISTANT' && (
               <AssistantScreen
                 snapshot={snapshot}
-                events={events}
+                events={periodEvents}
                 isDark={isDark}
-                onSelectEvent={(ev) => setSelectedEvent(ev)}
               />
             )}
-          </div>
-
-          {/* ── 4. BOTTOM ANDROID NAVIGATION BAR ────────── */}
-          <div className={`fixed bottom-0 left-0 right-0 z-40 border-t py-2 px-4 transition-all duration-200 ${
-            isDark 
-              ? 'bg-[#10181E]/95 backdrop-blur-xl border-white/[0.08] shadow-2xl shadow-black/90' 
-              : 'bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-lg'
-          }`}>
-            <div className="max-w-md mx-auto flex items-center justify-around relative">
-              <button 
-                onClick={() => setActiveTab('OVERVIEW')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
-                  activeTab === 'OVERVIEW'
-                    ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
-                    : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
-                }`}
-              >
-                <span className="text-xl">🏠</span>
-                <span>Home</span>
-                {activeTab === 'OVERVIEW' && (
-                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${isDark ? 'bg-brand-viridian' : 'bg-brand-600'}`} />
-                )}
-              </button>
-
-              <button 
-                onClick={() => setActiveTab('TRANSACTIONS')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
-                  activeTab === 'TRANSACTIONS'
-                    ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
-                    : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
-                }`}
-              >
-                <span className="text-xl">📊</span>
-                <span>Spend</span>
-                {activeTab === 'TRANSACTIONS' && (
-                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${isDark ? 'bg-brand-viridian' : 'bg-brand-600'}`} />
-                )}
-              </button>
-
-              {/* Central Floating AI Button */}
-              <div className="relative -top-5 flex flex-col items-center">
-                <button
-                  onClick={() => setActiveTab('ASSISTANT')}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center font-black transition-all duration-150 hover:scale-105 active:scale-95 shadow-xl ${
-                    isDark 
-                      ? 'bg-brand-viridian text-slate-950 ring-4 ring-[#080D11] shadow-brand-viridian/30' 
-                      : 'bg-brand-600 text-white ring-4 ring-white shadow-brand-600/30'
-                  }`}
-                  title="Open AI Spend Copilot"
-                >
-                  <span className="text-2xl">✨</span>
-                </button>
-                <span className={`block text-center text-[9px] font-black mt-1 tracking-wider uppercase ${
-                  isDark ? 'text-brand-viridian' : 'text-brand-700'
-                }`}>
-                  AI Copilot
-                </span>
-              </div>
-
-              <button 
-                onClick={() => setActiveTab('COMMITMENTS')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
-                  activeTab === 'COMMITMENTS'
-                    ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
-                    : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
-                }`}
-              >
-                <span className="text-xl">💡</span>
-                <span>Lenders</span>
-                {activeTab === 'COMMITMENTS' && (
-                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${isDark ? 'bg-brand-viridian' : 'bg-brand-600'}`} />
-                )}
-              </button>
-
-              <button 
-                onClick={() => setShowDiagnostics(true)}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
-                  isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <span className="text-xl">👤</span>
-                <span>Profile</span>
-              </button>
-            </div>
           </div>
         </>
       )}

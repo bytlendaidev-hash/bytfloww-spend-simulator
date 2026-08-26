@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BytFloww - AI Fintech Color System & Swatch Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      /* Active Theme (defaults to dark) */
+      --bg-page: #080B11;
+      --bg-card: #111622;
+      --bg-card-elevated: #182030;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+    }
+
+    [data-theme="light"] {
+      --bg-page: #F8FAFC;
+      --bg-card: #FFFFFF;
+      --bg-card-elevated: #F1F5F9;
+      --border: #E2E8F0;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      padding: 40px 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #05F29A 0%, #00E5FF 50%, #8B5CF6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* Grid of Color Cards */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .color-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+
+    .color-swatch-hero {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      position: relative;
+    }
+
+    .swatch-hex-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      color: #FFFFFF;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch-hex-pill:hover {
+      background: rgba(0,0,0,0.85);
+    }
+
+    .color-details {
+      padding: 16px;
+    }
+
+    .color-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .color-role {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .color-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    /* Tonal Scale Bars */
+    .tonal-scale {
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 28px;
+      margin-top: 10px;
+    }
+
+    .tonal-step {
+      flex: 1;
+      height: 100%;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .tonal-step:hover::after {
+      content: attr(data-weight);
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    /* Live Component Preview Section */
+    .preview-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      margin-top: 48px;
+    }
+
+    .preview-header {
+      margin-bottom: 24px;
+    }
+
+    .ui-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .mock-card {
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: -0.03em;
+      margin: 12px 0 4px;
+    }
+
+    .badge-quantum {
+      background: rgba(5, 242, 154, 0.15);
+      color: #05F29A;
+      border: 1px solid rgba(5, 242, 154, 0.3);
+    }
+    [data-theme="light"] .badge-quantum {
+      background: rgba(0, 168, 104, 0.12);
+      color: #00A868;
+      border: 1px solid rgba(0, 168, 104, 0.25);
+    }
+
+    .badge-ai {
+      background: rgba(139, 92, 246, 0.15);
+      color: #8B5CF6;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    [data-theme="light"] .badge-ai {
+      background: rgba(99, 102, 241, 0.12);
+      color: #6366F1;
+      border: 1px solid rgba(99, 102, 241, 0.25);
+    }
+
+    .badge-alert {
+      background: rgba(255, 59, 105, 0.15);
+      color: #FF3B69;
+      border: 1px solid rgba(255, 59, 105, 0.3);
+    }
+    [data-theme="light"] .badge-alert {
+      background: rgba(225, 29, 72, 0.12);
+      color: #E11D48;
+      border: 1px solid rgba(225, 29, 72, 0.25);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #05F29A;
+      color: #080B11;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="toast" id="toast">Copied Hex Code!</div>
+  
+  <div class="container">
+    <header>
+      <div>
+        <h1 class="brand-title">BytFloww Bespoke Color Intelligence</h1>
+        <p class="brand-sub">Next-Gen FinTech, Spend Forensics & AI Budgeting Palette Matrix</p>
+      </div>
+      <button class="theme-toggle" id="themeBtn">
+        <span id="themeIcon">☀️</span>
+        <span id="themeLabel">Light Mode</span>
+      </button>
+    </header>
+
+    <!-- PALETTE 1: QUANTUM MINT & CYBER AMETHYST (AI HERO) -->
+    <section>
+      <div class="section-title">
+        <span>⚡ System 1: Quantum Emerald & Cyber-Amethyst</span>
+      </div>
+      <p class="section-desc">Designed specifically for autonomous spend intelligence, real-time banking telemetry, and predictive cashflow.</p>
+
+      <div class="color-grid">
+        <!-- 1. Quantum Mint -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #05F29A, #00C87E);">
+            <div class="swatch-hex-pill" onclick="copyHex('#05F29A')">#05F29A 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Quantum Mint (Growth / Inflow)</div>
+            <div class="color-role">Primary Action / Cashflow Positive</div>
+            <p class="color-desc">Ultra-vibrant, high-DPI mint green. Evokes frictionless capital, safe-to-spend limits, and financial health.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #E6FDF4" style="background:#E6FDF4;" onclick="copyHex('#E6FDF4')"></div>
+              <div class="tonal-step" data-weight="200: #9DFBD2" style="background:#9DFBD2;" onclick="copyHex('#9DFBD2')"></div>
+              <div class="tonal-step" data-weight="400: #3DF6AC" style="background:#3DF6AC;" onclick="copyHex('#3DF6AC')"></div>
+              <div class="tonal-step" data-weight="500: #05F29A" style="background:#05F29A;" onclick="copyHex('#05F29A')"></div>
+              <div class="tonal-step" data-weight="700: #00A868" style="background:#00A868;" onclick="copyHex('#00A868')"></div>
+              <div class="tonal-step" data-weight="900: #024E31" style="background:#024E31;" onclick="copyHex('#024E31')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Cyber Amethyst -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">
+            <div class="swatch-hex-pill" onclick="copyHex('#8B5CF6')">#8B5CF6 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Cyber Amethyst (AI Engine)</div>
+            <div class="color-role">Autonomous Intelligence / Categorization</div>
+            <p class="color-desc">Deep computational violet-indigo. Reserved exclusively for AI predictions, smart rules, and automated tagging.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #F3E8FF" style="background:#F3E8FF;" onclick="copyHex('#F3E8FF')"></div>
+              <div class="tonal-step" data-weight="200: #DDD6FE" style="background:#DDD6FE;" onclick="copyHex('#DDD6FE')"></div>
+              <div class="tonal-step" data-weight="400: #A78BFA" style="background:#A78BFA;" onclick="copyHex('#A78BFA')"></div>
+              <div class="tonal-step" data-weight="500: #8B5CF6" style="background:#8B5CF6;" onclick="copyHex('#8B5CF6')"></div>
+              <div class="tonal-step" data-weight="700: #6D28D9" style="background:#6D28D9;" onclick="copyHex('#6D28D9')"></div>
+              <div class="tonal-step" data-weight="900: #3B0764" style="background:#3B0764;" onclick="copyHex('#3B0764')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Electric Cyan -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #00E5FF, #0284C7);">
+            <div class="swatch-hex-pill" onclick="copyHex('#00E5FF')">#00E5FF 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Electric Cyan (Telemetry & Sync)</div>
+            <div class="color-role">Live Feeds / Active Accounts / SMS Parser</div>
+            <p class="color-desc">High-luminance laser blue. Denotes live connected bank APIs, active SMS parser status, and realtime sync.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #ECFEFF" style="background:#ECFEFF;" onclick="copyHex('#ECFEFF')"></div>
+              <div class="tonal-step" data-weight="200: #A5F3FC" style="background:#A5F3FC;" onclick="copyHex('#A5F3FC')"></div>
+              <div class="tonal-step" data-weight="400: #22D3EE" style="background:#22D3EE;" onclick="copyHex('#22D3EE')"></div>
+              <div class="tonal-step" data-weight="500: #00E5FF" style="background:#00E5FF;" onclick="copyHex('#00E5FF')"></div>
+              <div class="tonal-step" data-weight="700: #0284C7" style="background:#0284C7;" onclick="copyHex('#0284C7')"></div>
+              <div class="tonal-step" data-weight="900: #083344" style="background:#083344;" onclick="copyHex('#083344')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Neon Coral Rose -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #FF3B69, #E11D48);">
+            <div class="swatch-hex-pill" onclick="copyHex('#FF3B69')">#FF3B69 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Neon Coral Rose (Outflow / Alert)</div>
+            <div class="color-role">Debits / Overdraft / Budget Breach</div>
+            <p class="color-desc">Sophisticated warm scarlet-rose. Replaces ugly aggressive pure red with an elegant, modern warning tone.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #FFF1F2" style="background:#FFF1F2;" onclick="copyHex('#FFF1F2')"></div>
+              <div class="tonal-step" data-weight="200: #FECDD3" style="background:#FECDD3;" onclick="copyHex('#FECDD3')"></div>
+              <div class="tonal-step" data-weight="400: #FB7185" style="background:#FB7185;" onclick="copyHex('#FB7185')"></div>
+              <div class="tonal-step" data-weight="500: #FF3B69" style="background:#FF3B69;" onclick="copyHex('#FF3B69')"></div>
+              <div class="tonal-step" data-weight="700: #BE123C" style="background:#BE123C;" onclick="copyHex('#BE123C')"></div>
+              <div class="tonal-step" data-weight="900: #4C0519" style="background:#4C0519;" onclick="copyHex('#4C0519')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PALETTE 2: SOLAR AMBER & OBSIDIAN (WEALTH & ASSET VAULT) -->
+    <section style="margin-top: 32px;">
+      <div class="section-title">
+        <span>👑 System 2: Solar Amber & Titanium Obsidian</span>
+      </div>
+      <p class="section-desc">For private banking, investments, high-net-worth portfolio analytics, and sovereign vault aesthetics.</p>
+
+      <div class="color-grid">
+        <!-- 1. Solar Amber -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+            <div class="swatch-hex-pill" onclick="copyHex('#F59E0B')">#F59E0B 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Solar Amber (Net Worth / Asset)</div>
+            <div class="color-role">Sovereign Wealth / Investments</div>
+            <p class="color-desc">Rich champagne bullion gold. Conveys high-value portfolios, equity assets, and vault reserves.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #FFFBEB" style="background:#FFFBEB;" onclick="copyHex('#FFFBEB')"></div>
+              <div class="tonal-step" data-weight="200: #FDE68A" style="background:#FDE68A;" onclick="copyHex('#FDE68A')"></div>
+              <div class="tonal-step" data-weight="400: #FBBF24" style="background:#FBBF24;" onclick="copyHex('#FBBF24')"></div>
+              <div class="tonal-step" data-weight="500: #F59E0B" style="background:#F59E0B;" onclick="copyHex('#F59E0B')"></div>
+              <div class="tonal-step" data-weight="700: #B45309" style="background:#B45309;" onclick="copyHex('#B45309')"></div>
+              <div class="tonal-step" data-weight="900: #451A03" style="background:#451A03;" onclick="copyHex('#451A03')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Nordic Spruce Teal -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #14B8A6, #0F766E);">
+            <div class="swatch-hex-pill" onclick="copyHex('#14B8A6')">#14B8A6 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Nordic Spruce (Savings / Yield)</div>
+            <div class="color-role">Recurring Deposits / Compound Interest</div>
+            <p class="color-desc">Deep botanical spruce teal. Calming, stable tone for fixed deposits and long-term capital preservation.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #F0FDFA" style="background:#F0FDFA;" onclick="copyHex('#F0FDFA')"></div>
+              <div class="tonal-step" data-weight="200: #99F6E4" style="background:#99F6E4;" onclick="copyHex('#99F6E4')"></div>
+              <div class="tonal-step" data-weight="400: #2DD4BF" style="background:#2DD4BF;" onclick="copyHex('#2DD4BF')"></div>
+              <div class="tonal-step" data-weight="500: #14B8A6" style="background:#14B8A6;" onclick="copyHex('#14B8A6')"></div>
+              <div class="tonal-step" data-weight="700: #0F766E" style="background:#0F766E;" onclick="copyHex('#0F766E')"></div>
+              <div class="tonal-step" data-weight="900: #042F2E" style="background:#042F2E;" onclick="copyHex('#042F2E')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Obsidian Carbon Matrix -->
+        <div class="color-card">
+          <div class="color-swatch-hero" style="background: linear-gradient(135deg, #1E293B, #080B11);">
+            <div class="swatch-hex-pill" onclick="copyHex('#080B11')">#080B11 📋</div>
+          </div>
+          <div class="color-details">
+            <div class="color-name">Deep Obsidian Canvas</div>
+            <div class="color-role">Noctis Canvas Foundation</div>
+            <p class="color-desc">Subtly tinted navy obsidian (`#080B11`). Prevents flat lifeless `#000000` while preserving pitch black contrast.</p>
+            <div class="tonal-scale">
+              <div class="tonal-step" data-weight="50: #F8FAFC" style="background:#F8FAFC;" onclick="copyHex('#F8FAFC')"></div>
+              <div class="tonal-step" data-weight="200: #E2E8F0" style="background:#E2E8F0;" onclick="copyHex('#E2E8F0')"></div>
+              <div class="tonal-step" data-weight="400: #94A3B8" style="background:#94A3B8;" onclick="copyHex('#94A3B8')"></div>
+              <div class="tonal-step" data-weight="500: #475569" style="background:#475569;" onclick="copyHex('#475569')"></div>
+              <div class="tonal-step" data-weight="700: #1E293B" style="background:#1E293B;" onclick="copyHex('#1E293B')"></div>
+              <div class="tonal-step" data-weight="900: #080B11" style="background:#080B11;" onclick="copyHex('#080B11')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE UI SIMULATION -->
+    <div class="preview-container">
+      <div class="preview-header">
+        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;">Live FinTech UI Simulation</h2>
+        <p style="color: var(--text-muted); font-size: 13px;">Experience how these semantic shades interact inside real financial widgets.</p>
+      </div>
+
+      <div class="ui-showcase-grid">
+        <!-- Card 1: Safe To Spend -->
+        <div class="mock-card" style="border-top: 3px solid #05F29A;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Safe-to-Spend Balance</span>
+            <span class="ai-badge badge-quantum">● Active Surplus</span>
+          </div>
+          <div class="metric-value" style="color: #05F29A;">$8,420.50</div>
+          <div style="font-size: 12px; color: var(--text-dim);">+14.8% vs last 30-day velocity</div>
+        </div>
+
+        <!-- Card 2: AI Forensics Alert -->
+        <div class="mock-card" style="border-top: 3px solid #8B5CF6;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">AI Spend Forensics</span>
+            <span class="ai-badge badge-ai">✨ AI Anomaly</span>
+          </div>
+          <div class="metric-value" style="font-size: 20px; font-weight: 700; margin: 12px 0 6px;">
+            Duplicate Charge Detected
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+            2 transactions of <strong>$49.00</strong> found at Adobe Creative Cloud within 4 hours.
+          </p>
+        </div>
+
+        <!-- Card 3: Outflow Velocity -->
+        <div class="mock-card" style="border-top: 3px solid #FF3B69;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Monthly Fixed Debits</span>
+            <span class="ai-badge badge-alert">▲ 4 Days Left</span>
+          </div>
+          <div class="metric-value" style="color: #FF3B69;">$2,180.00</div>
+          <div style="font-size: 12px; color: var(--text-dim);">8 recurring commitments scheduled</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const themeBtn = document.getElementById('themeBtn');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+    const toast = document.getElementById('toast');
+
+    let currentTheme = 'dark';
+
+    themeBtn.addEventListener('click', () => {
+      if (currentTheme === 'dark') {
+        document.body.setAttribute('data-theme', 'light');
+        currentTheme = 'light';
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = 'Dark Mode';
+      } else {
+        document.body.setAttribute('data-theme', 'dark');
+        currentTheme = 'dark';
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = 'Light Mode';
+      }
+    });
+
+    function copyHex(hex) {
+      navigator.clipboard.writeText(hex).then(() => {
+        toast.textContent = `Copied ${hex}!`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    }
+  </script>
+</body>
+</html>

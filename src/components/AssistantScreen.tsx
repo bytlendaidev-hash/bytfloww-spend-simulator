@@ -5,7 +5,7 @@ interface AssistantScreenProps {
   snapshot: SpendSnapshot;
   events: FinancialEvent[];
   isDark?: boolean;
-  onSelectEvent: (event: FinancialEvent) => void;
+  onSelectEvent?: (event: FinancialEvent) => void;
 }
 
 interface Message {
@@ -102,26 +102,26 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
             <div
               className={`p-4 sm:p-5 rounded-[20px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition ${
                 m.sender === 'USER'
-                  ? 'bg-white text-neutral-900 font-bold rounded-tr-none shadow-md'
-                  : 'bg-white/10 border border-white/20 text-white rounded-tl-none shadow-sm backdrop-blur-2xl'
+                  ? 'bg-jade-500 text-abyss-canvas font-bold rounded-tr-none shadow-solid-sm'
+                  : 'bg-abyss-well border border-abyss-border text-abyss-textPrimary rounded-tl-none shadow-solid-card-dark'
               }`}
             >
               <div className="whitespace-pre-wrap">{m.text}</div>
 
               {/* Attached Event Cards Grid */}
               {m.data && Array.isArray(m.data) && (
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-white/15">
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-abyss-border">
                   {m.data.map((ev: FinancialEvent) => (
                     <div
                       key={ev.id}
-                      onClick={() => onSelectEvent(ev)}
-                      className="p-3 rounded-[12px] bg-white/5 border border-white/10 hover:bg-white/15 cursor-pointer flex items-center justify-between transition text-xs"
+                      onClick={() => onSelectEvent?.(ev)}
+                      className="p-3 rounded-[12px] bg-abyss-card border border-abyss-border hover:bg-abyss-elevated cursor-pointer flex items-center justify-between transition text-xs"
                     >
                       <div className="min-w-0 pr-2">
-                        <div className="font-bold text-white truncate">{ev.merchant}</div>
-                        <div className="text-[10px] text-white/50">{ev.dateFormatted}</div>
+                        <div className="font-bold text-abyss-textPrimary truncate">{ev.merchant}</div>
+                        <div className="text-[10px] text-abyss-textMuted">{ev.dateFormatted}</div>
                       </div>
-                      <div className="font-bold font-mono text-white shrink-0">
+                      <div className="font-bold font-mono text-abyss-textPrimary shrink-0">
                         ₹{ev.amount.toLocaleString('en-IN')}
                       </div>
                     </div>
@@ -129,25 +129,25 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
                 </div>
               )}
             </div>
-            <span className="text-[10px] mt-1 px-1 font-mono text-white/40">{m.timestamp}</span>
+            <span className="text-[10px] mt-1 px-1 font-mono text-abyss-textMuted">{m.timestamp}</span>
           </div>
         ))}
       </div>
 
-      {/* Suggested Quick Prompts (Gaze Interactive) */}
+      {/* Suggested Quick Prompts */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar py-2 text-xs">
         {samplePrompts.map((p) => (
           <button
             key={p}
             onClick={() => handleQuery(p)}
-            className="spatial-btn px-4 py-2 whitespace-nowrap text-xs text-white"
+            className="spatial-btn px-4 py-2 whitespace-nowrap text-xs text-abyss-textPrimary"
           >
             {p}
           </button>
         ))}
       </div>
 
-      {/* Input Box with VisionOS Send Pill */}
+      {/* Input Box */}
       <div className="relative pt-2">
         <input
           type="text"
@@ -155,7 +155,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleQuery(inputText)}
           placeholder="Ask Copilot about any spend, payee, loan, cashflow..."
-          className="w-full px-6 py-4 pr-24 rounded-full text-sm bg-white/10 backdrop-blur-[30px] border border-white/20 text-white placeholder-white/40 outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]"
+          className="w-full px-6 py-4 pr-24 rounded-full text-sm bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none focus:border-jade-500 focus:bg-abyss-elevated transition-all duration-200"
         />
         <button
           onClick={() => handleQuery(inputText)}

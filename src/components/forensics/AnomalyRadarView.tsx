@@ -21,32 +21,32 @@ export const AnomalyRadarView: React.FC<AnomalyRadarViewProps> = ({
   const criticalCount = redFlags.filter(f => f.severity === 'CRITICAL').length;
   const highCount = redFlags.filter(f => f.severity === 'HIGH').length;
 
-  const cardCls = `rounded-[28px] border transition-all duration-300 ${
+  const cardCls = `rounded-[24px] border transition-all duration-200 ${
     isDark 
-      ? 'bg-[#0E1720]/80 border-white/[0.08] text-white shadow-2xl shadow-black/40 backdrop-blur-2xl' 
-      : 'bg-white/85 border-slate-200/90 text-slate-900 shadow-sm backdrop-blur-2xl'
+      ? 'bg-abyss-card border-abyss-border text-abyss-textPrimary shadow-solid-card-dark' 
+      : 'bg-white border-alabaster-border text-alabaster-textPrimary shadow-solid-card-light'
   }`;
 
   return (
     <div className="space-y-6 animate-emergence">
       {/* ── TOP RADAR HUD ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200'}`}>
-          <div className="text-[10px] font-bold uppercase text-rose-400">Critical Red Flags</div>
-          <div className="text-2xl font-black font-mono mt-1 text-rose-400">{criticalCount} Detected</div>
-          <div className="text-[10px] text-rose-400/80 mt-0.5">Immediate Risk Alerts</div>
+        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-pulse-900/20 border-pulse-500/30' : 'bg-pulse-50 border-pulse-200'}`}>
+          <div className="text-[10px] font-bold uppercase text-pulse-500">Critical Red Flags</div>
+          <div className="text-2xl font-black font-mono mt-1 text-pulse-500">{criticalCount} Detected</div>
+          <div className="text-[10px] text-pulse-500/80 mt-0.5">Immediate Risk Alerts</div>
         </div>
 
-        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
-          <div className="text-[10px] font-bold uppercase text-amber-400">High / Medium Warnings</div>
-          <div className="text-2xl font-black font-mono mt-1 text-amber-400">{highCount + (redFlags.length - criticalCount - highCount)} Detected</div>
-          <div className="text-[10px] text-amber-400/80 mt-0.5">Friction & Leakages</div>
+        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-ochre-900/20 border-ochre-500/30' : 'bg-ochre-50 border-ochre-200'}`}>
+          <div className="text-[10px] font-bold uppercase text-ochre-500">High / Medium Warnings</div>
+          <div className="text-2xl font-black font-mono mt-1 text-ochre-500">{highCount + (redFlags.length - criticalCount - highCount)} Detected</div>
+          <div className="text-[10px] text-ochre-500/80 mt-0.5">Friction & Leakages</div>
         </div>
 
-        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-indigo-950/20 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'}`}>
-          <div className="text-[10px] font-bold uppercase text-indigo-400">Scanned Ledger Transactions</div>
-          <div className="text-2xl font-black font-mono mt-1 text-indigo-400">{transactions.length.toLocaleString('en-IN')} Txns</div>
-          <div className="text-[10px] text-indigo-400/80 mt-0.5">100% Automated Coverage</div>
+        <div className={`p-4 rounded-2xl border ${isDark ? 'bg-synapse-900/20 border-synapse-500/30' : 'bg-synapse-50 border-synapse-200'}`}>
+          <div className="text-[10px] font-bold uppercase text-synapse-400 light:text-synapse-700">Scanned Ledger Transactions</div>
+          <div className="text-2xl font-black font-mono mt-1 text-synapse-400 light:text-synapse-700">{transactions.length.toLocaleString('en-IN')} Txns</div>
+          <div className="text-[10px] text-synapse-400/80 mt-0.5">100% Automated Coverage</div>
         </div>
       </div>
 
@@ -54,11 +54,11 @@ export const AnomalyRadarView: React.FC<AnomalyRadarViewProps> = ({
       <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <h2 className="text-base font-black flex items-center gap-2 font-heading">
+            <h2 className="text-base font-black flex items-center gap-2 font-heading text-abyss-textPrimary">
               <span>🚨</span>
               <span>Automated Forensic Red-Flag & Suspicious Pattern Radar</span>
             </h2>
-            <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className="text-xs mt-0.5 text-abyss-textMuted">
               Pattern-matching scanner detecting rapid paycheck drains, cross-lender debt rollovers, and friction micro-leakages.
             </p>
           </div>
@@ -67,8 +67,8 @@ export const AnomalyRadarView: React.FC<AnomalyRadarViewProps> = ({
         {redFlags.length === 0 ? (
           <div className="p-8 text-center space-y-2">
             <div className="text-3xl">✅</div>
-            <div className="text-sm font-bold text-emerald-400">Zero Critical Anomalies Detected</div>
-            <div className="text-xs text-slate-400">Your ledger patterns are within expected variance bounds.</div>
+            <div className="text-sm font-bold text-jade-500">Zero Critical Anomalies Detected</div>
+            <div className="text-xs text-abyss-textMuted">Your ledger patterns are within expected variance bounds.</div>
           </div>
         ) : (
           <div className="space-y-3">
@@ -77,10 +77,10 @@ export const AnomalyRadarView: React.FC<AnomalyRadarViewProps> = ({
                 key={flag.id}
                 className={`p-4 sm:p-5 rounded-2xl border space-y-2.5 ${
                   flag.severity === 'CRITICAL'
-                    ? (isDark ? 'bg-rose-950/25 border-rose-500/30' : 'bg-rose-50 border-rose-200')
+                    ? 'bg-pulse-500/10 border-pulse-500/30'
                     : flag.severity === 'HIGH'
-                    ? (isDark ? 'bg-amber-950/25 border-amber-500/30' : 'bg-amber-50 border-amber-200')
-                    : (isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200')
+                    ? 'bg-ochre-500/10 border-ochre-500/30'
+                    : 'bg-abyss-well border-abyss-border'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -89,34 +89,32 @@ export const AnomalyRadarView: React.FC<AnomalyRadarViewProps> = ({
                       {flag.type === 'PAYCHECK_DRAIN' ? '⚡' : flag.type === 'DEBT_DOMINO' ? '🔄' : '🔍'}
                     </span>
                     <div>
-                      <h3 className="text-xs font-black">{flag.title}</h3>
-                      <div className="text-[10px] opacity-70 font-mono">
+                      <h3 className="text-xs font-black text-abyss-textPrimary">{flag.title}</h3>
+                      <div className="text-[10px] text-abyss-textMuted font-mono">
                         Date / Frequency: {flag.dateOrFrequency} • Entity: {flag.counterparty}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black font-mono text-rose-400">
+                    <span className="text-xs font-black font-mono text-pulse-500">
                       ₹{flag.amount.toLocaleString('en-IN')}
                     </span>
                     <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
                       flag.severity === 'CRITICAL'
-                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                        ? 'bg-pulse-500/20 text-pulse-500 border border-pulse-500/30'
                         : flag.severity === 'HIGH'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
+                        ? 'bg-ochre-500/20 text-ochre-500 border border-ochre-500/30'
+                        : 'bg-synapse-500/20 text-synapse-400 light:text-synapse-700 border border-synapse-500/30'
                     }`}>
                       {flag.severity}
                     </span>
                   </div>
                 </div>
 
-                <p className="text-xs leading-relaxed opacity-90">{flag.description}</p>
+                <p className="text-xs leading-relaxed text-abyss-textSecondary">{flag.description}</p>
 
-                <div className={`p-2.5 rounded-xl text-[11px] font-medium flex items-center gap-2 ${
-                  isDark ? 'bg-black/30 text-emerald-300' : 'bg-white text-emerald-800 border border-emerald-200'
-                }`}>
+                <div className="p-2.5 rounded-xl text-[11px] font-medium flex items-center gap-2 bg-jade-500/10 border border-jade-500/20 text-jade-500">
                   <span>💡</span>
                   <span><strong>Recommended Fix:</strong> {flag.recommendedFix}</span>
                 </div>
