@@ -357,58 +357,58 @@ export const App: React.FC = () => {
             )}
           </div>
 
-          {/* ── 4. BOTTOM ANDROID NAVIGATION BAR (CLEAN SOLID COLORS) ────────── */}
-          <div className={`fixed bottom-0 left-0 right-0 z-40 border-t py-2 px-4 transition ${
+          {/* ── 4. BOTTOM ANDROID NAVIGATION BAR ────────── */}
+          <div className={`fixed bottom-0 left-0 right-0 z-40 border-t py-2 px-4 transition-all duration-200 ${
             isDark 
-              ? 'bg-[#10181E] border-[#22323D] shadow-2xl shadow-black/80' 
-              : 'bg-white border-slate-200 shadow-lg'
+              ? 'bg-[#10181E]/95 backdrop-blur-xl border-white/[0.08] shadow-2xl shadow-black/90' 
+              : 'bg-white/95 backdrop-blur-xl border-slate-200/90 shadow-lg'
           }`}>
             <div className="max-w-md mx-auto flex items-center justify-around relative">
               <button 
                 onClick={() => setActiveTab('OVERVIEW')}
-                className={`flex flex-col items-center gap-1 text-[10px] font-black transition ${
+                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
                   activeTab === 'OVERVIEW'
-                    ? (isDark ? 'text-[#00F2FE]' : 'text-teal-700')
+                    ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
                     : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
                 }`}
               >
-                <span className="text-lg">🏠</span>
+                <span className="text-xl">🏠</span>
                 <span>Home</span>
                 {activeTab === 'OVERVIEW' && (
-                  <span className={`w-1 h-1 rounded-full ${isDark ? 'bg-[#00F2FE]' : 'bg-teal-700'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${isDark ? 'bg-brand-viridian' : 'bg-brand-600'}`} />
                 )}
               </button>
 
               <button 
                 onClick={() => setActiveTab('TRANSACTIONS')}
-                className={`flex flex-col items-center gap-1 text-[10px] font-black transition ${
+                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
                   activeTab === 'TRANSACTIONS'
-                    ? (isDark ? 'text-[#00F2FE]' : 'text-teal-700')
+                    ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
                     : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
                 }`}
               >
-                <span className="text-lg">📊</span>
+                <span className="text-xl">📊</span>
                 <span>Spend</span>
                 {activeTab === 'TRANSACTIONS' && (
-                  <span className={`w-1 h-1 rounded-full ${isDark ? 'bg-[#00F2FE]' : 'bg-teal-700'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${isDark ? 'bg-brand-viridian' : 'bg-brand-600'}`} />
                 )}
               </button>
 
-              {/* Central Floating AI Button (Solid Color, No Gradients) */}
+              {/* Central Floating AI Button */}
               <div className="relative -top-5 flex flex-col items-center">
                 <button
                   onClick={() => setActiveTab('ASSISTANT')}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center font-black transition-all duration-150 hover:scale-105 active:scale-95 shadow-lg ${
+                  className={`w-14 h-14 rounded-full flex items-center justify-center font-black transition-all duration-150 hover:scale-105 active:scale-95 shadow-xl ${
                     isDark 
-                      ? 'bg-[#00BFA5] text-slate-950 ring-4 ring-[#0A1014]' 
-                      : 'bg-[#0D9488] text-white ring-4 ring-white shadow-teal-900/20'
+                      ? 'bg-brand-viridian text-slate-950 ring-4 ring-[#080D11] shadow-brand-viridian/30' 
+                      : 'bg-brand-600 text-white ring-4 ring-white shadow-brand-600/30'
                   }`}
                   title="Open AI Spend Copilot"
                 >
                   <span className="text-2xl">✨</span>
                 </button>
                 <span className={`block text-center text-[9px] font-black mt-1 tracking-wider uppercase ${
-                  isDark ? 'text-[#00F2FE]' : 'text-teal-800'
+                  isDark ? 'text-brand-viridian' : 'text-brand-700'
                 }`}>
                   AI Copilot
                 </span>
@@ -416,26 +416,26 @@ export const App: React.FC = () => {
 
               <button 
                 onClick={() => setActiveTab('COMMITMENTS')}
-                className={`flex flex-col items-center gap-1 text-[10px] font-black transition ${
+                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
                   activeTab === 'COMMITMENTS'
-                    ? (isDark ? 'text-[#00F2FE]' : 'text-teal-700')
+                    ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
                     : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
                 }`}
               >
-                <span className="text-lg">💡</span>
+                <span className="text-xl">💡</span>
                 <span>Lenders</span>
                 {activeTab === 'COMMITMENTS' && (
-                  <span className={`w-1 h-1 rounded-full ${isDark ? 'bg-[#00F2FE]' : 'bg-teal-700'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full mt-0.5 ${isDark ? 'bg-brand-viridian' : 'bg-brand-600'}`} />
                 )}
               </button>
 
               <button 
                 onClick={() => setShowDiagnostics(true)}
-                className={`flex flex-col items-center gap-1 text-[10px] font-black transition ${
+                className={`flex flex-col items-center gap-0.5 text-[10px] font-black transition-all duration-150 active:scale-95 ${
                   isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span className="text-lg">👤</span>
+                <span className="text-xl">👤</span>
                 <span>Profile</span>
               </button>
             </div>

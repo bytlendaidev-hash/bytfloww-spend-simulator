@@ -36,18 +36,18 @@ export const SpendMonthSelector: React.FC<SpendMonthSelectorProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4">
       <div 
-        className={`w-full max-w-md rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl border transition-all animate-fade-in ${
+        className={`w-full max-w-md rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-7 shadow-2xl border transition-all duration-200 animate-fade-in ${
           isDark 
-            ? 'bg-[#0E1C23] border-cyan-500/20 text-[#E2ECEF]' 
-            : 'bg-white border-slate-200 text-[#0F172A]'
+            ? 'bg-[#10181E] border-white/[0.08] text-white shadow-black/80' 
+            : 'bg-white border-slate-200/90 text-slate-900 shadow-xl'
         }`}
       >
         <div className={`flex items-center justify-between pb-4 border-b ${
-          isDark ? 'border-white/10' : 'border-slate-100'
+          isDark ? 'border-white/[0.06]' : 'border-slate-100'
         }`}>
           <div>
-            <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>Select Spend Period</h3>
-            <p className={`text-xs ${isDark ? 'text-[#8A9EA8]' : 'text-slate-500'}`}>Filter by historical month or all time</p>
+            <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>Select Spend Period</h3>
+            <p className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Filter by historical month or all time</p>
           </div>
           <button 
             onClick={onClose}
@@ -62,7 +62,7 @@ export const SpendMonthSelector: React.FC<SpendMonthSelectorProps> = ({
         <div className="my-4 space-y-4 max-h-[55vh] overflow-y-auto pr-1 no-scrollbar text-xs">
           {/* Quick Ranges */}
           <div>
-            <span className={`font-semibold block mb-2 ${isDark ? 'text-[#8A9EA8]' : 'text-slate-500'}`}>Quick Horizons</span>
+            <span className={`font-black uppercase tracking-wider text-[10px] block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Quick Horizons</span>
             <div className="space-y-1.5">
               {quickRanges.map(r => (
                 <div
@@ -71,16 +71,18 @@ export const SpendMonthSelector: React.FC<SpendMonthSelectorProps> = ({
                     onSelectPeriod(r.key);
                     onClose();
                   }}
-                  className={`p-3.5 rounded-2xl cursor-pointer flex items-center justify-between transition border ${
+                  className={`p-3.5 rounded-2xl cursor-pointer flex items-center justify-between transition-all duration-150 border ${
                     selectedPeriodKey === r.key
-                      ? 'bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-cyan-500/40 text-[#00F2FE] font-bold'
+                      ? isDark
+                        ? 'bg-brand-viridian/15 border-brand-viridian/40 text-brand-viridian font-black'
+                        : 'bg-emerald-50 border-brand-300 text-brand-800 font-black shadow-sm'
                       : isDark
-                      ? 'bg-[#12232B] hover:bg-[#152a35] text-slate-200 border-white/5'
-                      : 'bg-[#F8FAFC] hover:bg-slate-100 text-slate-800 border-slate-200/80'
+                      ? 'bg-[#142027] hover:bg-[#1a2832] text-slate-300 border-white/[0.06]'
+                      : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200/80 shadow-sm'
                   }`}
                 >
-                  <span>{r.label}</span>
-                  {selectedPeriodKey === r.key && <span>✓</span>}
+                  <span className="font-bold">{r.label}</span>
+                  {selectedPeriodKey === r.key && <span className="font-black text-brand-viridian dark:text-brand-viridian">✓</span>}
                 </div>
               ))}
             </div>
@@ -88,7 +90,9 @@ export const SpendMonthSelector: React.FC<SpendMonthSelectorProps> = ({
 
           {/* Historical Months */}
           <div>
-            <span className={`font-semibold block mb-2 ${isDark ? 'text-[#8A9EA8]' : 'text-slate-500'}`}>Historical Months Detected ({availableMonths.length})</span>
+            <span className={`font-black uppercase tracking-wider text-[10px] block mb-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Historical Months Detected ({availableMonths.length})
+            </span>
             <div className="space-y-1.5">
               {availableMonths.map(m => (
                 <div
@@ -97,21 +101,23 @@ export const SpendMonthSelector: React.FC<SpendMonthSelectorProps> = ({
                     onSelectPeriod(m.monthKey);
                     onClose();
                   }}
-                  className={`p-3.5 rounded-2xl cursor-pointer flex items-center justify-between transition border ${
+                  className={`p-3.5 rounded-2xl cursor-pointer flex items-center justify-between transition-all duration-150 border ${
                     selectedPeriodKey === m.monthKey
-                      ? 'bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border-cyan-500/40 text-[#00F2FE] font-bold'
+                      ? isDark
+                        ? 'bg-brand-viridian/15 border-brand-viridian/40 text-brand-viridian font-black'
+                        : 'bg-emerald-50 border-brand-300 text-brand-800 font-black shadow-sm'
                       : isDark
-                      ? 'bg-[#12232B] hover:bg-[#152a35] text-slate-200 border-white/5'
-                      : 'bg-[#F8FAFC] hover:bg-slate-100 text-slate-800 border-slate-200/80'
+                      ? 'bg-[#142027] hover:bg-[#1a2832] text-slate-300 border-white/[0.06]'
+                      : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200/80 shadow-sm'
                   }`}
                 >
                   <div>
-                    <div className="font-bold">{m.label} ({m.monthKey})</div>
-                    <div className={`text-[10px] ${isDark ? 'text-[#8A9EA8]' : 'text-slate-500'}`}>{m.count} transactions</div>
+                    <div className="font-black">{m.label} ({m.monthKey})</div>
+                    <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{m.count} transactions</div>
                   </div>
                   <div className="text-right font-mono">
-                    <div>₹{m.spend.toLocaleString('en-IN')}</div>
-                    {selectedPeriodKey === m.monthKey && <span className="text-[#00F2FE] text-xs">✓ Active</span>}
+                    <div className="font-black">₹{m.spend.toLocaleString('en-IN')}</div>
+                    {selectedPeriodKey === m.monthKey && <span className={`text-[10px] font-black ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>✓ Active</span>}
                   </div>
                 </div>
               ))}
@@ -122,3 +128,4 @@ export const SpendMonthSelector: React.FC<SpendMonthSelectorProps> = ({
     </div>
   );
 };
+

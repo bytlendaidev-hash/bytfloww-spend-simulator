@@ -62,25 +62,25 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
   const displayedEvents = filteredEvents.slice(0, page * pageSize);
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8">
       {/* ── 1. SEARCH INPUT ─────────────────────────────────────────────── */}
       <div className="relative">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-          placeholder="Search merchant, amount (>1k), UPI ID, Txn Ref..."
-          className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition backdrop-blur-xl ${
+          placeholder="Search merchant, amount, UPI ID, Reference No..."
+          className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-150 ${
             isDark 
-              ? 'bg-[#10181E]/85 border-white/[0.08] text-white placeholder-slate-500 focus:border-cyan-500/50 shadow-xl shadow-black/40' 
-              : 'bg-white border-slate-200 text-[#0F172A] placeholder-slate-400 focus:border-[#00BFA5] shadow-sm'
+              ? 'bg-[#10181E] border-white/[0.08] text-white placeholder-slate-500 focus:border-brand-viridian focus:ring-2 focus:ring-brand-viridian/20' 
+              : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 shadow-sm'
           }`}
         />
         <span className="absolute left-4 top-3.5 text-xs text-slate-400">🔍</span>
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-4 top-3.5 text-xs text-slate-400 hover:text-slate-200"
+            className="absolute right-4 top-3.5 text-xs text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded-full"
           >
             ✕
           </button>
@@ -90,26 +90,26 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
       {/* ── 2. QUICK FILTER CHIPS ────────────────────────────────────────── */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs">
         {[
-          { key: 'ALL', label: 'All' },
+          { key: 'ALL', label: 'All Transactions' },
           { key: 'EXPENSES', label: 'Expenses' },
           { key: 'INCOME', label: 'Income' },
           { key: 'TRANSFERS', label: 'Transfers' },
           { key: 'EMIS', label: 'EMIs & Loans' },
-          { key: 'HIGH_VAL', label: 'High Value' },
+          { key: 'HIGH_VAL', label: 'High Value (≥₹1k)' },
         ].map((chip) => {
           const isSelected = activeFilter === chip.key;
           return (
             <button
               key={chip.key}
               onClick={() => { setActiveFilter(chip.key as any); setPage(1); }}
-              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition border ${
+              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
                 isSelected
                   ? isDark
-                    ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5] shadow-md shadow-teal-500/20'
-                    : 'bg-[#0D9488] text-white border-[#0D9488] shadow-md'
+                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-md shadow-brand-viridian/25'
+                    : 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-600/20'
                   : isDark
-                  ? 'border-[#273B49] text-slate-300 bg-[#152028] hover:bg-[#1C2C38] hover:text-white'
-                  : 'border-slate-300 text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                  ? 'border-white/[0.08] text-slate-300 bg-[#142027] hover:bg-[#1a2832] hover:text-white'
+                  : 'border-slate-200/90 text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 shadow-sm'
               }`}
             >
               {chip.label}
@@ -118,37 +118,38 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         })}
       </div>
 
-      <div className={`text-xs font-bold px-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-        {filteredEvents.length} transactions found
+      <div className={`text-xs font-bold px-1 flex items-center justify-between ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+        <span>{filteredEvents.length} filtered transactions</span>
+        <span>Showing {displayedEvents.length} items</span>
       </div>
 
       {/* ── 3. MONTH SUMMARY BANNER ─────────────────────────────────────── */}
-      <div className={`p-5 rounded-[28px] border flex items-center justify-between shadow-sm ${
-        isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200'
+      <div className={`p-5 rounded-[28px] border flex items-center justify-between shadow-sm transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90'
       }`}>
         <div>
           <h4 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            August 2026
+            August 2026 Live Ledger
           </h4>
-          <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-            {filteredEvents.length} transactions
+          <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            {filteredEvents.length} parsed events
           </span>
         </div>
 
         <div className="flex items-center gap-4 text-xs font-bold font-mono">
           <div className="text-right">
-            <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Spend</span>
-            <span className="text-rose-500 font-black text-sm">₹{(totalFilteredSpend / 1000).toFixed(1)} k</span>
+            <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Spend</span>
+            <span className="text-rose-600 dark:text-rose-400 font-black text-sm">₹{Math.round(totalFilteredSpend).toLocaleString('en-IN')}</span>
           </div>
           <div className="text-right">
-            <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Income</span>
-            <span className={`font-black text-sm ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}>₹{(totalFilteredIncome / 1000).toFixed(1)} k</span>
+            <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Income</span>
+            <span className={`font-black text-sm ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>₹{Math.round(totalFilteredIncome).toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
 
       {/* ── 4. TRANSACTION CARD ITEMS ────────────────────────────────────── */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {displayedEvents.map((ev) => {
           const isCredit = ev.direction === 'INFLOW';
 
@@ -156,42 +157,61 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
             <div
               key={ev.id}
               onClick={() => onSelectEvent(ev)}
-              className={`p-4.5 rounded-[24px] border cursor-pointer flex items-center justify-between transition ${
+              className={`p-4 rounded-[24px] border cursor-pointer flex items-center justify-between transition-all duration-150 active:scale-[0.99] group ${
                 isDark 
-                  ? 'bg-[#121B22] border-[#22323D] hover:border-[#00BFA5]/40 hover:bg-[#18242D]' 
-                  : 'bg-white border-slate-200 hover:bg-slate-50 shadow-sm'
+                  ? 'bg-[#10181E] border-white/[0.06] hover:border-brand-viridian/40 hover:bg-[#142027]' 
+                  : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/80 shadow-sm'
               }`}
             >
-              <div className="flex items-center gap-3.5">
-                <div className="relative">
-                  <MerchantLogoView merchantName={ev.merchant} size={44} isDark={isDark} />
-                  <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black ${
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="relative flex-shrink-0">
+                  <MerchantLogoView merchantName={ev.merchant} size={42} isDark={isDark} />
+                  <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black shadow-sm ${
                     isCredit ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
                   }`}>
                     {isCredit ? '↓' : '↑'}
                   </span>
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <div className={`text-xs sm:text-sm font-black tracking-tight truncate max-w-[170px] sm:max-w-xs ${
-                    isDark ? 'text-white' : 'text-[#0F172A]'
+                    isDark ? 'text-white' : 'text-slate-900'
                   }`}>
                     {ev.merchant}
                   </div>
-                  <div className="text-[11px] text-slate-400 font-medium">
+                  <div className={`text-[11px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {ev.category} {ev.accountHint ? `• ${ev.accountHint}` : ''}
                   </div>
                 </div>
               </div>
 
-              <div className="text-right">
-                <div className={`text-xs sm:text-sm font-black font-mono ${
-                  isCredit ? 'text-[#00F2FE]' : 'text-rose-400'
-                }`}>
-                  {isCredit ? '+' : '-'}₹{ev.amount > 1000 ? `${(ev.amount / 1000).toFixed(1)} k` : ev.amount.toLocaleString('en-IN')}
-                </div>
-                <div className="text-[10px] text-slate-400 font-medium">
-                  {ev.dateFormatted}, {ev.timeFormatted}
+              <div className="flex items-center gap-3 flex-shrink-0 pl-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSplitBill(ev);
+                  }}
+                  className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition ${
+                    isDark
+                      ? 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:bg-white/[0.1]'
+                      : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                  }`}
+                  title="Split bill with friends"
+                >
+                  <span>➗</span>
+                  <span>Split</span>
+                </button>
+
+                <div className="text-right">
+                  <div className={`text-xs sm:text-sm font-black font-mono ${
+                    isCredit ? (isDark ? 'text-brand-viridian' : 'text-brand-700') : 'text-rose-600 dark:text-rose-400'
+                  }`}>
+                    {isCredit ? '+' : '-'}₹{ev.amount.toLocaleString('en-IN')}
+                  </div>
+                  <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    {ev.dateFormatted}, {ev.timeFormatted}
+                  </div>
                 </div>
               </div>
             </div>
@@ -204,8 +224,10 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         <div className="pt-2 text-center">
           <button
             onClick={() => setPage(p => p + 1)}
-            className={`w-full py-3.5 rounded-2xl border text-xs font-bold transition ${
-              isDark ? 'border-white/10 text-slate-300 hover:bg-white/5' : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+            className={`w-full py-3.5 rounded-2xl border text-xs font-black transition-all duration-150 active:scale-[0.99] ${
+              isDark 
+                ? 'bg-[#142027] border-white/[0.08] text-slate-200 hover:bg-[#1a2832]' 
+                : 'bg-white border-slate-200/90 text-slate-800 hover:bg-slate-100 shadow-sm'
             }`}
           >
             Load More Transactions ({filteredEvents.length - page * pageSize} remaining)
@@ -215,3 +237,4 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
     </div>
   );
 };
+

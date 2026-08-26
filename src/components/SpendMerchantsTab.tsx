@@ -29,10 +29,10 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
 
   const totalMerchantSpend = merchants.reduce((s, m) => s + m.totalSpend, 0);
 
-  const colors = ['#E91E63', '#3F51B5', '#00BCD4', '#009688', '#FF5722', '#FF9800', '#9E9E9E'];
+  const colors = ['#059669', '#4F46E5', '#D97706', '#E11D48', '#2563EB', '#0284C7', '#7C3AED'];
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8">
       {/* ── 1. SEARCH & FILTER BAR ─────────────────────────────────────── */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -40,44 +40,46 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search merchants..."
-            className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition backdrop-blur-xl ${
+            placeholder="Search merchants, brands, platforms..."
+            className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-150 ${
               isDark 
-                ? 'bg-[#10181E]/85 border-white/[0.08] text-white placeholder-slate-500 focus:border-cyan-500/50 shadow-xl shadow-black/40' 
-                : 'bg-white border-slate-200 text-[#0F172A] placeholder-slate-400 focus:border-[#00BFA5] shadow-sm'
+                ? 'bg-[#10181E] border-white/[0.08] text-white placeholder-slate-500 focus:border-brand-viridian focus:ring-2 focus:ring-brand-viridian/20' 
+                : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 shadow-sm'
             }`}
           />
           <span className="absolute left-4 top-3.5 text-xs text-slate-400">🔍</span>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-3.5 text-xs text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded-full"
+            >
+              ✕
+            </button>
+          )}
         </div>
-
-        <button className={`w-12 h-12 rounded-2xl border flex items-center justify-center text-sm backdrop-blur-xl ${
-          isDark ? 'bg-[#10181E]/85 border-white/[0.08] text-slate-300' : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-        }`}>
-          ⚡
-        </button>
       </div>
 
       {/* Filter Chips */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs">
         {[
-          { key: 'ALL', label: 'All' },
-          { key: 'FREQUENT', label: 'Frequent' },
-          { key: 'RECURRING', label: 'Recurring' },
-          { key: 'TOP_AVG', label: 'Top Avg' },
+          { key: 'ALL', label: 'All Merchants' },
+          { key: 'FREQUENT', label: 'Frequent (≥3 txns)' },
+          { key: 'RECURRING', label: 'Recurring Subscriptions' },
+          { key: 'TOP_AVG', label: 'High Ticket (≥₹1k avg)' },
         ].map((chip) => {
           const isSelected = filterType === chip.key;
           return (
             <button
               key={chip.key}
               onClick={() => setFilterType(chip.key as any)}
-              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition border ${
+              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 ${
                 isSelected
                   ? isDark
-                    ? 'bg-[#00BFA5] text-slate-950 border-[#00BFA5] shadow-md shadow-teal-500/20'
-                    : 'bg-[#0D9488] text-white border-[#0D9488] shadow-md'
+                    ? 'bg-brand-viridian text-slate-950 border-brand-viridian shadow-md shadow-brand-viridian/25'
+                    : 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-600/20'
                   : isDark
-                  ? 'border-[#273B49] text-slate-300 bg-[#152028] hover:bg-[#1C2C38] hover:text-white'
-                  : 'border-slate-300 text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 shadow-sm'
+                  ? 'border-white/[0.08] text-slate-300 bg-[#142027] hover:bg-[#1a2832] hover:text-white'
+                  : 'border-slate-200/90 text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 shadow-sm'
               }`}
             >
               {chip.label}
@@ -89,18 +91,18 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
       {/* ── 2. MERCHANT DIRECTORY HEADER ───────────────────────────────── */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className={`text-base ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}>🏪</span>
+          <span className={`text-base ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>🏪</span>
           <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            Merchant Directory
+            Merchant Directory & Spend DNA
           </h3>
         </div>
-        <span className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          {filteredMerchants.length} entities
+        <span className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          {filteredMerchants.length} detected entities
         </span>
       </div>
 
       {/* ── 3. MERCHANT CARDS LIST ─────────────────────────────────────── */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {filteredMerchants.map((m, idx) => {
           const accentColor = colors[idx % colors.length];
           const pct = totalMerchantSpend > 0 ? ((m.totalSpend / totalMerchantSpend) * 100).toFixed(1) : '0';
@@ -110,38 +112,38 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
               key={m.name}
               onClick={() => onSelectMerchant(m.name)}
               style={{ borderLeftColor: accentColor, borderLeftWidth: '4px' }}
-              className={`p-4.5 rounded-[24px] border transition cursor-pointer flex items-center justify-between hover:scale-[1.01] ${
+              className={`p-4 rounded-[24px] border transition-all duration-150 cursor-pointer flex items-center justify-between hover:scale-[1.005] active:scale-[0.99] group ${
                 isDark 
-                  ? 'bg-[#121B22] border-[#22323D] hover:border-[#00BFA5]/40 hover:bg-[#18242D]' 
-                  : 'bg-white border-slate-200 hover:bg-slate-50 shadow-sm'
+                  ? 'bg-[#10181E] border-white/[0.06] hover:border-brand-viridian/40 hover:bg-[#142027]' 
+                  : 'bg-white border-slate-200/80 hover:border-slate-300 hover:bg-slate-50/80 shadow-sm'
               }`}
             >
-              <div className="flex items-center gap-3.5">
-                <MerchantLogoView merchantName={m.name} size={44} isDark={isDark} />
-                <div>
+              <div className="flex items-center gap-3.5 min-w-0">
+                <MerchantLogoView merchantName={m.name} size={42} isDark={isDark} />
+                <div className="min-w-0">
                   <div className={`text-xs sm:text-sm font-black tracking-tight truncate max-w-[180px] sm:max-w-xs ${
                     isDark ? 'text-white' : 'text-slate-900'
                   }`}>
                     {m.name}
                   </div>
-                  <div className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <div className={`text-[11px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {m.txCount} transaction{m.txCount > 1 ? 's' : ''} • Avg ₹{m.avgTicket.toLocaleString('en-IN')}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-right">
+              <div className="flex items-center gap-3 text-right flex-shrink-0 pl-2">
                 <div>
                   <div className={`text-xs sm:text-sm font-black font-mono ${
                     isDark ? 'text-white' : 'text-slate-900'
                   }`}>
                     ₹{m.totalSpend.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[11px] font-bold" style={{ color: accentColor }}>
-                    {pct}% of total
+                  <div className="text-[11px] font-black" style={{ color: accentColor }}>
+                    {pct}% of spend
                   </div>
                 </div>
-                <span className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>›</span>
+                <span className={`text-sm font-black ${isDark ? 'text-slate-400' : 'text-slate-400'} group-hover:translate-x-0.5 transition-transform`}>›</span>
               </div>
             </div>
           );
@@ -150,3 +152,4 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
     </div>
   );
 };
+

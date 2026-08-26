@@ -24,7 +24,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: 'COPILOT',
-      text: `Hello! I am your Gemini Financial Copilot. I have indexed all **${events.length.toLocaleString('en-IN')} real transactions** from your SMS dataset. Ask me anything about your spend habits, specific payees, loan commitments, or accounts!`,
+      text: `Hello! I am your BytFloww AI Spend Copilot. I have indexed all **${events.length.toLocaleString('en-IN')} real transactions** from your SMS dataset. Ask me anything about your spend habits, specific payees, loan commitments, or accounts!`,
       timestamp: 'Just now',
     },
   ]);
@@ -92,8 +92,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
   ];
 
   return (
-    <div className={`p-6 sm:p-8 rounded-[32px] border flex flex-col h-[75vh] ${
-      isDark ? 'bg-[#0E1C23]/90 border-cyan-500/15 shadow-xl shadow-cyan-950/20' : 'bg-white border-slate-200 shadow-sm'
+    <div className={`p-6 sm:p-8 rounded-[32px] border flex flex-col h-[75vh] transition-all duration-200 ${
+      isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
     }`}>
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto space-y-4 pr-2 no-scrollbar">
@@ -103,30 +103,34 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
             className={`flex flex-col ${m.sender === 'USER' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`p-4.5 rounded-[24px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition ${
+              className={`p-4 sm:p-5 rounded-[24px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition ${
                 m.sender === 'USER'
-                  ? 'bg-gradient-to-r from-[#00F2FE] to-[#9B51E0] text-black font-bold rounded-tr-none shadow-[0_0_20px_rgba(0,242,254,0.3)]'
+                  ? 'bg-gradient-to-r from-selvex-600 to-selvex-500 text-white font-bold rounded-tr-none shadow-md shadow-selvex-500/25'
                   : isDark
-                  ? 'bg-[#12232B] text-white border border-cyan-500/20 rounded-tl-none'
-                  : 'bg-slate-100 text-slate-900 border border-slate-200 shadow-sm rounded-tl-none'
+                  ? 'bg-[#142027] text-white border border-white/[0.08] rounded-tl-none'
+                  : 'bg-slate-50 text-slate-900 border border-slate-200/80 shadow-sm rounded-tl-none'
               }`}
             >
               <div className="whitespace-pre-wrap">{m.text}</div>
 
               {/* Attached Event Cards Grid */}
               {m.data && Array.isArray(m.data) && (
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-white/10">
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-white/10 dark:border-white/10 border-slate-200">
                   {m.data.map((ev: FinancialEvent) => (
                     <div
                       key={ev.id}
                       onClick={() => onSelectEvent(ev)}
-                      className="p-3 rounded-2xl bg-[#081216]/80 hover:bg-[#081216] cursor-pointer flex items-center justify-between transition text-xs border border-white/5 hover:border-cyan-500/30"
+                      className={`p-3 rounded-2xl cursor-pointer flex items-center justify-between transition text-xs border ${
+                        isDark 
+                          ? 'bg-[#10181E] border-white/[0.06] hover:border-brand-viridian/40' 
+                          : 'bg-white border-slate-200 hover:border-brand-500 shadow-sm'
+                      }`}
                     >
-                      <div>
-                        <div className="font-bold text-white truncate max-w-[140px]">{ev.merchant}</div>
-                        <div className="text-[10px] text-[#8A9EA8]">{ev.dateFormatted}</div>
+                      <div className="min-w-0 pr-2">
+                        <div className={`font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{ev.merchant}</div>
+                        <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{ev.dateFormatted}</div>
                       </div>
-                      <div className="font-black font-mono text-[#00F2FE]">
+                      <div className="font-black font-mono text-rose-600 dark:text-rose-400 flex-shrink-0">
                         ₹{ev.amount.toLocaleString('en-IN')}
                       </div>
                     </div>
@@ -134,21 +138,21 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
                 </div>
               )}
             </div>
-            <span className="text-[10px] text-[#8A9EA8] mt-1 px-1">{m.timestamp}</span>
+            <span className={`text-[10px] mt-1 px-1 font-medium ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{m.timestamp}</span>
           </div>
         ))}
       </div>
 
       {/* Suggested Quick Prompts */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar py-2 text-xs">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar py-2.5 text-xs">
         {samplePrompts.map((p) => (
           <button
             key={p}
             onClick={() => handleQuery(p)}
-            className={`px-4 py-2 rounded-2xl whitespace-nowrap transition border ${
+            className={`px-3.5 py-1.5 rounded-2xl whitespace-nowrap transition-all duration-150 border flex-shrink-0 font-bold active:scale-95 ${
               isDark 
-                ? 'bg-[#12232B] border-cyan-500/20 text-slate-200 hover:border-cyan-500/40 hover:text-white' 
-                : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                ? 'bg-[#142027] border-white/[0.08] text-slate-200 hover:border-selvex-400 hover:text-white' 
+                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 shadow-sm'
             }`}
           >
             {p}
@@ -163,16 +167,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleQuery(inputText)}
-          placeholder="Ask Copilot about any expense, payee, loan, cashflow..."
-          className={`w-full px-5 py-4 pr-24 rounded-2xl text-xs sm:text-sm outline-none border transition ${
+          placeholder="Ask Copilot about any spend, payee, loan, cashflow..."
+          className={`w-full px-5 py-4 pr-24 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-150 ${
             isDark 
-              ? 'bg-[#12232B] border-cyan-500/20 text-white placeholder-[#5F7480] focus:border-[#00F2FE]' 
-              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#00F2FE]'
+              ? 'bg-[#142027] border-white/[0.08] text-white placeholder-slate-500 focus:border-selvex-500 focus:ring-2 focus:ring-selvex-500/20' 
+              : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-selvex-500 focus:ring-2 focus:ring-selvex-500/20 shadow-sm'
           }`}
         />
         <button
           onClick={() => handleQuery(inputText)}
-          className="absolute right-3 top-5 px-5 py-2 bg-gradient-to-r from-[#00F2FE] to-[#9B51E0] text-black font-extrabold text-xs rounded-xl transition shadow-[0_0_18px_rgba(0,242,254,0.4)] hover:scale-105"
+          className="absolute right-3 top-5 px-5 py-2 bg-selvex-600 hover:bg-selvex-500 text-white font-black text-xs rounded-xl transition-all duration-150 shadow-md shadow-selvex-500/30 hover:scale-105 active:scale-95"
         >
           Send
         </button>
@@ -180,3 +184,4 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
     </div>
   );
 };
+

@@ -3,21 +3,34 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --brand-viridian: #059669;
+    --brand-selvex: #4F46E5;
+    --brand-ambric: #D97706;
+    --brand-vermora: #E11D48;
+  }
+
   body {
-    transition: background-color 0.2s ease, color 0.2s ease;
-    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif;
+    transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Dark theme clean solid obsidian background */
+  /* Dark theme clean solid obsidian background with subtle mesh glow */
   body.dark-mode {
-    background-color: #0A1014;
+    background-color: #080D11;
     color: #FFFFFF;
+    background-image: radial-gradient(circle at 15% 0%, rgba(0, 200, 150, 0.12) 0%, transparent 40%), radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 45%), radial-gradient(circle at 10% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 40%), radial-gradient(circle at 90% 90%, rgba(0, 242, 254, 0.08) 0%, transparent 45%);
+    background-attachment: fixed;
   }
 
-  /* Light theme clean solid porcelain background */
+  /* Light theme clean solid porcelain canvas with soft mesh ambient tint */
   body.light-mode {
-    background-color: #F4F6F9;
+    background-color: #F8FAFC;
     color: #0F172A;
+    background-image: radial-gradient(circle at 10% 0%, rgba(16, 185, 129, 0.06) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.05) 0%, transparent 40%), radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.03) 0%, transparent 40%);
+    background-attachment: fixed;
   }
 }
 
@@ -32,8 +45,8 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.04); opacity: 1; }
 }
 
 .animate-pulse-glow {
@@ -48,3 +61,4 @@
 .animate-fade-in {
   animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+

@@ -23,26 +23,25 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
   };
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8">
       {/* ── 1. SPENDS BY CATEGORY DONUT CHART CARD ──────────────────────── */}
-      <div className={`p-6 sm:p-7 rounded-[32px] border backdrop-blur-2xl shadow-2xl transition ${
-        isDark ? 'bg-[#10181E]/85 border-white/[0.08] shadow-black/60' : 'bg-white border-slate-200 shadow-sm'
+      <div className={`p-6 sm:p-7 rounded-[32px] border transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+            <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
               Spends by Category
             </h3>
-            <span className="text-xs text-slate-400 font-medium">
-              Total Spend • August 2026
+            <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Total Spend • August 2026 Live Analysis
             </span>
           </div>
 
-          <button className={`flex items-center gap-1 px-4 py-2 rounded-2xl text-xs font-black border transition ${
-            isDark ? 'bg-white/[0.05] border-white/[0.08] text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-700'
+          <button className={`flex items-center gap-1 px-3.5 py-1.5 rounded-2xl text-xs font-black border transition ${
+            isDark ? 'bg-[#142027] border-white/[0.08] text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-700'
           }`}>
-            <span>📅 This Month</span>
-            <span className="text-[10px]">▼</span>
+            <span>📅 August 2026</span>
           </button>
         </div>
 
@@ -56,7 +55,7 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
                 cy="50"
                 r="38"
                 fill="transparent"
-                stroke={isDark ? '#1E293B' : '#F1F5F9'}
+                stroke={isDark ? '#1E293B' : '#E2E8F0'}
                 strokeWidth="12"
               />
               {/* Dynamic segments */}
@@ -87,11 +86,11 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
 
             {/* Center Text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className={`text-lg font-black font-mono ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+              <span className={`text-lg font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 ₹{Math.round(totalSpend).toLocaleString('en-IN')}
               </span>
-              <span className={`text-[11px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Total
+              <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Total Spend
               </span>
             </div>
           </div>
@@ -102,19 +101,19 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
               <div key={cat.category} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
-                    <span className={`font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>{cat.category}</span>
+                    <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: cat.color }} />
+                    <span className={`font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{cat.category}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`font-mono ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{cat.pct}%</span>
-                    <span className={`font-mono font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                    <span className={`font-mono font-bold text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{cat.pct}%</span>
+                    <span className={`font-mono font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
                       ₹{cat.amount.toLocaleString('en-IN')}
                     </span>
                   </div>
                 </div>
-                <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>
+                <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-black/40' : 'bg-slate-100'}`}>
                   <div 
-                    style={{ width: `${cat.pct}%`, backgroundColor: cat.color }}
+                    style={{ width: `${Math.max(2, cat.pct)}%`, backgroundColor: cat.color }}
                     className="h-full rounded-full"
                   />
                 </div>
@@ -125,19 +124,19 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
       </div>
 
       {/* ── 2. CATEGORY DIRECTORY ───────────────────────────────────────── */}
-      <div className={`p-6 rounded-[28px] border space-y-4 ${
-        isDark ? 'bg-[#101920] border-white/10' : 'bg-white border-slate-200 shadow-sm'
+      <div className={`p-6 rounded-[28px] border space-y-4 transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between">
-          <h3 className={`text-base font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+          <h3 className={`text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
             Category Directory
           </h3>
-          <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Sort by: <strong className="cursor-pointer">Amount ▼</strong>
+          <span className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            Sorted by Total Spend
           </span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {categories.map((cat) => {
             const isExpanded = expandedCategory === cat.category;
             const catEvents = isExpanded ? getCategoryEvents(cat.category) : [];
@@ -145,8 +144,8 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
             return (
               <div
                 key={cat.category}
-                className={`p-4 rounded-2xl border transition ${
-                  isDark ? 'bg-[#0B1217] border-white/5' : 'bg-[#F8FAFC] border-slate-200/80'
+                className={`p-4 rounded-2xl border transition-all duration-150 ${
+                  isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'
                 }`}
               >
                 <div 
@@ -156,39 +155,39 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm"
-                        style={{ backgroundColor: `${cat.color}20`, color: cat.color }}
+                        className="w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm shadow-sm"
+                        style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
                       >
                         {cat.category.slice(0, 1)}
                       </div>
                       <div>
-                        <div className={`text-xs sm:text-sm font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                        <div className={`text-xs sm:text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           {cat.category}
                         </div>
-                        <div className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                          {cat.eventCount} spends
+                        <div className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                          {cat.eventCount} transactions
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <div className={`text-xs sm:text-sm font-black font-mono ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
+                        <div className={`text-xs sm:text-sm font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           ₹{cat.amount.toLocaleString('en-IN')}
                         </div>
-                        <div className="text-[11px] font-bold" style={{ color: cat.color }}>
+                        <div className="text-[11px] font-black" style={{ color: cat.color }}>
                           {cat.pct}%
                         </div>
                       </div>
-                      <span className={`text-slate-400 text-xs font-bold transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
+                      <span className={`text-slate-400 text-sm font-black transition-transform duration-150 ${isExpanded ? 'rotate-90' : ''}`}>
                         ›
                       </span>
                     </div>
                   </div>
 
-                  <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-white/5' : 'bg-slate-200'}`}>
+                  <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-black/40' : 'bg-slate-200'}`}>
                     <div 
-                      style={{ width: `${cat.pct}%`, backgroundColor: cat.color }}
+                      style={{ width: `${Math.max(2, cat.pct)}%`, backgroundColor: cat.color }}
                       className="h-full rounded-full"
                     />
                   </div>
@@ -196,21 +195,21 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
 
                 {/* Expanded Sub-transactions */}
                 {isExpanded && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-white/5 space-y-2">
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-white/10 space-y-2 animate-fade-in">
                     {catEvents.map(e => (
                       <div 
                         key={e.id}
                         onClick={() => onSelectEvent(e)}
-                        className={`p-2.5 rounded-xl flex items-center justify-between cursor-pointer text-xs ${
-                          isDark ? 'bg-[#101920] hover:bg-white/5' : 'bg-white hover:bg-slate-50 border border-slate-200'
+                        className={`p-2.5 rounded-xl flex items-center justify-between cursor-pointer text-xs transition ${
+                          isDark ? 'bg-[#18242D] hover:bg-[#20303D]' : 'bg-white hover:bg-slate-100 border border-slate-200/80 shadow-sm'
                         }`}
                       >
                         <div>
-                          <div className={`font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>{e.merchant}</div>
-                          <div className="text-[10px] text-slate-400">{e.dateFormatted} • {e.paymentMode}</div>
+                          <div className={`font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>{e.merchant}</div>
+                          <div className="text-[10px] text-slate-400 font-medium">{e.dateFormatted} • {e.paymentMode}</div>
                         </div>
-                        <div className={`font-mono font-bold ${isDark ? 'text-white' : 'text-[#0F172A]'}`}>
-                          ₹{e.amount.toLocaleString('en-IN')}
+                        <div className="font-mono font-black text-rose-600 dark:text-rose-400">
+                          -₹{e.amount.toLocaleString('en-IN')}
                         </div>
                       </div>
                     ))}
@@ -224,3 +223,4 @@ export const SpendCategoriesTab: React.FC<SpendCategoriesTabProps> = ({
     </div>
   );
 };
+

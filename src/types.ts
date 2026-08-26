@@ -492,23 +492,33 @@ export type ActiveModule = 'SMS_INTELLIGENCE' | 'BANK_STATEMENTS';
 
 export type StatementSection = 
   | 'OVERVIEW' 
-  | 'TRANSACTIONS'
-  | 'SPENDING'
   | 'INCOME'
   | 'LOANS' 
   | 'PEOPLE'
-  | 'RECURRING'
+  | 'LIFESTYLE'
   | 'CASH_FLOW'
-  | 'INSIGHTS'
+  | 'RECURRING'
+  | 'ANOMALIES'
+  | 'FLOW_MAP'
+  | 'CREDIT_CARDS'
+  | 'CASH_ATM'
+  | 'WALLETS'
+  | 'RATIOS'
+  | 'WHERE_100_WENT'
+  | 'RISK_SCORE'
+  | 'TRANSACTIONS'
   | 'AI_ANALYST'
   | 'UPLOAD'
-  | 'INFLOW'       // backwards compat alias
-  | 'CATEGORIES'   // backwards compat alias
-  | 'VELOCITY'     // backwards compat alias
-  | 'MERCHANTS'    // backwards compat alias
-  | 'CHANNELS'     // backwards compat alias
-  | 'LEDGER'       // backwards compat alias
-  | 'COPILOT';     // backwards compat alias
+  // Backwards compat aliases
+  | 'SPENDING'
+  | 'INSIGHTS'
+  | 'INFLOW'
+  | 'CATEGORIES'
+  | 'VELOCITY'
+  | 'MERCHANTS'
+  | 'CHANNELS'
+  | 'LEDGER'
+  | 'COPILOT';
 
 export interface BackendFinancialAccount {
   id: string;
@@ -542,5 +552,6 @@ export interface BackendRecurringItem {
   nextBillingDate?: string;
   status: 'ACTIVE' | 'PAUSED' | 'CANCELLED';
 }
+
 
 

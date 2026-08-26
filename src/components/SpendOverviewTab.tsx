@@ -45,36 +45,36 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
   const topMerchant = snapshot.topMerchants[0];
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-6">
-      {/* ── 1. HERO PERIOD SPEND CARD (SOLID DEEP EMERALD) ─────────────── */}
-      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] text-white shadow-xl space-y-4 relative overflow-hidden transition-all border ${
+    <div className="space-y-4 max-w-4xl mx-auto pb-8">
+      {/* ── 1. HERO PERIOD SPEND CARD ────────────────────────────────────── */}
+      <div className={`p-6 sm:p-8 rounded-[28px] sm:rounded-[32px] text-white shadow-xl space-y-4 relative overflow-hidden transition-all duration-200 border ${
         isDark
-          ? 'bg-[#062420] border-[#00BFA5]/30 shadow-black/40'
-          : 'bg-[#004D40] border-teal-800 shadow-md'
+          ? 'bg-hero-emerald-dark border-brand-viridian/25 shadow-black/60'
+          : 'bg-hero-emerald border-emerald-700/60 shadow-brand-900/10'
       }`}>
         {/* Top period header */}
         <div className="flex items-center justify-between gap-2 relative z-10">
-          <span className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 bg-[#00BFA5]/20 text-[#00F2FE] border border-[#00BFA5]/30">
-            <span className="w-2 h-2 rounded-full bg-[#00BFA5]" />
-            ● {snapshot.periodLabel.toUpperCase()}
+          <span className="px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider flex items-center gap-2 bg-black/25 text-brand-300 dark:text-brand-viridian border border-white/10 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-brand-400 dark:bg-brand-viridian animate-pulse" />
+            <span>● {snapshot.periodLabel.toUpperCase()}</span>
           </span>
 
-          <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm ${
+          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm backdrop-blur-md ${
             snapshot.netCashflow >= 0
               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
               : 'bg-rose-500/20 text-rose-300 border-rose-400/30'
           }`}>
-            ● {snapshot.healthScoreTier}
+            ● {snapshot.healthScoreTier} TIER
           </span>
         </div>
 
         {/* Main spend number */}
         <div className="relative z-10 pt-1">
-          <span className="text-[10px] sm:text-[11px] uppercase tracking-widest text-teal-200 font-bold block">
-            spent this period
+          <span className="text-[11px] uppercase tracking-widest text-emerald-200 font-bold block opacity-90">
+            Total Spent This Period
           </span>
           <div className="text-3xl sm:text-5xl font-black tracking-tight font-mono mt-1 text-white flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl text-[#00F2FE] font-sans">₹</span>
+            <span className="text-2xl sm:text-3xl text-brand-300 dark:text-brand-viridian font-sans font-normal">₹</span>
             {snapshot.totalSpend.toLocaleString('en-IN')}
           </div>
         </div>
@@ -82,22 +82,24 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
         {/* Budget Status line & Progress bar */}
         <div className="space-y-2 pt-1 relative z-10">
           <div className="flex items-center justify-between text-[11px] sm:text-xs">
-            <span className="px-2.5 py-0.5 rounded-full bg-black/40 text-[10px] sm:text-[11px] font-bold text-teal-100 border border-white/10">
-              {snapshot.transactionCount} transactions
+            <span className="px-2.5 py-0.5 rounded-full bg-black/30 text-[11px] font-bold text-emerald-100 border border-white/10">
+              {snapshot.transactionCount} transactions analyzed
             </span>
-            <span className={`text-[11px] sm:text-xs font-black truncate max-w-[200px] sm:max-w-none ${isOverBudget ? 'text-amber-300' : 'text-emerald-300'}`}>
+            <span className={`text-[11px] sm:text-xs font-black truncate max-w-[220px] sm:max-w-none ${
+              isOverBudget ? 'text-amber-300' : 'text-emerald-200'
+            }`}>
               {isOverBudget 
                 ? `Over budget by ₹${varianceAmount.toLocaleString('en-IN')} (${budgetPct}%)` 
-                : `Within budget (${budgetPct}% used)`}
+                : `Within budget (${budgetPct}% utilized)`}
             </span>
           </div>
 
-          {/* Progress bar (Solid Color) */}
+          {/* Progress bar */}
           <div className="h-2 sm:h-2.5 rounded-full bg-black/40 border border-white/10 overflow-hidden p-0.5">
             <div 
               style={{ width: `${Math.min(100, Math.max(3, budgetPct))}%` }}
-              className={`h-full rounded-full transition-all duration-300 ${
-                isOverBudget ? 'bg-[#EF4444]' : 'bg-[#00BFA5]'
+              className={`h-full rounded-full transition-all duration-500 ${
+                isOverBudget ? 'bg-rose-500' : 'bg-brand-400 dark:bg-brand-viridian'
               }`}
             />
           </div>
@@ -105,13 +107,13 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       </div>
 
       {/* ── 2. TRI-METRIC CASHFLOW STRIP (RESPONSIVE 3-COLUMN STRIP) ──────── */}
-      <div className={`p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] border grid grid-cols-3 gap-1 sm:gap-2 text-left shadow-sm transition ${
-        isDark ? 'bg-[#121B22] border-[#22323D] text-white' : 'bg-white border-slate-200 text-slate-900'
+      <div className={`p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] border grid grid-cols-3 gap-2 text-left shadow-sm transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08] text-white' : 'bg-white border-slate-200/90 text-slate-900'
       }`}>
         {/* Income */}
         <div className="space-y-0.5 sm:space-y-1 pl-1">
-          <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
-            isDark ? 'text-[#00F2FE]' : 'text-teal-700'
+          <div className={`flex items-center gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
+            isDark ? 'text-brand-viridian' : 'text-brand-700'
           }`}>
             <span>↓</span> Income
           </div>
@@ -121,29 +123,27 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
         </div>
 
         {/* Expenses */}
-        <div className={`space-y-0.5 sm:space-y-1 border-l border-r px-2 sm:px-3 ${isDark ? 'border-[#22323D]' : 'border-slate-200'}`}>
-          <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
-            isDark ? 'text-rose-400' : 'text-rose-600'
-          }`}>
+        <div className={`space-y-0.5 sm:space-y-1 border-l border-r px-2 sm:px-3 ${isDark ? 'border-white/[0.08]' : 'border-slate-200'}`}>
+          <div className="flex items-center gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400">
             <span>↑</span> Spend
           </div>
-          <div className={`text-xs sm:text-lg font-black font-mono text-rose-500 truncate`}>
+          <div className="text-xs sm:text-lg font-black font-mono text-rose-600 dark:text-rose-400 truncate">
             ₹{snapshot.totalSpend.toLocaleString('en-IN')}
           </div>
         </div>
 
         {/* Net Flow */}
         <div className="space-y-0.5 sm:space-y-1 pl-1 sm:pl-2">
-          <div className={`flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
+          <div className={`flex items-center gap-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider ${
             snapshot.netCashflow >= 0 
-              ? (isDark ? 'text-[#00F2FE]' : 'text-teal-700')
+              ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
               : (isDark ? 'text-rose-400' : 'text-rose-600')
           }`}>
             <span>⇄</span> Net Flow
           </div>
           <div className={`text-xs sm:text-lg font-black font-mono truncate ${
             snapshot.netCashflow >= 0 
-              ? (isDark ? 'text-[#00F2FE]' : 'text-teal-700')
+              ? (isDark ? 'text-brand-viridian' : 'text-brand-700')
               : (isDark ? 'text-rose-400' : 'text-rose-600')
           }`}>
             {snapshot.netCashflow >= 0 ? '+' : '-'}₹{Math.abs(snapshot.netCashflow).toLocaleString('en-IN')}
@@ -151,15 +151,15 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
         </div>
       </div>
 
-      {/* ── 3. MORNING & EVENING ROUTINE CARDS (FULL WIDTH ON MOBILE) ───── */}
+      {/* ── 3. MORNING & EVENING ROUTINE CARDS ───────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Morning Intention */}
         <div 
           onClick={() => onOpenDebrief()}
-          className={`p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] border flex items-center justify-between cursor-pointer transition active:scale-[0.99] ${
+          className={`p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] border flex items-center justify-between cursor-pointer transition-all duration-150 active:scale-[0.99] ${
             isDark 
-              ? 'bg-[#121B22] border-[#22323D] hover:border-[#00BFA5]/50 text-white' 
-              : 'bg-white border-slate-200 hover:border-teal-400 text-slate-900 shadow-sm'
+              ? 'bg-[#10181E] border-white/[0.08] hover:border-amber-500/40 text-white' 
+              : 'bg-white border-slate-200/90 hover:border-amber-400 text-slate-900 shadow-sm'
           }`}
         >
           <div className="flex items-center gap-3.5">
@@ -171,31 +171,31 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                 <span className={`text-xs sm:text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Morning Intention
                 </span>
-                <span className={`text-[9px] font-black px-2 py-0.2 rounded-full border ${
-                  isDark ? 'bg-[#00BFA5]/15 text-[#00F2FE] border-[#00BFA5]/30' : 'bg-teal-50 text-teal-800 border-teal-200'
+                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border ${
+                  isDark ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-800 border-amber-200'
                 }`}>
                   LIVE
                 </span>
               </div>
-              <div className={`text-[10px] sm:text-[11px] font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <div className={`text-[10px] sm:text-[11px] font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Real-time spend notifications
               </div>
             </div>
           </div>
-          <span className={`text-base font-black pl-2 ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}>→</span>
+          <span className={`text-base font-black pl-2 ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>→</span>
         </div>
 
         {/* Evening Reflection */}
         <div 
           onClick={() => onOpenDebrief()}
-          className={`p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] border flex items-center justify-between cursor-pointer transition active:scale-[0.99] ${
+          className={`p-4 sm:p-5 rounded-[24px] sm:rounded-[28px] border flex items-center justify-between cursor-pointer transition-all duration-150 active:scale-[0.99] ${
             isDark 
-              ? 'bg-[#121B22] border-[#22323D] hover:border-purple-500/50 text-white' 
-              : 'bg-white border-slate-200 hover:border-purple-400 text-slate-900 shadow-sm'
+              ? 'bg-[#10181E] border-white/[0.08] hover:border-selvex-500/40 text-white' 
+              : 'bg-white border-slate-200/90 hover:border-selvex-300 text-slate-900 shadow-sm'
           }`}
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl flex-shrink-0">
+            <div className="w-11 h-11 rounded-2xl bg-selvex-500/10 border border-selvex-500/20 flex items-center justify-center text-xl flex-shrink-0">
               🌙
             </div>
             <div>
@@ -203,24 +203,24 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                 <span className={`text-xs sm:text-sm font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Night Reflection
                 </span>
-                <span className={`text-[9px] font-black px-2 py-0.2 rounded-full border ${
-                  isDark ? 'bg-purple-500/15 text-purple-300 border-purple-400/30' : 'bg-purple-50 text-purple-800 border-purple-200'
+                <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border ${
+                  isDark ? 'bg-selvex-500/15 text-selvex-300 border-selvex-500/30' : 'bg-indigo-50 text-selvex-700 border-selvex-200'
                 }`}>
                   10 PM
                 </span>
               </div>
-              <div className={`text-[10px] sm:text-[11px] font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              <div className={`text-[10px] sm:text-[11px] font-medium mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                 Nightly wrap-up & debrief
               </div>
             </div>
           </div>
-          <span className={`text-base font-black pl-2 ${isDark ? 'text-purple-400' : 'text-purple-700'}`}>→</span>
+          <span className={`text-base font-black pl-2 ${isDark ? 'text-selvex-400' : 'text-selvex-600'}`}>→</span>
         </div>
       </div>
 
       {/* ── 4. WHERE YOUR MONEY WENT (CATEGORIES) ──────────────────────── */}
-      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3.5 transition ${
-        isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3.5 transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between">
           <h3 className={`text-sm sm:text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -228,7 +228,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           </h3>
           <button 
             onClick={() => onNavigateToTab('CATEGORIES')}
-            className={`text-xs font-black hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+            className={`text-xs font-black hover:underline ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}
           >
             View all ({snapshot.categoryDistribution.length}) →
           </button>
@@ -242,7 +242,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
             <div
               key={cat.category}
               style={{ width: `${Math.max(3, cat.pct)}%`, backgroundColor: cat.color }}
-              className="h-full rounded-full hover:opacity-80 transition cursor-pointer shadow-sm"
+              className="h-full rounded-full hover:opacity-85 transition cursor-pointer shadow-sm"
               title={`${cat.category}: ₹${cat.amount.toLocaleString('en-IN')} (${cat.pct}%)`}
               onClick={() => onSelectCategory ? onSelectCategory(cat) : onNavigateToTab('CATEGORIES')}
             />
@@ -255,10 +255,10 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
             <div 
               key={cat.category}
               onClick={() => onSelectCategory ? onSelectCategory(cat) : onNavigateToTab('CATEGORIES')}
-              className={`p-3.5 rounded-2xl cursor-pointer transition space-y-1.5 border ${
+              className={`p-3.5 rounded-2xl cursor-pointer transition-all duration-150 space-y-1.5 border ${
                 isDark 
-                  ? 'bg-[#18242D] hover:bg-[#20303D] border-[#273B49]' 
-                  : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+                  ? 'bg-[#142027] hover:bg-[#1a2832] border-white/[0.06]' 
+                  : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80'
               }`}
             >
               <div className="flex items-center justify-between text-xs sm:text-sm">
@@ -269,7 +269,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className={`font-mono text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <span className={`font-mono text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {cat.pct}%
                   </span>
                   <span className={`font-mono font-black text-xs sm:text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -290,19 +290,21 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
         </div>
       </div>
 
-      {/* ── 5. ✨ NEEDS YOUR ATTENTION (AI COPILOT SMART INSIGHTS) ────────── */}
-      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3 transition ${
-        isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+      {/* ── 5. ✨ SELVEX AI COPILOT SMART INSIGHTS ───────────────────────── */}
+      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3 transition-all duration-200 ${
+        isDark 
+          ? 'bg-selvex-950/20 border-selvex-500/25 text-white' 
+          : 'bg-indigo-50/70 border-indigo-100 text-slate-900 shadow-sm'
       }`}>
         <div className="flex items-center justify-between">
           <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-wider ${
-            isDark ? 'text-[#00F2FE]' : 'text-teal-800'
+            isDark ? 'text-selvex-400' : 'text-selvex-700'
           }`}>
-            <span>✨</span> NEEDS YOUR ATTENTION
+            <span>✨</span> BYTFLOWW AI INTELLIGENCE
           </div>
           <button 
             onClick={() => onNavigateToTab('ASSISTANT')}
-            className={`text-xs font-black hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+            className={`text-xs font-black hover:underline ${isDark ? 'text-selvex-400' : 'text-selvex-700'}`}
           >
             Ask Copilot →
           </button>
@@ -314,34 +316,34 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
             <span className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
               {isOverBudget 
                 ? `Budget exceeded by ₹${varianceAmount.toLocaleString('en-IN')}`
-                : `Healthy financial period: ₹${varianceAmount.toLocaleString('en-IN')} headroom remaining`}
+                : `Healthy financial velocity: ₹${varianceAmount.toLocaleString('en-IN')} headroom remaining this period`}
             </span>
           </div>
 
           {topMerchant && (
             <div 
               onClick={() => onSelectMerchant(topMerchant.name)}
-              className="flex items-start gap-2 cursor-pointer hover:opacity-80"
+              className="flex items-start gap-2 cursor-pointer hover:opacity-85"
             >
-              <span className={`font-bold ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}>•</span>
+              <span className={`font-bold ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}>•</span>
               <span className={isDark ? 'text-slate-200' : 'text-slate-800'}>
-                Largest merchant: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{topMerchant.name}</strong> (₹{topMerchant.totalSpend.toLocaleString('en-IN')}) 🔍
+                Primary merchant spend: <strong className={isDark ? 'text-white' : 'text-slate-900'}>{topMerchant.name}</strong> (₹{topMerchant.totalSpend.toLocaleString('en-IN')}) 🔍
               </span>
             </div>
           )}
 
           <div className={`flex items-start gap-2 pt-2 text-[11px] sm:text-xs border-t ${
-            isDark ? 'text-slate-400 border-white/5' : 'text-slate-600 border-slate-200'
+            isDark ? 'text-slate-400 border-white/[0.08]' : 'text-slate-500 border-indigo-100'
           }`}>
             <span>💡</span>
-            <span>AI Financial Intelligence analyzed {snapshot.transactionCount} transactions across your SMS feed.</span>
+            <span>Real-time local ML analysis processed {snapshot.transactionCount} transactions with 100% privacy.</span>
           </div>
         </div>
       </div>
 
       {/* ── 6. UPCOMING COMMITMENTS (RESPONSIVE 2x2 ON MOBILE) ─────────── */}
-      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3 transition ${
-        isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3 transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between">
           <h3 className={`text-sm sm:text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -349,7 +351,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           </h3>
           <button 
             onClick={() => onNavigateToTab('COMMITMENTS')}
-            className={`text-xs font-black hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+            className={`text-xs font-black hover:underline ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}
           >
             View all ({snapshot.commitments.length}) →
           </button>
@@ -359,45 +361,45 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           onClick={() => onNavigateToTab('COMMITMENTS')}
           className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-left pt-0.5 cursor-pointer hover:opacity-90 transition"
         >
-          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>EMIs</span>
+          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'}`}>
+            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>EMIs</span>
             <div className={`text-xs sm:text-base font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               ₹{snapshot.totalEmis.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Subs</span>
+          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'}`}>
+            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Subs</span>
             <div className={`text-xs sm:text-base font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               ₹{snapshot.totalSubscriptions.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Bills</span>
+          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'}`}>
+            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Bills</span>
             <div className={`text-xs sm:text-base font-black font-mono mt-0.5 ${isDark ? 'text-white' : 'text-slate-900'}`}>
               ₹{snapshot.totalBills.toLocaleString('en-IN')}
             </div>
           </div>
 
-          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#18242D] border-[#273B49]' : 'bg-slate-50 border-slate-200'}`}>
-            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Insurance</span>
-            <div className={`text-xs sm:text-base font-black font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          <div className={`p-3 sm:p-3.5 rounded-2xl border ${isDark ? 'bg-[#142027] border-white/[0.06]' : 'bg-slate-50 border-slate-200/80'}`}>
+            <span className={`text-[10px] sm:text-[11px] font-bold block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Insurance</span>
+            <div className={`text-xs sm:text-base font-black font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>
               —
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── 7. LINKED BANK ACCOUNTS (STACKED ON MOBILE) ───────────────── */}
+      {/* ── 7. LINKED BANK ACCOUNTS ─────────────────────────────────────── */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <div className={`flex items-center gap-1.5 text-xs font-black uppercase tracking-wider ${
-            isDark ? 'text-[#00F2FE]' : 'text-teal-800'
+            isDark ? 'text-brand-viridian' : 'text-brand-800'
           }`}>
             <span>●</span> LINKED BANK ACCOUNTS & LIQUIDITY
           </div>
-          <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {snapshot.accounts.length} Accounts • Tap to inspect 🔍
           </span>
         </div>
@@ -410,7 +412,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
               ? 'bg-[#4D0A14] border-rose-700/40 text-white'
               : isHdfc
               ? 'bg-[#0A2540] border-blue-700/40 text-white'
-              : 'bg-[#082824] border-teal-700/40 text-white';
+              : 'bg-[#082824] border-emerald-700/40 text-white';
 
             const cardId = isHdfc ? 'hdfc-bank-account-card' : isAirtel ? 'airtel-bank-account-card' : `bank-account-${acc.accountMask}`;
             return (
@@ -418,7 +420,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                 id={cardId}
                 key={`${acc.institution}_${acc.accountMask}`}
                 onClick={() => onSelectAccount && onSelectAccount(acc)}
-                className={`p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] text-white space-y-3 shadow-md cursor-pointer hover:scale-[1.005] transition border group ${bgClass}`}
+                className={`p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] text-white space-y-3 shadow-md cursor-pointer hover:scale-[1.005] transition-all duration-150 border group ${bgClass}`}
               >
                 {/* Header Row: Bank Logo, Institution, Verified Badge & Account Mask */}
                 <div className="flex items-center justify-between gap-2">
@@ -446,14 +448,14 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                     AVAILABLE BALANCE
                   </span>
                   <div className="text-2xl sm:text-3xl font-black font-mono mt-0.5 flex items-baseline gap-0.5">
-                    <span className="text-lg font-sans text-teal-300">₹</span>
+                    <span className="text-lg font-sans text-emerald-300">₹</span>
                     {(acc.latestBalance !== undefined ? acc.latestBalance : (isAirtel ? 33.09 : 26860)).toLocaleString('en-IN')}
                   </div>
                 </div>
 
                 <div className="pt-2 border-t border-white/10 flex justify-between text-xs text-slate-300">
                   <span className="text-[11px]">Period Outflow: <strong className="text-white font-mono">₹{acc.totalDebits.toLocaleString('en-IN')}</strong></span>
-                  <span className="text-[10px] text-teal-300 font-black group-hover:underline">View History ↗</span>
+                  <span className="text-[10px] text-emerald-300 font-black group-hover:underline">View History ↗</span>
                 </div>
               </div>
             );
@@ -465,11 +467,11 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <div className={`flex items-center gap-1.5 text-xs font-black uppercase tracking-wider ${
-            isDark ? 'text-[#00F2FE]' : 'text-teal-800'
+            isDark ? 'text-brand-viridian' : 'text-brand-800'
           }`}>
             <span>●</span> DETECTED CREDIT CARDS & SPEND LIMITS
           </div>
-          <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          <span className={`text-[11px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {snapshot.creditCards.length} Card • Tap for Drilldown 🔍
           </span>
         </div>
@@ -480,7 +482,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
             <div 
               key={`${card.institution}_${card.accountMask}`}
               onClick={() => onSelectCreditCard && onSelectCreditCard(card)}
-              className="p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] bg-[#3D0B16] text-white relative overflow-hidden shadow-md cursor-pointer hover:scale-[1.005] transition border border-rose-700/40 group"
+              className="p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] bg-[#3D0B16] text-white relative overflow-hidden shadow-md cursor-pointer hover:scale-[1.005] transition-all duration-150 border border-rose-700/40 group"
             >
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-2">
@@ -523,41 +525,41 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       {/* ── 9. GRACE PERIOD & MULTI-CARD ADVISOR ───────────────────────── */}
       <div 
         onClick={() => onSelectCreditCard && onSelectCreditCard(primaryCreditCard)}
-        className={`p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] border transition cursor-pointer hover:scale-[1.005] group shadow-sm ${
+        className={`p-5 sm:p-6 rounded-[24px] sm:rounded-[28px] border transition-all duration-150 cursor-pointer hover:scale-[1.005] group shadow-sm ${
           isDark 
-            ? 'bg-[#082824] border-teal-500/30 text-teal-100' 
-            : 'bg-teal-50 border-teal-200 text-teal-950'
+            ? 'bg-[#082824] border-emerald-500/30 text-emerald-100' 
+            : 'bg-emerald-50/90 border-brand-200 text-emerald-950'
         }`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-base sm:text-lg">🔥</span>
-            <span className={`text-xs font-black uppercase tracking-wider ${isDark ? 'text-[#00F2FE]' : 'text-teal-900'}`}>
+            <span className={`text-xs font-black uppercase tracking-wider ${isDark ? 'text-brand-viridian' : 'text-brand-800'}`}>
               46 Days Interest-Free Swipe Today
             </span>
           </div>
           <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase border ${
-            isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-teal-200 text-teal-900 border-teal-300'
+            isDark ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-emerald-200 text-emerald-900 border-emerald-300'
           }`}>
             SWIPE TODAY
           </span>
         </div>
 
-        <p className={`text-[11px] sm:text-xs font-medium leading-relaxed mt-2 ${isDark ? 'text-teal-200' : 'text-teal-900'}`}>
+        <p className={`text-[11px] sm:text-xs font-medium leading-relaxed mt-2 ${isDark ? 'text-emerald-200' : 'text-emerald-900'}`}>
           {primaryCreditCard.institution} Credit Card (*{primaryCreditCard.accountMask}): Fresh billing cycle active. Swiping today gives you up to 46 days interest-free runway!
         </p>
 
         <div className={`pt-2 border-t flex justify-between text-xs mt-2.5 ${
-          isDark ? 'border-teal-500/20 text-teal-300' : 'border-teal-200 text-teal-800'
+          isDark ? 'border-emerald-500/20 text-emerald-300' : 'border-brand-200 text-brand-800'
         }`}>
           <span className="text-[11px]">Unbilled Spend: <strong className={`font-mono font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>₹{primaryCreditCard.totalDebits.toLocaleString('en-IN')}</strong></span>
-          <span className={`text-[10px] font-black group-hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-900'}`}>Inspect Runway ↗</span>
+          <span className={`text-[10px] font-black group-hover:underline ${isDark ? 'text-brand-viridian' : 'text-brand-800'}`}>Inspect Runway ↗</span>
         </div>
       </div>
 
       {/* ── 10. RECENT TRANSACTIONS FEED ──────────────────────────────── */}
-      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3.5 transition ${
-        isDark ? 'bg-[#121B22] border-[#22323D]' : 'bg-white border-slate-200 shadow-sm'
+      <div className={`p-5 sm:p-7 rounded-[28px] sm:rounded-[32px] border space-y-3.5 transition-all duration-200 ${
+        isDark ? 'bg-[#10181E] border-white/[0.08]' : 'bg-white border-slate-200/90 shadow-sm'
       }`}>
         <div className="flex items-center justify-between">
           <h3 className={`text-sm sm:text-base font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
@@ -565,7 +567,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           </h3>
           <button 
             onClick={() => onNavigateToTab('TRANSACTIONS')}
-            className={`text-xs font-black hover:underline ${isDark ? 'text-[#00F2FE]' : 'text-teal-700'}`}
+            className={`text-xs font-black hover:underline ${isDark ? 'text-brand-viridian' : 'text-brand-700'}`}
           >
             View All ({snapshot.transactionCount}) →
           </button>
@@ -579,10 +581,10 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
               <div
                 key={ev.id}
                 onClick={() => onSelectEvent(ev)}
-                className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition ${
+                className={`p-3.5 rounded-2xl border flex items-center justify-between cursor-pointer transition-all duration-150 ${
                   isDark 
-                    ? 'bg-[#18242D] border-[#273B49] hover:bg-[#20303D]' 
-                    : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                    ? 'bg-[#142027] border-white/[0.06] hover:bg-[#1a2832]' 
+                    : 'bg-slate-50 border-slate-200/80 hover:bg-slate-100'
                 }`}
               >
                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -594,7 +596,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                     }`}>
                       {ev.merchant}
                     </div>
-                    <div className={`text-[10px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    <div className={`text-[10px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                       {ev.category} • {ev.dateFormatted}
                     </div>
                   </div>
@@ -602,11 +604,11 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
 
                 <div className="text-right flex-shrink-0 pl-2">
                   <div className={`text-xs font-black font-mono ${
-                    isCredit ? (isDark ? 'text-[#00F2FE]' : 'text-emerald-700') : 'text-rose-500'
+                    isCredit ? (isDark ? 'text-brand-viridian' : 'text-brand-700') : 'text-rose-600 dark:text-rose-400'
                   }`}>
                     {isCredit ? '+' : '-'}₹{ev.amount.toLocaleString('en-IN')}
                   </div>
-                  <div className={`text-[9px] sm:text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <div className={`text-[9px] sm:text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {ev.paymentMode}
                   </div>
                 </div>
@@ -615,13 +617,13 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           })}
         </div>
 
-        {/* View All Button (Solid Color) */}
+        {/* View All Button */}
         <button
           onClick={() => onNavigateToTab('TRANSACTIONS')}
-          className={`w-full py-3.5 rounded-2xl font-black text-xs transition shadow-md active:scale-[0.99] ${
+          className={`w-full py-3.5 rounded-2xl font-black text-xs transition-all duration-150 shadow-md active:scale-[0.99] ${
             isDark 
-              ? 'bg-[#00BFA5] hover:bg-[#00A892] text-slate-950' 
-              : 'bg-[#0D9488] hover:bg-[#0F766E] text-white'
+              ? 'bg-brand-viridian hover:bg-brand-viridianDark text-slate-950 shadow-brand-viridian/20' 
+              : 'bg-brand-600 hover:bg-brand-700 text-white shadow-brand-600/20'
           }`}
         >
           View All {snapshot.transactionCount} Transactions ({snapshot.periodLabel}) →
@@ -630,4 +632,5 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
     </div>
   );
 };
+
 
