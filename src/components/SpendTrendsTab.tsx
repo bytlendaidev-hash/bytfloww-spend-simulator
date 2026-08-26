@@ -3,13 +3,12 @@ import { SpendSnapshot } from '../types';
 
 interface SpendTrendsTabProps {
   snapshot: SpendSnapshot;
-  isDark: boolean;
+  isDark?: boolean;
   onSelectPeriod: (monthKey: string) => void;
 }
 
 export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
   snapshot,
-  isDark,
 }) => {
   // Aggregate real daily spend from snapshot events
   const debits = snapshot.filteredEvents.filter(e => e.direction === 'OUTFLOW' && e.economicType !== 'REFUND');
@@ -43,30 +42,28 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
   const svgLineD = `M 0 110 ` + cumulativePoints.map(p => `L ${p.x} ${p.y}`).join(' ');
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8 animate-emergence">
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
       {/* ── 1. DAILY SPENDING ACTIVITY ─────────────────────────────────── */}
-      <div className={`p-6 sm:p-7 rounded-[32px] border space-y-4 transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
+      <div className="spatial-card p-6 sm:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base text-emerald-400">📊</span>
-            <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span className="text-base text-[#0A84FF]">📊</span>
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
               Daily Spending Activity
             </h3>
           </div>
-          <span className={`text-xs font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          <span className="text-xs text-white/50 font-medium">
             {daysInPeriod} days tracked ({snapshot.periodLabel})
           </span>
         </div>
 
         {/* 31 Bars Chart Container */}
         <div className="pt-4">
-          <div className="h-44 flex items-end justify-between gap-1 border-b border-slate-200 dark:border-white/10 pb-1 relative">
-            <div className="absolute top-2 left-0 text-[10px] text-slate-400 font-mono">
+          <div className="h-44 flex items-end justify-between gap-1.5 border-b border-white/10 pb-1 relative">
+            <div className="absolute top-0 left-0 text-[10px] text-white/40 font-mono">
               ₹{maxDaySpend.toLocaleString('en-IN')}
             </div>
-            <div className="absolute top-1/2 left-0 text-[10px] text-slate-400 font-mono">
+            <div className="absolute top-1/2 left-0 text-[10px] text-white/40 font-mono">
               ₹{Math.round(maxDaySpend / 2).toLocaleString('en-IN')}
             </div>
 
@@ -80,10 +77,10 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
                     style={{ height: `${heightPct}%` }}
                     className={`w-full rounded-t-sm transition-all duration-300 ${
                       isPeak 
-                        ? 'bg-gradient-to-t from-emerald-400 to-teal-300 shadow-lg shadow-emerald-400/50' 
+                        ? 'bg-gradient-to-t from-[#0A84FF] to-[#30D158] shadow-[0_0_12px_rgba(10,132,255,0.6)]' 
                         : d.spend > 0 
-                        ? 'bg-emerald-500/80 hover:bg-emerald-400' 
-                        : isDark ? 'bg-white/[0.06]' : 'bg-slate-200'
+                        ? 'bg-white/30 hover:bg-white/60' 
+                        : 'bg-white/5'
                     }`}
                     title={`Day ${d.day}: ₹${d.spend.toLocaleString('en-IN')}`}
                   />
@@ -95,30 +92,28 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
       </div>
 
       {/* ── 2. CUMULATIVE SPENDING AREA CHART ───────────────────────────── */}
-      <div className={`p-6 sm:p-7 rounded-[28px] border space-y-3 transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-lg shadow-black/40' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
+      <div className="spatial-card p-6 sm:p-8 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base text-emerald-400">📈</span>
-            <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <span className="text-base text-[#30D158]">📈</span>
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
               Cumulative Spending Trajectory
             </h3>
           </div>
-          <span className={`text-xs font-mono font-black ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
+          <span className="text-xs font-mono font-bold text-white">
             Total: ₹{snapshot.totalSpend.toLocaleString('en-IN')}
           </span>
         </div>
 
         {/* SVG Area Chart */}
-        <div className="pt-3">
-          <svg className="w-full h-36" viewBox="0 0 400 120">
-            <path d={svgPathD} fill={isDark ? 'rgba(0, 200, 150, 0.15)' : 'rgba(5, 150, 105, 0.10)'} />
-            <path d={svgLineD} fill="none" stroke={isDark ? '#34D399' : '#059669'} strokeWidth="2.5" />
-            <circle cx="400" cy={cumulativePoints[cumulativePoints.length - 1]?.y || 20} r="4" fill={isDark ? '#34D399' : '#059669'} stroke="#FFFFFF" strokeWidth="2" />
+        <div className="pt-2">
+          <svg className="w-full h-40" viewBox="0 0 400 120">
+            <path d={svgPathD} fill="rgba(10, 132, 255, 0.15)" />
+            <path d={svgLineD} fill="none" stroke="#0A84FF" strokeWidth="2.5" />
+            <circle cx="400" cy={cumulativePoints[cumulativePoints.length - 1]?.y || 20} r="4.5" fill="#0A84FF" stroke="#FFFFFF" strokeWidth="2" />
           </svg>
 
-          <div className={`flex justify-between text-[10px] font-mono pt-1 font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          <div className="flex justify-between text-[11px] font-mono pt-2 font-medium text-white/50">
             <span>Day 1: ₹0</span>
             <span>Day {daysInPeriod}: ₹{snapshot.totalSpend.toLocaleString('en-IN')}</span>
           </div>
@@ -126,43 +121,35 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
       </div>
 
       {/* ── 3. VELOCITY & SPENDING BOUNDS ───────────────────────────────── */}
-      <div className={`p-6 rounded-[28px] border space-y-4 transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-lg shadow-black/40' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
+      <div className="spatial-card p-6 sm:p-8 space-y-4">
         <div className="flex items-center gap-2">
-          <span className="text-base text-indigo-400">🌀</span>
-          <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <span className="text-base text-[#6366F1]">🌀</span>
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
             Velocity & Spending Bounds
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Daily Avg */}
-          <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
-            isDark ? 'bg-emerald-950/20 border-emerald-500/25' : 'bg-emerald-50/70 border-emerald-200'
-          }`}>
-            <span className={`text-[10px] block font-bold uppercase tracking-wider ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>Daily Avg Velocity</span>
-            <div className={`text-base sm:text-lg font-black font-mono mt-1 ${isDark ? 'text-emerald-400' : 'text-emerald-800'}`}>
+          <div className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/50 block">Daily Avg Velocity</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-white mt-1">
               ₹{snapshot.dailyAvgSpend.toLocaleString('en-IN')}
             </div>
           </div>
 
           {/* Highest Day */}
-          <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
-            isDark ? 'bg-rose-950/20 border-rose-500/25' : 'bg-rose-50/70 border-rose-200'
-          }`}>
-            <span className={`text-[10px] block font-bold uppercase tracking-wider ${isDark ? 'text-rose-300' : 'text-rose-700'}`}>Peak Spending Day</span>
-            <div className="text-base sm:text-lg font-black font-mono text-rose-500 dark:text-rose-400 mt-1">
+          <div className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/50 block">Peak Spending Day</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-[#FF453A] mt-1">
               ₹{snapshot.highestSpendDay.toLocaleString('en-IN')}
             </div>
           </div>
 
           {/* Lowest Day */}
-          <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
-            isDark ? 'bg-white/[0.03] border-white/[0.06]' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <span className={`text-[10px] block font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Floor Spending Day</span>
-            <div className={`text-base sm:text-lg font-black font-mono mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <div className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/50 block">Floor Spending Day</span>
+            <div className="text-lg sm:text-2xl font-bold font-mono text-white mt-1">
               ₹{lowestDaySpend.toLocaleString('en-IN')}
             </div>
           </div>
@@ -171,5 +158,3 @@ export const SpendTrendsTab: React.FC<SpendTrendsTabProps> = ({
     </div>
   );
 };
-
-

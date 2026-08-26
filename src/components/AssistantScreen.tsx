@@ -4,7 +4,7 @@ import { FinancialEvent, SpendSnapshot } from '../types';
 interface AssistantScreenProps {
   snapshot: SpendSnapshot;
   events: FinancialEvent[];
-  isDark: boolean;
+  isDark?: boolean;
   onSelectEvent: (event: FinancialEvent) => void;
 }
 
@@ -18,7 +18,6 @@ interface Message {
 export const AssistantScreen: React.FC<AssistantScreenProps> = ({
   snapshot,
   events,
-  isDark,
   onSelectEvent,
 }) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -92,9 +91,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
   ];
 
   return (
-    <div className={`p-6 sm:p-8 rounded-[32px] border flex flex-col h-[75vh] transition-all duration-300 backdrop-blur-2xl animate-emergence ${
-      isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-    }`}>
+    <div className="spatial-card p-6 sm:p-8 flex flex-col h-[75vh] space-y-4 max-w-5xl mx-auto animate-emergence">
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto space-y-4 pr-2 no-scrollbar">
         {messages.map((m, idx) => (
@@ -103,34 +100,28 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
             className={`flex flex-col ${m.sender === 'USER' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`p-4 sm:p-5 rounded-[24px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition backdrop-blur-xl ${
+              className={`p-4 sm:p-5 rounded-[20px] max-w-[85%] sm:max-w-[70%] text-xs sm:text-sm leading-relaxed transition ${
                 m.sender === 'USER'
-                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold rounded-tr-none shadow-md shadow-indigo-500/25'
-                  : isDark
-                  ? 'bg-white/[0.04] text-white border border-white/[0.08] rounded-tl-none shadow-sm'
-                  : 'bg-white text-slate-900 border border-slate-200/80 shadow-sm rounded-tl-none'
+                  ? 'bg-white text-neutral-900 font-bold rounded-tr-none shadow-md'
+                  : 'bg-white/10 border border-white/20 text-white rounded-tl-none shadow-sm backdrop-blur-2xl'
               }`}
             >
               <div className="whitespace-pre-wrap">{m.text}</div>
 
               {/* Attached Event Cards Grid */}
               {m.data && Array.isArray(m.data) && (
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-white/10 dark:border-white/10 border-slate-200">
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-white/15">
                   {m.data.map((ev: FinancialEvent) => (
                     <div
                       key={ev.id}
                       onClick={() => onSelectEvent(ev)}
-                      className={`p-3 rounded-2xl cursor-pointer flex items-center justify-between transition text-xs border backdrop-blur-md ${
-                        isDark 
-                          ? 'bg-[#0E1720]/90 border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06]' 
-                          : 'bg-slate-50 border-slate-200 hover:border-emerald-500 shadow-sm'
-                      }`}
+                      className="p-3 rounded-[12px] bg-white/5 border border-white/10 hover:bg-white/15 cursor-pointer flex items-center justify-between transition text-xs"
                     >
                       <div className="min-w-0 pr-2">
-                        <div className={`font-black font-heading truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{ev.merchant}</div>
-                        <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{ev.dateFormatted}</div>
+                        <div className="font-bold text-white truncate">{ev.merchant}</div>
+                        <div className="text-[10px] text-white/50">{ev.dateFormatted}</div>
                       </div>
-                      <div className="font-black font-mono text-rose-500 dark:text-rose-400 flex-shrink-0">
+                      <div className="font-bold font-mono text-white shrink-0">
                         ₹{ev.amount.toLocaleString('en-IN')}
                       </div>
                     </div>
@@ -138,29 +129,25 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
                 </div>
               )}
             </div>
-            <span className={`text-[10px] mt-1 px-1 font-medium ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{m.timestamp}</span>
+            <span className="text-[10px] mt-1 px-1 font-mono text-white/40">{m.timestamp}</span>
           </div>
         ))}
       </div>
 
-      {/* Suggested Quick Prompts */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar py-2.5 text-xs">
+      {/* Suggested Quick Prompts (Gaze Interactive) */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar py-2 text-xs">
         {samplePrompts.map((p) => (
           <button
             key={p}
             onClick={() => handleQuery(p)}
-            className={`px-3.5 py-1.5 rounded-2xl whitespace-nowrap transition-all duration-150 border flex-shrink-0 font-bold active:scale-95 backdrop-blur-md ${
-              isDark 
-                ? 'bg-white/[0.04] border-white/[0.08] text-slate-200 hover:border-indigo-400 hover:text-white hover:bg-white/[0.08]' 
-                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white hover:text-slate-900 shadow-sm'
-            }`}
+            className="spatial-btn px-4 py-2 whitespace-nowrap text-xs text-white"
           >
             {p}
           </button>
         ))}
       </div>
 
-      {/* Input Box with Radiant Glow Button */}
+      {/* Input Box with VisionOS Send Pill */}
       <div className="relative pt-2">
         <input
           type="text"
@@ -168,15 +155,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleQuery(inputText)}
           placeholder="Ask Copilot about any spend, payee, loan, cashflow..."
-          className={`w-full px-5 py-4 pr-24 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-200 backdrop-blur-xl ${
-            isDark 
-              ? 'bg-[#0E1720]/90 border-white/[0.1] text-white placeholder-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 shadow-inner' 
-              : 'bg-white border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-sm'
-          }`}
+          className="w-full px-6 py-4 pr-24 rounded-full text-sm bg-white/10 backdrop-blur-[30px] border border-white/20 text-white placeholder-white/40 outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]"
         />
         <button
           onClick={() => handleQuery(inputText)}
-          className="absolute right-3 top-5 px-5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:brightness-110 text-white font-black text-xs rounded-xl transition-all duration-150 shadow-md shadow-indigo-500/30 hover:scale-105 active:scale-95"
+          className="spatial-btn-selected absolute right-3 top-4.5 px-5 py-2 rounded-full text-xs"
         >
           Send
         </button>
@@ -184,5 +167,3 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({
     </div>
   );
 };
-
-

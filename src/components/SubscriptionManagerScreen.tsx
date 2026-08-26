@@ -4,93 +4,78 @@ import { CommitmentItem } from '../types';
 interface SubscriptionManagerScreenProps {
   commitments: CommitmentItem[];
   totalSubscriptions: number;
-  isDark: boolean;
+  isDark?: boolean;
 }
 
 export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps> = ({
   commitments,
   totalSubscriptions,
-  isDark,
 }) => {
   const recurringSubs = commitments.filter(c => c.type === 'SUBSCRIPTION' || c.type === 'MANDATE');
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-8 animate-emergence">
-      {/* 1. Subscriptions Burn Rate Card */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
+      {/* ── 1. SUBSCRIPTIONS BURN RATE SPATIAL CARD ───────────────────────── */}
+      <div className="spatial-card p-6 sm:p-8 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className="text-xs uppercase font-semibold tracking-wider text-white/60 block">
               Active Digital Subscriptions & Autopay e-Mandates
             </span>
-            <div className={`text-3xl sm:text-4xl font-black font-mono mt-1 ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>
+            <div className="text-3xl sm:text-5xl font-bold font-mono mt-1 text-white">
               ₹{Math.round(totalSubscriptions).toLocaleString('en-IN')}
-              <span className={`text-xs sm:text-sm font-medium ml-2 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>/ month</span>
+              <span className="text-sm font-sans font-medium ml-2 text-white/50">/ month</span>
             </div>
           </div>
-          <span className={`text-xs font-black px-3.5 py-1.5 rounded-full border backdrop-blur-md ${
-            isDark 
-              ? 'bg-amber-500/15 text-amber-300 border-amber-500/25' 
-              : 'bg-amber-50 text-amber-800 border-amber-200 shadow-sm'
-          }`}>
+          <span className="spatial-btn px-4 py-1.5 text-xs text-white">
             {recurringSubs.length} ACTIVE SERVICES
           </span>
         </div>
-        <p className={`text-xs sm:text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          Estimated yearly recurring burn: <span className={`font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>₹{Math.round(totalSubscriptions * 12).toLocaleString('en-IN')}</span>
+        <p className="text-xs sm:text-sm font-medium text-white/70">
+          Estimated yearly recurring burn: <strong className="font-mono text-white">₹{Math.round(totalSubscriptions * 12).toLocaleString('en-IN')}</strong>
         </p>
       </div>
 
-      {/* 2. Detected Subscriptions Grid */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
-        <h4 className={`text-sm font-black font-heading uppercase tracking-wider mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+      {/* ── 2. DETECTED SUBSCRIPTIONS GRID ───────────────────────────────── */}
+      <div className="spatial-card p-6 sm:p-8 space-y-4">
+        <h4 className="text-base font-bold tracking-tight text-white">
           Detected Services & Autopay Mandates
         </h4>
 
         {recurringSubs.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-sm font-medium">
+          <div className="p-8 text-center text-white/40 text-sm font-medium">
             No recurring subscription mandates detected in this period.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {recurringSubs.map((sub) => (
               <div
                 key={sub.id}
-                className={`p-5 rounded-2xl border transition-all duration-150 backdrop-blur-xl ${
-                  isDark ? 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white shadow-sm'
-                }`}
+                className="p-5 rounded-[16px] bg-white/5 border border-white/10 hover:bg-white/15 transition-all duration-300 space-y-3"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-base shadow-sm flex-shrink-0 ${
-                      isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'
-                    }`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-10 h-10 rounded-[12px] flex items-center justify-center font-bold text-base bg-white/10 text-white shrink-0">
                       🔄
                     </div>
                     <div className="min-w-0">
-                      <div className={`text-sm font-black font-heading tracking-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{sub.name}</div>
-                      <div className={`text-xs font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                        {sub.cadence} • Next: <span className={`font-bold ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>{sub.nextExpectedDate}</span>
+                      <div className="text-sm font-bold text-white tracking-tight truncate">{sub.name}</div>
+                      <div className="text-xs text-white/50 font-medium truncate">
+                        {sub.cadence} • Next: <span className="text-[#30D158] font-semibold">{sub.nextExpectedDate}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right flex-shrink-0 pl-2">
-                    <div className={`text-sm sm:text-base font-black font-mono ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>
+                  <div className="text-right shrink-0 pl-3">
+                    <div className="text-sm sm:text-base font-bold font-mono text-white">
                       ₹{sub.amount.toLocaleString('en-IN')}
                     </div>
-                    <div className={`text-[10px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Autopay Active</div>
+                    <div className="text-[10px] font-mono text-white/40">Autopay Active</div>
                   </div>
                 </div>
 
                 {sub.umn && (
-                  <div className={`p-2.5 rounded-xl text-[11px] font-mono truncate border backdrop-blur-md ${
-                    isDark ? 'bg-black/40 border-white/[0.06] text-slate-400' : 'bg-white border-slate-200 text-slate-600'
-                  }`}>
+                  <div className="p-2.5 rounded-[10px] text-xs font-mono truncate bg-black/40 border border-white/10 text-white/70">
                     Mandate UMN: {sub.umn}
                   </div>
                 )}
@@ -102,5 +87,3 @@ export const SubscriptionManagerScreen: React.FC<SubscriptionManagerScreenProps>
     </div>
   );
 };
-
-

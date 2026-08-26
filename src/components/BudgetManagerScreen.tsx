@@ -4,13 +4,12 @@ import { CategoryBreakdownItem } from '../types';
 interface BudgetManagerScreenProps {
   categories: CategoryBreakdownItem[];
   totalSpend: number;
-  isDark: boolean;
+  isDark?: boolean;
 }
 
 export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
   categories,
   totalSpend,
-  isDark,
 }) => {
   const initialBudget = Math.round(totalSpend > 0 ? (totalSpend * 1.15 / 1000) * 1000 : 50000);
   const [monthlyBudgetLimit, setMonthlyBudgetLimit] = useState<number>(initialBudget);
@@ -28,19 +27,17 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
   const isOverBudget = remainingBudget < 0;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-8 animate-emergence">
-      {/* 1. Overall Monthly Budget Card */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 relative overflow-hidden backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
+      {/* ── 1. OVERALL MONTHLY BUDGET SPATIAL CARD ───────────────────────── */}
+      <div className="spatial-card p-6 sm:p-8 space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <span className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <span className="text-xs uppercase font-semibold tracking-wider text-white/60 block">
               Monthly Budget Utilization
             </span>
-            <div className={`text-2xl sm:text-4xl font-black font-mono mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            <div className="text-2xl sm:text-5xl font-bold font-mono mt-1 text-white">
               ₹{Math.round(totalSpend).toLocaleString('en-IN')}{' '}
-              <span className={`text-sm sm:text-base font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              <span className="text-sm sm:text-lg font-sans font-medium text-white/50">
                 / ₹{monthlyBudgetLimit.toLocaleString('en-IN')} Target Limit
               </span>
             </div>
@@ -48,28 +45,20 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
 
           <button
             onClick={() => setIsEditingBudget(!isEditingBudget)}
-            className={`px-4 py-2 rounded-2xl text-xs font-black border transition-all duration-150 active:scale-95 backdrop-blur-md ${
-              isDark 
-                ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-400/30 shadow-md' 
-                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200 shadow-sm'
-            }`}
+            className="spatial-btn px-4 py-2 text-xs text-white"
           >
-            {isEditingBudget ? 'Cancel Edit' : '⚙️ Adjust Budget Target'}
+            {isEditingBudget ? 'Cancel Edit' : '⚙️ Adjust Target Limit'}
           </button>
         </div>
 
         {isEditingBudget && (
-          <div className={`mb-5 p-4 rounded-2xl border flex items-center gap-3 max-w-md animate-emergence backdrop-blur-xl ${
-            isDark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <span className="text-sm text-slate-400 font-bold">₹</span>
+          <div className="p-4 rounded-[14px] bg-white/5 border border-white/15 flex items-center gap-3 max-w-md animate-emergence">
+            <span className="text-sm text-white/50 font-bold">₹</span>
             <input
               type="number"
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
-              className={`flex-1 bg-transparent text-sm font-black outline-none font-mono ${
-                isDark ? 'text-white' : 'text-slate-900'
-              }`}
+              className="flex-1 bg-transparent text-sm font-bold outline-none font-mono text-white"
             />
             <button
               onClick={() => {
@@ -77,9 +66,7 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
                 if (val > 0) setMonthlyBudgetLimit(val);
                 setIsEditingBudget(false);
               }}
-              className={`px-4 py-2 font-black text-xs rounded-xl transition shadow-sm ${
-                isDark ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 hover:brightness-110' : 'bg-emerald-600 text-white hover:bg-emerald-700'
-              }`}
+              className="spatial-btn-selected px-4 py-2 text-xs rounded-full"
             >
               Save Limit
             </button>
@@ -87,18 +74,18 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
         )}
 
         {/* Progress Bar */}
-        <div className={`h-3.5 rounded-full overflow-hidden mb-3 p-0.5 border ${isDark ? 'bg-black/40 border-white/10' : 'bg-slate-100 border-slate-200'}`}>
+        <div className="h-3 rounded-full overflow-hidden p-0.5 bg-black/40 border border-white/15">
           <div
             style={{ width: `${budgetPct}%` }}
             className={`h-full rounded-full transition-all duration-500 ${
-              budgetPct >= 90 ? 'bg-rose-500' : budgetPct >= 75 ? 'bg-amber-500' : 'bg-gradient-to-r from-emerald-400 to-teal-400'
+              budgetPct >= 90 ? 'bg-[#FF453A]' : budgetPct >= 75 ? 'bg-[#FF9F0A]' : 'bg-gradient-to-r from-[#0A84FF] to-[#30D158]'
             }`}
           />
         </div>
 
-        <div className="flex items-center justify-between text-xs sm:text-sm">
-          <span className={`font-semibold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{budgetPct}% of target budget consumed</span>
-          <span className={`font-black font-mono ${isOverBudget ? 'text-rose-500 dark:text-rose-400' : isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
+        <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
+          <span className="text-white/60">{budgetPct}% of target budget consumed</span>
+          <span className={isOverBudget ? 'text-[#FF453A]' : 'text-[#30D158]'}>
             {isOverBudget 
               ? `₹${Math.abs(Math.round(remainingBudget)).toLocaleString('en-IN')} Over Budget` 
               : `₹${Math.round(remainingBudget).toLocaleString('en-IN')} Safe to Spend`}
@@ -106,15 +93,13 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
         </div>
       </div>
 
-      {/* 2. Category-Specific Budget Breakdown */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
-        <h4 className={`text-sm font-black font-heading uppercase tracking-wider mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+      {/* ── 2. CATEGORY-SPECIFIC BUDGET BREAKDOWN ───────────────────────── */}
+      <div className="spatial-card p-6 sm:p-8 space-y-4">
+        <h4 className="text-base font-bold tracking-tight text-white">
           Category Budgets & Velocity
         </h4>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {categories.map((cat) => {
             const categoryBudgetLimit = Math.round(monthlyBudgetLimit * (cat.pct / 100 || 0.15));
             const catUtilization = Math.min(100, Math.round((cat.amount / (categoryBudgetLimit || 1)) * 100));
@@ -122,35 +107,33 @@ export const BudgetManagerScreen: React.FC<BudgetManagerScreenProps> = ({
             return (
               <div
                 key={cat.category}
-                className={`p-4 rounded-2xl border transition-all duration-150 backdrop-blur-xl ${
-                  isDark ? 'bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]' : 'bg-slate-50/80 border-slate-200/80 hover:bg-white'
-                }`}
+                className="p-4 sm:p-5 rounded-[14px] bg-white/5 border border-white/10 hover:bg-white/15 transition-all duration-300 space-y-3"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div 
-                      className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shadow-sm"
-                      style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
+                      className="w-8 h-8 rounded-[10px] flex items-center justify-center font-bold text-xs shadow-sm"
+                      style={{ backgroundColor: `${cat.color}30`, color: cat.color }}
                     >
                       ●
                     </div>
                     <div>
-                      <div className={`text-xs sm:text-sm font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>{cat.category}</div>
-                      <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{cat.eventCount} transactions</div>
+                      <div className="text-sm font-bold text-white tracking-tight">{cat.category}</div>
+                      <div className="text-xs text-white/50 font-medium">{cat.eventCount} transactions</div>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className={`text-xs font-black font-mono ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    <div className="text-sm font-bold font-mono text-white">
                       ₹{Math.round(cat.amount).toLocaleString('en-IN')}
                     </div>
-                    <div className={`text-[10px] font-mono font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      Allocation: ₹{categoryBudgetLimit.toLocaleString('en-IN')}
+                    <div className="text-[10px] font-mono text-white/40">
+                      Cap: ₹{categoryBudgetLimit.toLocaleString('en-IN')}
                     </div>
                   </div>
                 </div>
 
-                <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-black/40' : 'bg-slate-200'}`}>
+                <div className="h-1.5 rounded-full bg-black/40 overflow-hidden">
                   <div
                     style={{ width: `${Math.max(2, catUtilization)}%`, backgroundColor: cat.color }}
                     className="h-full rounded-full transition-all duration-300"

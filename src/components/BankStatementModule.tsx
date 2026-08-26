@@ -381,11 +381,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
     }
   };
 
-  const cardCls = `rounded-[28px] border transition-all duration-300 ${
-    isDark 
-      ? 'bg-[#0E1720]/80 border-white/[0.08] text-white shadow-2xl shadow-black/40 backdrop-blur-2xl' 
-      : 'bg-white/85 border-slate-200/90 text-slate-900 shadow-sm backdrop-blur-2xl'
-  }`;
+  const cardCls = 'spatial-card';
 
   const availableFYs = useMemo(() => {
     return session?.coverage?.financialYearsCovered || [];
@@ -398,12 +394,12 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`p-6 sm:p-8 rounded-[32px] border-2 border-dashed transition-all relative overflow-hidden text-center ${
+        className={`p-6 sm:p-8 rounded-[24px] border-2 border-dashed transition-all relative overflow-hidden text-center ${
           isDragging 
-            ? (isDark ? 'border-emerald-400 bg-emerald-950/30' : 'border-emerald-500 bg-emerald-50')
+            ? 'border-white bg-white/20'
             : hasData 
-            ? (isDark ? 'border-white/[0.12] bg-[#0E171E]/70' : 'border-slate-300 bg-slate-50/80')
-            : (isDark ? 'border-emerald-500/40 bg-gradient-to-b from-[#0E171E] to-[#080D11]' : 'border-slate-300 bg-gradient-to-b from-white to-slate-50')
+            ? 'border-white/20 bg-white/5'
+            : 'border-white/25 bg-white/10 backdrop-blur-[30px]'
         }`}
       >
         <input
@@ -417,22 +413,18 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="flex items-center justify-center">
-            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center text-3xl shadow-xl transition-transform duration-200 ${
+            <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-3xl shadow-xl transition-transform duration-200 bg-white/10 border border-white/20 text-white ${
               isDragging ? 'scale-110' : ''
-            } ${
-              isDark 
-                ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10 text-emerald-400 border border-emerald-500/30 shadow-emerald-500/10' 
-                : 'bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-emerald-600/10'
             }`}>
               📑
             </div>
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-black font-heading tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Multi-Statement Financial Forensics Workspace
             </h1>
-            <p className={`text-xs sm:text-sm mt-1 max-w-lg mx-auto ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className="text-xs sm:text-sm mt-1 max-w-lg mx-auto text-white/60 font-medium">
               Drag & drop bank statement files (XLS, XLSX, CSV) to analyze multi-month timelines, loan recycling, salary cycles, and P2P transfers.
             </p>
           </div>
@@ -442,11 +434,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className={`px-6 py-3 rounded-2xl text-xs font-black transition flex items-center gap-2 shadow-lg active:scale-95 ${
-                isDark 
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:brightness-110 shadow-emerald-500/20' 
-                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105 shadow-emerald-600/20'
-              }`}
+              className="spatial-btn-selected px-6 py-3 rounded-full text-xs font-bold transition flex items-center gap-2"
             >
               <span>📥</span>
               <span>{hasData ? 'Add More Statement Files' : 'Select Bank Statements'}</span>
@@ -455,9 +443,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             {hasData && (
               <button
                 onClick={handleClearAll}
-                className={`px-4 py-3 rounded-2xl text-xs font-bold border transition ${
-                  isDark ? 'border-white/10 text-rose-400 hover:bg-rose-950/20' : 'border-slate-200 text-rose-600 hover:bg-rose-50'
-                }`}
+                className="spatial-btn px-4 py-3 text-xs text-[#FF453A] font-semibold"
               >
                 Clear All Files
               </button>
@@ -469,12 +455,12 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         {isProcessing && (
           <div className="max-w-md mx-auto mt-6 space-y-2 animate-fade-in">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-emerald-400">{processingStage}</span>
-              <span className="font-mono text-slate-400">{processingProgress}%</span>
+              <span className="text-[#30D158]">{processingStage}</span>
+              <span className="font-mono text-white/50">{processingProgress}%</span>
             </div>
-            <div className="w-full h-2 rounded-full bg-black/40 overflow-hidden border border-white/10">
+            <div className="w-full h-2.5 rounded-full bg-black/40 overflow-hidden border border-white/15">
               <div 
-                className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-300 rounded-full"
+                className="h-full bg-gradient-to-r from-[#0A84FF] to-[#30D158] transition-all duration-300 rounded-full"
                 style={{ width: `${processingProgress}%` }}
               />
             </div>
@@ -483,7 +469,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
         {/* Error Message Alert */}
         {errorMessage && (
-          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-bold text-center">
+          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-[14px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold text-center">
             ⚠️ {errorMessage}
           </div>
         )}
@@ -491,27 +477,17 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
       {/* ── UPLOADED FILES WORKSPACE & COVERAGE STATUS (WHEN DATA LOADED) ── */}
       {hasData && (
-        <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+        <div className="spatial-card p-6 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-base">📑</span>
-              <h2 className="text-sm font-black uppercase tracking-wider font-heading">Statement Source Files ({session.files.length})</h2>
+              <span className="text-base text-[#0A84FF]">📑</span>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-white">Statement Source Files ({session.files.length})</h2>
             </div>
             <div className="flex items-center gap-2 text-xs flex-wrap">
-              <span className={`px-2.5 py-1 rounded-xl font-bold border ${
-                session.coverage.status === 'COMPLETE_CONTINUOUS' 
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  : session.coverage.status === 'GAPS_DETECTED'
-                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                  : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-              }`}>
+              <span className="px-3 py-1 rounded-full font-semibold border bg-white/10 border-white/20 text-white">
                 Coverage: {session.coverage.status.replace(/_/g, ' ')} ({session.coverage.continuityScore}% Quality)
               </span>
-              <span className={`px-2.5 py-1 rounded-xl font-bold border ${
-                session.coverage.balanceContinuityStatus === 'BALANCE_CONTINUITY_VERIFIED'
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-              }`}>
+              <span className="px-3 py-1 rounded-full font-semibold border bg-[#30D158]/20 text-[#30D158] border-[#30D158]/30">
                 {session.coverage.balanceContinuityStatus.replace(/_/g, ' ')}
               </span>
             </div>
@@ -522,42 +498,34 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             {session.files.map((file, idx) => (
               <div 
                 key={file.fileId || idx}
-                className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
-                  file.duplicateStatus === 'EXACT_FILE_DUPLICATE'
-                    ? (isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200')
-                    : file.parseStatus === 'FAILED'
-                    ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200')
-                    : (isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200')
-                }`}
+                className="p-4 rounded-[14px] bg-white/5 border border-white/10 flex items-center justify-between gap-3"
               >
                 <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <span className="text-xs">📄</span>
-                    <span className="text-xs font-bold truncate max-w-[180px]">{file.fileName}</span>
+                    <span className="text-xs font-bold text-white truncate max-w-[180px]">{file.fileName}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                    <span className="font-semibold text-slate-300">{file.detectedBank}</span>
+                  <div className="flex items-center gap-2 text-[10px] text-white/50">
+                    <span className="font-semibold text-white/80">{file.detectedBank}</span>
                     <span>•</span>
                     <span>{file.transactionCount} rows</span>
                     {file.duplicateTransactionCount > 0 && (
-                      <span className="text-amber-400 font-semibold">({file.duplicateTransactionCount} dupes)</span>
+                      <span className="text-[#FF9F0A] font-semibold">({file.duplicateTransactionCount} dupes)</span>
                     )}
                   </div>
                   {file.statementStartDate && file.statementEndDate && (
-                    <div className="text-[9px] font-mono opacity-70">
+                    <div className="text-[9px] font-mono text-white/40">
                       {file.statementStartDate} → {file.statementEndDate}
                     </div>
                   )}
                   {file.duplicateStatus === 'EXACT_FILE_DUPLICATE' && (
-                    <div className="text-[10px] font-bold text-amber-400">⚠️ Exact Duplicate (Skipped)</div>
+                    <div className="text-[10px] font-bold text-[#FF9F0A]">⚠️ Exact Duplicate (Skipped)</div>
                   )}
                 </div>
 
                 <button
                   onClick={() => handleRemoveFile(idx)}
-                  className={`p-1.5 rounded-lg border text-xs opacity-70 hover:opacity-100 transition ${
-                    isDark ? 'border-white/10 hover:bg-white/10 text-slate-300' : 'border-slate-300 hover:bg-slate-200 text-slate-700'
-                  }`}
+                  className="p-1.5 rounded-full border border-white/10 hover:bg-white/20 text-white/50 hover:text-white transition"
                   title="Remove this statement"
                 >
                   ✕
@@ -568,31 +536,31 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
           {/* Session Overview Stats Banner */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Unique Valid Txns</div>
-              <div className="text-lg font-black font-mono mt-0.5 text-emerald-400">{session.uniqueTransactions.length.toLocaleString('en-IN')}</div>
+            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
+              <div className="text-[10px] font-bold uppercase text-white/50">Unique Valid Txns</div>
+              <div className="text-lg font-bold font-mono mt-0.5 text-white">{session.uniqueTransactions.length.toLocaleString('en-IN')}</div>
             </div>
-            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Dupes Excluded</div>
-              <div className="text-lg font-black font-mono mt-0.5 text-amber-400">{session.duplicateTransactionsRemoved}</div>
+            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
+              <div className="text-[10px] font-bold uppercase text-white/50">Dupes Excluded</div>
+              <div className="text-lg font-bold font-mono mt-0.5 text-[#FF9F0A]">{session.duplicateTransactionsRemoved}</div>
             </div>
-            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Months Covered</div>
-              <div className="text-lg font-black font-mono mt-0.5 text-indigo-400">{session.coverage.totalMonths} mos</div>
+            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
+              <div className="text-[10px] font-bold uppercase text-white/50">Months Covered</div>
+              <div className="text-lg font-bold font-mono mt-0.5 text-[#0A84FF]">{session.coverage.totalMonths} mos</div>
             </div>
-            <div className={`p-3 rounded-2xl border text-center ${isDark ? 'bg-black/20 border-white/[0.06]' : 'bg-white border-slate-200 shadow-sm'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Date Span</div>
-              <div className="text-[11px] font-bold font-mono mt-1 text-slate-300 truncate">{session.coverage.earliestDate} → {session.coverage.latestDate}</div>
+            <div className="p-3.5 rounded-[14px] bg-white/5 border border-white/10 text-center">
+              <div className="text-[10px] font-bold uppercase text-white/50">Date Span</div>
+              <div className="text-xs font-bold font-mono mt-1 text-white truncate">{session.coverage.earliestDate} → {session.coverage.latestDate}</div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── FILTER & NAVIGATION BAR ──────────────────────────────────────── */}
+      {/* ── FILTER & TAB BAR ORNAMENT (STICKY) ────────────────────────────── */}
       {hasData && (
-        <div className={`p-3 sm:p-4 ${cardCls} flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sticky top-16 z-30`}>
+        <div className="spatial-card p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sticky top-4 z-30">
           {/* Section Navigation Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
             {[
               { id: 'OVERVIEW', label: '📊 Overview' },
               { id: 'WHERE_100_WENT', label: '🎯 Where ₹100 Went' },
@@ -618,15 +586,15 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               <button
                 key={tab.id}
                 onClick={() => setActiveSection(tab.id as StatementSection)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-300 flex items-center gap-1.5 ${
                   activeSection === tab.id
-                    ? (isDark ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20')
-                    : (isDark ? 'text-slate-400 hover:text-white hover:bg-white/5' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
+                    ? 'spatial-btn-selected'
+                    : 'spatial-btn text-white/70'
                 }`}
               >
                 <span>{tab.label}</span>
                 {tab.badge && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-black uppercase bg-emerald-400/20 text-emerald-400">
+                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-bold uppercase bg-[#30D158]/20 text-[#30D158]">
                     {tab.badge}
                   </span>
                 )}
@@ -638,24 +606,22 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
               onClick={() => setShowReportModal(true)}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-indigo-500 to-violet-600 text-white hover:brightness-110 transition flex items-center gap-1.5 shadow-md shadow-indigo-500/20"
+              className="spatial-btn px-4 py-1.5 text-xs font-bold text-white flex items-center gap-1.5"
               title="Open Boardroom PDF Dossier & Export CSV"
             >
               <span>📄</span>
               <span>Export Dossier</span>
             </button>
-            <span className="text-[11px] font-bold text-slate-400 hidden sm:inline">Period:</span>
+            <span className="text-xs font-semibold text-white/50 hidden sm:inline">Period:</span>
             <select
               value={periodFilter}
               onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl border outline-none cursor-pointer ${
-                isDark ? 'bg-[#142028] border-white/[0.1] text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
-              }`}
+              className="text-xs font-bold px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white outline-none cursor-pointer"
             >
-              <option value="ALL_TIME">All Imported Data ({session.coverage.totalMonths} Mos)</option>
-              <option value="CURRENT_FY">Current Financial Year (FY)</option>
+              <option value="ALL_TIME" className="bg-[#141A20] text-white">All Imported Data ({session.coverage.totalMonths} Mos)</option>
+              <option value="CURRENT_FY" className="bg-[#141A20] text-white">Current Financial Year (FY)</option>
               {availableFYs.map(fy => (
-                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`}>{fy}</option>
+                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`} className="bg-[#141A20] text-white">{fy}</option>
               ))}
             </select>
           </div>
@@ -668,91 +634,75 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           {/* Reconciled Executive KPI Command Center Grid with Dynamic Sparklines */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
             {/* 1. Total Inflow */}
-            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
-              isDark 
-                ? 'bg-gradient-to-b from-emerald-950/30 to-[#0E171E] border-emerald-500/30 shadow-lg shadow-emerald-950/20' 
-                : 'bg-gradient-to-b from-emerald-50 to-white border-emerald-200 shadow-sm'
-            }`}>
+            <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Total Inflow</span>
+                <span className="text-[10px] font-bold uppercase text-[#30D158] tracking-wider">Total Inflow</span>
                 <span className="text-xs">↗️</span>
               </div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400 tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-[#30D158] tracking-tight">
                 ₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 18 Q 20 8, 40 16 T 80 6 T 100 4" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 18 Q 20 8, 40 16 T 80 6 T 100 4" fill="none" stroke="#30D158" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-semibold text-slate-400 flex items-center justify-between">
-                <span>{forensicData.totalTransactions} total txns</span>
-                <span className="text-emerald-400 font-bold">+100%</span>
+              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+                <span>{forensicData.totalTransactions} txns</span>
+                <span className="text-[#30D158] font-bold">+100%</span>
               </div>
             </div>
 
             {/* 2. Total Outflow */}
-            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
-              isDark 
-                ? 'bg-gradient-to-b from-rose-950/30 to-[#0E171E] border-rose-500/30 shadow-lg shadow-rose-950/20' 
-                : 'bg-gradient-to-b from-rose-50 to-white border-rose-200 shadow-sm'
-            }`}>
+            <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-rose-400 tracking-wider">Total Outflow</span>
+                <span className="text-[10px] font-bold uppercase text-[#FF453A] tracking-wider">Total Outflow</span>
                 <span className="text-xs">↘️</span>
               </div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400 tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-[#FF453A] tracking-tight">
                 ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 6 Q 20 18, 40 10 T 80 20 T 100 16" fill="none" stroke="#F43F5E" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 6 Q 20 18, 40 10 T 80 20 T 100 16" fill="none" stroke="#FF453A" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-semibold text-slate-400 flex items-center justify-between">
-                <span>Outflow Reconciled</span>
-                <span className="text-rose-400 font-bold">-100%</span>
+              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
+                <span>Outflow</span>
+                <span className="text-[#FF453A] font-bold">-100%</span>
               </div>
             </div>
 
             {/* 3. True Lifestyle Spend */}
-            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
-              isDark 
-                ? 'bg-gradient-to-b from-teal-950/30 to-[#0E171E] border-teal-500/30 shadow-lg shadow-teal-950/20' 
-                : 'bg-gradient-to-b from-teal-50 to-white border-teal-200 shadow-sm'
-            }`}>
+            <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-teal-400 tracking-wider">Lifestyle Spend</span>
+                <span className="text-[10px] font-bold uppercase text-white/70 tracking-wider">Lifestyle Spend</span>
                 <span className="text-xs">🛍️</span>
               </div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-teal-400 tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-white tracking-tight">
                 ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 14 Q 25 20, 50 10 T 75 14 T 100 8" fill="none" stroke="#14B8A6" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 14 Q 25 20, 50 10 T 75 14 T 100 8" fill="none" stroke="#0A84FF" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-semibold text-teal-400/80 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
                 <span>Food & Retail</span>
-                <span className="font-black text-teal-400">{forensicData.trueLifestyleShare.toFixed(1)}%</span>
+                <span className="font-bold text-white">{forensicData.trueLifestyleShare.toFixed(1)}%</span>
               </div>
             </div>
 
             {/* 4. Money Movement & Debt */}
-            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
-              isDark 
-                ? 'bg-gradient-to-b from-indigo-950/30 to-[#0E171E] border-indigo-500/30 shadow-lg shadow-indigo-950/20' 
-                : 'bg-gradient-to-b from-indigo-50 to-white border-indigo-200 shadow-sm'
-            }`}>
+            <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">Money Movement</span>
+                <span className="text-[10px] font-bold uppercase text-[#6366F1] tracking-wider">Money Movement</span>
                 <span className="text-xs">🔄</span>
               </div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-indigo-400 tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-[#6366F1] tracking-tight">
                 ₹{forensicData.moneyMovementTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
@@ -761,59 +711,51 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                   <path d="M0 10 Q 30 4, 60 16 T 90 8 T 100 12" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-semibold text-indigo-400/80 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
                 <span>Transfers & Debt</span>
-                <span className="font-black text-indigo-400">{forensicData.moneyMovementShare.toFixed(1)}%</span>
+                <span className="font-bold text-[#6366F1]">{forensicData.moneyMovementShare.toFixed(1)}%</span>
               </div>
             </div>
 
             {/* 5. Corporate Earned Salary */}
-            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
-              isDark 
-                ? 'bg-gradient-to-b from-cyan-950/30 to-[#0E171E] border-cyan-500/30 shadow-lg shadow-cyan-950/20' 
-                : 'bg-gradient-to-b from-cyan-50 to-white border-cyan-200 shadow-sm'
-            }`}>
+            <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-cyan-400 tracking-wider">Corporate Salary</span>
+                <span className="text-[10px] font-bold uppercase text-[#0A84FF] tracking-wider">Corporate Salary</span>
                 <span className="text-xs">💼</span>
               </div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-cyan-300 tracking-tight">
+              <div className="text-base sm:text-xl font-bold font-mono mt-1 text-white tracking-tight">
                 ₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 16 Q 20 6, 40 14 T 80 4 T 100 2" fill="none" stroke="#00F2FE" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 16 Q 20 6, 40 14 T 80 4 T 100 2" fill="none" stroke="#0A84FF" strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-semibold text-slate-400 flex items-center justify-between">
+              <div className="text-[10px] font-medium text-white/50 flex items-center justify-between">
                 <span>Verified Payroll</span>
-                <span className="text-cyan-400 font-bold">17 Cycles</span>
+                <span className="text-white font-bold">17 Cycles</span>
               </div>
             </div>
 
             {/* 6. Period Net Cash Flow */}
-            <div className={`p-4 rounded-[24px] border relative overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
-              isDark 
-                ? (forensicData.netCashFlow >= 0 ? 'bg-gradient-to-b from-emerald-950/30 to-[#0E171E] border-emerald-500/30' : 'bg-gradient-to-b from-rose-950/30 to-[#0E171E] border-rose-500/30')
-                : (forensicData.netCashFlow >= 0 ? 'bg-gradient-to-b from-emerald-50 to-white border-emerald-200' : 'bg-gradient-to-b from-rose-50 to-white border-rose-200')
-            }`}>
+            <div className="spatial-card p-4 sm:p-5 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Net Cash Flow</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">Net Cash Flow</span>
                 <span className="text-xs">{forensicData.netCashFlow >= 0 ? '📈' : '📉'}</span>
               </div>
-              <div className={`text-lg sm:text-xl font-black font-mono mt-1 tracking-tight ${forensicData.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <div className={`text-base sm:text-xl font-bold font-mono mt-1 tracking-tight ${forensicData.netCashFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
                 {forensicData.netCashFlow >= 0 ? '+' : ''}₹{forensicData.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
               {/* Sparkline Wave */}
               <div className="my-1.5 h-6 w-full opacity-80">
                 <svg className="w-full h-full" viewBox="0 0 100 24" preserveAspectRatio="none">
-                  <path d="M0 12 Q 30 18, 50 8 T 80 14 T 100 16" fill="none" stroke={forensicData.netCashFlow >= 0 ? '#10B981' : '#F43F5E'} strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M0 12 Q 30 18, 50 8 T 80 14 T 100 16" fill="none" stroke={forensicData.netCashFlow >= 0 ? '#30D158' : '#FF453A'} strokeWidth="2.5" strokeLinecap="round" />
                 </svg>
               </div>
-              <div className="text-[10px] font-semibold flex items-center justify-between">
-                <span className="text-slate-400">Period Net Delta</span>
-                <span className={`font-black px-1.5 py-0.2 rounded ${forensicData.netCashFlow >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+              <div className="text-[10px] font-medium flex items-center justify-between">
+                <span className="text-white/50">Period Delta</span>
+                <span className={`font-bold px-1.5 py-0.2 rounded-full ${forensicData.netCashFlow >= 0 ? 'bg-[#30D158]/20 text-[#30D158]' : 'bg-[#FF453A]/20 text-[#FF453A]'}`}>
                   {forensicData.netCashFlow >= 0 ? 'SURPLUS' : 'DEFICIT'}
                 </span>
               </div>
@@ -821,38 +763,34 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
 
           {/* Quick Where ₹100 Went Preview */}
-          <Where100WentChart liveResult={session.analytics} isDark={isDark} />
+          <Where100WentChart liveResult={session.analytics} isDark={true} />
 
           {/* Top Problems and Immediate Action Plan */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-              <h3 className="text-sm font-black uppercase text-rose-400 flex items-center gap-2 font-heading">
+            <div className="spatial-card p-6 space-y-4">
+              <h3 className="text-sm font-bold uppercase text-[#FF453A] flex items-center gap-2">
                 <span>⚠️</span>
                 <span>Top Forensic Vulnerabilities</span>
               </h3>
               <div className="space-y-2">
                 {forensicData.topProblems.map((prob, idx) => (
-                  <div key={idx} className={`p-3.5 rounded-2xl border text-xs font-semibold flex items-start gap-2.5 ${
-                    isDark ? 'bg-rose-950/20 border-rose-500/20 text-rose-200' : 'bg-rose-50 border-rose-200 text-rose-900'
-                  }`}>
-                    <span className="font-mono text-rose-400 font-bold">{idx + 1}.</span>
+                  <div key={idx} className="p-3.5 rounded-[12px] bg-[#FF453A]/10 border border-[#FF453A]/20 text-white/90 text-xs font-semibold flex items-start gap-2.5">
+                    <span className="font-mono text-[#FF453A] font-bold">{idx + 1}.</span>
                     <span>{prob}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-              <h3 className="text-sm font-black uppercase text-emerald-400 flex items-center gap-2 font-heading">
+            <div className="spatial-card p-6 space-y-4">
+              <h3 className="text-sm font-bold uppercase text-[#30D158] flex items-center gap-2">
                 <span>🎯</span>
                 <span>Prioritized Action Plan</span>
               </h3>
               <div className="space-y-2">
                 {forensicData.topActions.map((act, idx) => (
-                  <div key={idx} className={`p-3.5 rounded-2xl border text-xs font-semibold flex items-start gap-2.5 ${
-                    isDark ? 'bg-emerald-950/20 border-emerald-500/20 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                  }`}>
-                    <span className="font-mono text-emerald-400 font-bold">{idx + 1}.</span>
+                  <div key={idx} className="p-3.5 rounded-[12px] bg-[#30D158]/10 border border-[#30D158]/20 text-white/90 text-xs font-semibold flex items-start gap-2.5">
+                    <span className="font-mono text-[#30D158] font-bold">{idx + 1}.</span>
                     <span>{act}</span>
                   </div>
                 ))}
@@ -905,7 +843,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {hasData && activeSection === 'VARIANCE_HEATMAP' && (
         <VarianceHeatmapView
           transactions={session.uniqueTransactions}
-          isDark={isDark}
+          isDark={true}
         />
       )}
 
@@ -914,7 +852,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <FireRunwayTracker
           dataset={forensicData}
           transactions={session.uniqueTransactions}
-          isDark={isDark}
+          isDark={true}
         />
       )}
 
@@ -923,13 +861,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <PredictiveRunwayChart
           dataset={forensicData}
           transactions={session.uniqueTransactions}
-          isDark={isDark}
+          isDark={true}
         />
       )}
 
       {/* ── 2. SECTION: WHERE EVERY ₹100 WENT ──────────────────────────── */}
       {hasData && activeSection === 'WHERE_100_WENT' && (
-        <Where100WentChart liveResult={session.analytics} isDark={isDark} />
+        <Where100WentChart liveResult={session.analytics} isDark={true} />
       )}
 
       {/* ── 3. SECTION: LOAN & DEBT FORENSICS ──────────────────────────── */}
@@ -937,94 +875,94 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <div className="space-y-6">
           {/* Summary Cards for Loans */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total Borrowed (Credits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Total Borrowed</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#30D158]">
                 ₹{forensicData.lenders.reduce((s, l) => s + l.totalBorrowed, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.borrowCount, 0)} disbursal txns</div>
+              <div className="text-[10px] text-white/40 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.borrowCount, 0)} disbursals</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total Repaid (Debits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Total Repaid</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF453A]">
                 ₹{forensicData.lenders.reduce((s, l) => s + l.totalRepaid, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.repayCount, 0)} repayment txns</div>
+              <div className="text-[10px] text-white/40 mt-0.5">{forensicData.lenders.reduce((s, l) => s + l.repayCount, 0)} repayments</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Net Debt Delta</div>
-              <div className={`text-lg sm:text-xl font-black font-mono mt-1 ${forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Net Debt Delta</div>
+              <div className={`text-lg sm:text-xl font-bold font-mono mt-1 ${forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
                 {forensicData.lenders.reduce((s, l) => s + l.netDelta, 0) >= 0 ? '+' : ''}₹{forensicData.lenders.reduce((s, l) => s + l.netDelta, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Borrowed minus Repaid</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Borrowed vs Repaid</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Serviced Lenders</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-amber-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Serviced Lenders</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF9F0A]">
                 {forensicData.lenders.length} Entities
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Active / Serviced</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Active / Serviced</div>
             </div>
           </div>
 
-          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+          <div className="spatial-card p-6 space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <h2 className="text-base font-black flex items-center gap-2 font-heading">
+                <h2 className="text-base font-bold flex items-center gap-2 text-white">
                   <span>🏦</span>
                   <span>Lender & Debt Servicing Matrix ({forensicData.lenders.length} Lenders)</span>
                 </h2>
-                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className="text-xs text-white/50 mt-0.5">
                   Tracking loan credits vs repayments and revolving loan recycling ratios.
                 </p>
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                    <th className="p-3">Lender / Facility</th>
-                    <th className="p-3 text-right">Total Borrowed</th>
-                    <th className="p-3 text-right">Total Repaid</th>
-                    <th className="p-3 text-right">Net Delta</th>
-                    <th className="p-3 text-center">Txns (B/R)</th>
-                    <th className="p-3 text-center">Recycling Risk</th>
-                    <th className="p-3 text-center">Status</th>
+                <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
+                  <tr className="border-b border-white/10">
+                    <th className="p-3.5">Lender / Facility</th>
+                    <th className="p-3.5 text-right">Total Borrowed</th>
+                    <th className="p-3.5 text-right">Total Repaid</th>
+                    <th className="p-3.5 text-right">Net Delta</th>
+                    <th className="p-3.5 text-center">Txns (B/R)</th>
+                    <th className="p-3.5 text-center">Recycling Risk</th>
+                    <th className="p-3.5 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.06]">
+                <tbody className="divide-y divide-white/5">
                   {forensicData.lenders.map((l) => (
-                    <tr key={l.id} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
-                      <td className="p-3 font-semibold">
+                    <tr key={l.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-3.5 font-semibold text-white">
                         <div className="flex items-center gap-2.5">
                           <BrandLogoBadge entityName={l.name} size="sm" />
                           <div>
-                            <div className="font-bold">{l.name}</div>
-                            <div className="text-[10px] text-slate-400">{l.productType}</div>
+                            <div className="font-bold text-white">{l.name}</div>
+                            <div className="text-[10px] text-white/40">{l.productType}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="p-3 text-right font-mono font-bold text-emerald-400">
+                      <td className="p-3.5 text-right font-mono font-bold text-[#30D158]">
                         ₹{l.totalBorrowed.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="p-3 text-right font-mono font-bold text-rose-400">
+                      <td className="p-3.5 text-right font-mono font-bold text-[#FF453A]">
                         ₹{l.totalRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className={`p-3 text-right font-mono font-bold ${l.netDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <td className={`p-3.5 text-right font-mono font-bold ${l.netDelta >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
                         {l.netDelta >= 0 ? '+' : ''}₹{l.netDelta.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="p-3 text-center font-mono text-[11px]">
+                      <td className="p-3.5 text-center font-mono text-[11px] text-white/70">
                         {l.borrowCount} / {l.repayCount}
                       </td>
-                      <td className="p-3 text-center">
-                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
-                          l.recyclingRisk === 'HIGH' ? 'bg-rose-500/20 text-rose-400' : l.recyclingRisk === 'MODERATE' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'
+                      <td className="p-3.5 text-center">
+                        <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                          l.recyclingRisk === 'HIGH' ? 'bg-[#FF453A]/20 text-[#FF453A]' : l.recyclingRisk === 'MODERATE' ? 'bg-[#FF9F0A]/20 text-[#FF9F0A]' : 'bg-[#30D158]/20 text-[#30D158]'
                         }`}>
                           {l.recyclingRisk}
                         </span>
                       </td>
-                      <td className="p-3 text-center font-mono text-[10px] text-slate-400">
+                      <td className="p-3.5 text-center font-mono text-[10px] text-white/50">
                         {l.status}
                       </td>
                     </tr>
@@ -1036,13 +974,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         </div>
       )}
 
-            {/* ── 2J. SECTION: REAL-TIME SPEND & INFLOW FINANCIAL CALENDAR ───── */}
+      {/* ── 2J. SECTION: REAL-TIME SPEND & INFLOW FINANCIAL CALENDAR ───── */}
       {hasData && activeSection === 'SPEND_CALENDAR' && (
         <MasterLedgerCalendar
           transactions={session.uniqueTransactions}
           selectedDate={calendarSelectedDate}
           onSelectDate={setCalendarSelectedDate}
-          isDark={isDark}
+          isDark={true}
           onFilterLedgerToDate={(date) => {
             setCalendarSelectedDate(date);
             setActiveSection('LEDGER');
@@ -1054,7 +992,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {hasData && activeSection === 'LEDGER' && (
         <TransactionExplorer 
           liveResult={session.analytics} 
-          isDark={isDark} 
+          isDark={true} 
           initialDate={calendarSelectedDate}
           onDateChange={setCalendarSelectedDate}
         />
@@ -1064,91 +1002,8 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {hasData && activeSection === 'PEOPLE' && (
         <P2PSocialGraphView
           transactions={session.uniqueTransactions}
-          isDark={isDark}
+          isDark={true}
         />
-      )}
-      {false && hasData && activeSection === 'PEOPLE' && (
-        <div className="space-y-6">
-          {/* Summary Cards for P2P */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total P2P Sent (Debits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
-                ₹{forensicData.recipients.reduce((s, r) => s + r.totalSent, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-              </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Outward Peer Transfers</div>
-            </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total P2P Received (Credits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400">
-                ₹{forensicData.recipients.reduce((s, r) => s + r.totalReceived, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-              </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Inward Peer Transfers</div>
-            </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Net P2P Drain (Net Outflow)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-slate-300">
-                ₹{forensicData.recipients.reduce((s, r) => s + r.netOutflow, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-              </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Sent minus Received</div>
-            </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Counterparties</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-violet-400">
-                {forensicData.recipients.length} People
-              </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">{forensicData.recipients.reduce((s, r) => s + r.txnCount, 0)} total transfers</div>
-            </div>
-          </div>
-
-          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-            <h2 className="text-base font-black flex items-center gap-2 font-heading">
-              <span>👥</span>
-              <span>Peer-to-Peer (P2P) Recipient Ledger ({forensicData.recipients.length} Counterparties)</span>
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                    <th className="p-3">Counterparty</th>
-                    <th className="p-3 text-right">Total Sent</th>
-                    <th className="p-3 text-right">Total Received</th>
-                    <th className="p-3 text-right">Net Outflow</th>
-                    <th className="p-3 text-center">Txns</th>
-                    <th className="p-3 text-center">Priority</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/[0.06]">
-                  {forensicData.recipients.map((rec) => (
-                    <tr key={rec.id} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
-                      <td className="p-3">
-                        <div className="font-bold">{rec.name}</div>
-                        {rec.upiHandle && <div className="text-[10px] font-mono text-slate-400">{rec.upiHandle}</div>}
-                      </td>
-                      <td className="p-3 text-right font-mono font-bold text-rose-400">
-                        ₹{rec.totalSent.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                      </td>
-                      <td className="p-3 text-right font-mono font-bold text-emerald-400">
-                        ₹{rec.totalReceived.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                      </td>
-                      <td className="p-3 text-right font-mono font-bold text-slate-300">
-                        ₹{rec.netOutflow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
-                      </td>
-                      <td className="p-3 text-center font-mono">{rec.txnCount}</td>
-                      <td className="p-3 text-center">
-                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
-                          rec.flaggedPriority === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400' : rec.flaggedPriority === 'HIGH' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-500/20 text-slate-400'
-                        }`}>
-                          {rec.flaggedPriority}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* ── 6. SECTION: 16-MONTH VELOCITY ───────────────────────────────── */}
@@ -1156,72 +1011,72 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <div className="space-y-6">
           {/* Summary Cards for Velocity */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total Period Inflow (Credits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-emerald-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Total Period Inflow</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#30D158]">
                 ₹{forensicData.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Avg: ₹{Math.round(forensicData.totalCredits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Avg: ₹{Math.round(forensicData.totalCredits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total Period Outflow (Debits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Total Period Outflow</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF453A]">
                 ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Avg: ₹{Math.round(forensicData.totalDebits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Avg: ₹{Math.round(forensicData.totalDebits / Math.max(1, forensicData.monthlyCashFlow.length)).toLocaleString('en-IN')}/mo</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Net Period Cash Flow</div>
-              <div className={`text-lg sm:text-xl font-black font-mono mt-1 ${forensicData.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Net Period Cash Flow</div>
+              <div className={`text-lg sm:text-xl font-bold font-mono mt-1 ${forensicData.netCashFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
                 {forensicData.netCashFlow >= 0 ? '+' : ''}₹{forensicData.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Overall Surplus/Deficit</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Overall Surplus/Deficit</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Monthly Balance Health</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-indigo-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Monthly Balance Health</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-white">
                 {forensicData.monthlyCashFlow.filter(m => !m.isDeficit).length} Surplus / {forensicData.monthlyCashFlow.filter(m => m.isDeficit).length} Deficit
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Across {forensicData.monthlyCashFlow.length} recorded months</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Across {forensicData.monthlyCashFlow.length} recorded months</div>
             </div>
           </div>
 
-          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-            <h2 className="text-base font-black flex items-center gap-2 font-heading">
+          <div className="spatial-card p-6 space-y-4">
+            <h2 className="text-base font-bold flex items-center gap-2 text-white">
               <span>📈</span>
               <span>Monthly Cash Flow Velocity Table</span>
             </h2>
-            <div className="overflow-x-auto">
+            <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
               <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                    <th className="p-3">Month</th>
-                    <th className="p-3">FY</th>
-                    <th className="p-3 text-right">Credits</th>
-                    <th className="p-3 text-right">Debits</th>
-                    <th className="p-3 text-right">Net Flow</th>
-                    <th className="p-3 text-right">Salary</th>
-                    <th className="p-3 text-right">Debt Repaid</th>
-                    <th className="p-3 text-right">Lifestyle</th>
-                    <th className="p-3 text-center">Status</th>
+                <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
+                  <tr className="border-b border-white/10">
+                    <th className="p-3.5">Month</th>
+                    <th className="p-3.5">FY</th>
+                    <th className="p-3.5 text-right">Credits</th>
+                    <th className="p-3.5 text-right">Debits</th>
+                    <th className="p-3.5 text-right">Net Flow</th>
+                    <th className="p-3.5 text-right">Salary</th>
+                    <th className="p-3.5 text-right">Debt Repaid</th>
+                    <th className="p-3.5 text-right">Lifestyle</th>
+                    <th className="p-3.5 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.06]">
+                <tbody className="divide-y divide-white/5">
                   {forensicData.monthlyCashFlow.map((m) => (
-                    <tr key={m.monthKey} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
-                      <td className="p-3 font-bold">{m.monthName}</td>
-                      <td className="p-3 font-mono text-[10px] text-slate-400">{m.financialYear}</td>
-                      <td className="p-3 text-right font-mono text-emerald-400">₹{m.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3 text-right font-mono text-rose-400">₹{m.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className={`p-3 text-right font-mono font-bold ${m.netCashFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <tr key={m.monthKey} className="hover:bg-white/5 transition-colors">
+                      <td className="p-3.5 font-bold text-white">{m.monthName}</td>
+                      <td className="p-3.5 font-mono text-[10px] text-white/40">{m.financialYear}</td>
+                      <td className="p-3.5 text-right font-mono text-[#30D158]">₹{m.totalCredits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-[#FF453A]">₹{m.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className={`p-3.5 text-right font-mono font-bold ${m.netCashFlow >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'}`}>
                         ₹{m.netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </td>
-                      <td className="p-3 text-right font-mono text-slate-300">₹{m.salary.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3 text-right font-mono text-rose-300">₹{m.loanRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3 text-right font-mono text-teal-300">₹{m.lifestyleSpend.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                      <td className="p-3 text-center">
-                        <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${
-                          m.isDeficit ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
+                      <td className="p-3.5 text-right font-mono text-white/80">₹{m.salary.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-[#FF453A]/80">₹{m.loanRepaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-right font-mono text-white/70">₹{m.lifestyleSpend.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                      <td className="p-3.5 text-center">
+                        <span className={`text-[9px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                          m.isDeficit ? 'bg-[#FF453A]/20 text-[#FF453A]' : 'bg-[#30D158]/20 text-[#30D158]'
                         }`}>
                           {m.isDeficit ? 'DEFICIT' : 'SURPLUS'}
                         </span>
@@ -1237,30 +1092,28 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
       {/* ── 7. SECTION: 7 FINANCIAL HEALTH RATIOS ────────────────────────── */}
       {hasData && activeSection === 'RATIOS' && (
-        <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-          <h2 className="text-base font-black flex items-center gap-2 font-heading">
+        <div className="spatial-card p-6 space-y-4">
+          <h2 className="text-base font-bold flex items-center gap-2 text-white">
             <span>⚖️</span>
             <span>7 Financial Health & Risk Ratios</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {forensicData.ratios.map((r, idx) => (
-              <div key={idx} className={`p-4 rounded-2xl border space-y-2 ${
-                r.status === 'CRITICAL' ? (isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200') : (isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200')
-              }`}>
+              <div key={idx} className="p-5 rounded-[16px] bg-white/5 border border-white/10 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold">{r.ratioName}</span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${
-                    r.status === 'CRITICAL' ? 'bg-rose-500/20 text-rose-400' : r.status === 'MODERATE' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'
+                  <span className="text-xs font-bold text-white">{r.ratioName}</span>
+                  <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase ${
+                    r.status === 'CRITICAL' ? 'bg-[#FF453A]/20 text-[#FF453A]' : r.status === 'MODERATE' ? 'bg-[#FF9F0A]/20 text-[#FF9F0A]' : 'bg-[#30D158]/20 text-[#30D158]'
                   }`}>
                     {r.status}
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-black font-mono">{r.currentValue}%</span>
-                  <span className="text-[10px] text-slate-400">Benchmark: {r.benchmark}</span>
+                  <span className="text-2xl font-bold font-mono text-white">{r.currentValue}%</span>
+                  <span className="text-[10px] text-white/40">Benchmark: {r.benchmark}</span>
                 </div>
-                <div className="text-[10px] text-slate-400">{r.formula}</div>
-                <div className="text-xs leading-relaxed opacity-90">{r.assessment}</div>
+                <div className="text-[10px] text-white/50">{r.formula}</div>
+                <div className="text-xs text-white/80 leading-relaxed">{r.assessment}</div>
               </div>
             ))}
           </div>
@@ -1272,38 +1125,38 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <div className="space-y-6">
           {/* Summary Cards for Debits */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Total Outflow (Debits)</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-rose-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Total Outflow</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#FF453A]">
                 ₹{forensicData.totalDebits.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">100% of Reconciled Outflow</div>
+              <div className="text-[10px] text-white/40 mt-0.5">100% of Reconciled Outflow</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-teal-500/10 border-teal-500/30' : 'bg-teal-50 border-teal-200'}`}>
-              <div className={`text-[10px] font-bold uppercase ${isDark ? 'text-teal-400' : 'text-teal-700'}`}>True Lifestyle Spend</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-teal-500">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/70">True Lifestyle Spend</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-white">
                 ₹{forensicData.trueLifestyleTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className={`text-[10px] ${isDark ? 'text-teal-400/80' : 'text-teal-600'} mt-0.5`}>{forensicData.trueLifestyleShare.toFixed(1)}% of Debits</div>
+              <div className="text-[10px] text-white/50 mt-0.5">{forensicData.trueLifestyleShare.toFixed(1)}% of Debits</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-indigo-50 border-indigo-200'}`}>
-              <div className={`text-[10px] font-bold uppercase ${isDark ? 'text-indigo-400' : 'text-indigo-700'}`}>Money Movement</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-indigo-400">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-[#6366F1]">Money Movement</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-[#6366F1]">
                 ₹{forensicData.moneyMovementTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </div>
-              <div className={`text-[10px] ${isDark ? 'text-indigo-400/80' : 'text-indigo-600'} mt-0.5`}>{forensicData.moneyMovementShare.toFixed(1)}% (Transfers & Debt)</div>
+              <div className="text-[10px] text-white/50 mt-0.5">{forensicData.moneyMovementShare.toFixed(1)}% (Transfers & Debt)</div>
             </div>
-            <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="text-[10px] font-bold uppercase text-slate-400">Categories Tracked</div>
-              <div className="text-lg sm:text-xl font-black font-mono mt-1 text-slate-200">
+            <div className="spatial-card p-4 sm:p-5">
+              <div className="text-[10px] font-bold uppercase text-white/50">Categories Tracked</div>
+              <div className="text-lg sm:text-xl font-bold font-mono mt-1 text-white">
                 {forensicData.debitBreakdown.length} Categories
               </div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Ranked by volume</div>
+              <div className="text-[10px] text-white/40 mt-0.5">Ranked by volume</div>
             </div>
           </div>
 
-          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-            <h2 className="text-base font-black flex items-center gap-2 font-heading">
+          <div className="spatial-card p-6 space-y-4">
+            <h2 className="text-base font-bold flex items-center gap-2 text-white">
               <span>💳</span>
               <span>14-Category Debit Breakdown</span>
             </h2>
@@ -1311,15 +1164,15 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               {forensicData.debitBreakdown.map((d) => (
                 <div key={d.rank} className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold flex items-center gap-2">
+                    <span className="font-bold flex items-center gap-2 text-white">
                       <span>{d.icon}</span>
                       <span>{d.category}</span>
-                      {d.isLifestyle && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-400 font-bold">LIFESTYLE</span>}
+                      {d.isLifestyle && <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-white font-bold">LIFESTYLE</span>}
                     </span>
-                    <span className="font-mono font-bold">₹{d.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({d.percentage.toFixed(1)}%)</span>
+                    <span className="font-mono font-bold text-white">₹{d.amount.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({d.percentage.toFixed(1)}%)</span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-slate-800/20 overflow-hidden">
-                    <div className="h-full rounded-full bg-indigo-500" style={{ width: `${Math.max(1, d.percentage)}%` }} />
+                  <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(1, d.percentage)}%` }} />
                   </div>
                 </div>
               ))}
@@ -1331,93 +1184,93 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {/* ── 9. SECTION: INCOME & SALARY DECOMPOSITION ───────────────────── */}
       {hasData && activeSection === 'INFLOW' && (
         <div className="space-y-6">
-          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+          <div className="spatial-card p-6 space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
-                <h2 className="text-base font-black flex items-center gap-2 font-heading">
+                <h2 className="text-base font-bold flex items-center gap-2 text-white">
                   <span>💰</span>
                   <span>Inflow & Ingress Decomposition</span>
                 </h2>
-                <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className="text-xs text-white/50 mt-0.5">
                   Strict segregation of Earned Corporate Salary, EPFO / PF Capital Withdrawals, and Borrowed Debt Disbursals.
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-bold uppercase text-slate-400">Earned Salary</div>
-                <div className="text-lg font-black font-mono mt-1 text-emerald-400">₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">17 Payroll Cycles</div>
+              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
+                <div className="text-[10px] font-bold uppercase text-white/50">Earned Salary</div>
+                <div className="text-lg font-bold font-mono mt-1 text-[#30D158]">₹{forensicData.salaryTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">17 Payroll Cycles</div>
               </div>
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-sky-950/20 border-sky-500/30' : 'bg-sky-50 border-sky-200'}`}>
-                <div className="text-[10px] font-bold uppercase text-sky-400">EPFO / PF Claims</div>
-                <div className="text-lg font-black font-mono mt-1 text-sky-400">₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-sky-400/80 mt-0.5">Statutory Inflow</div>
+              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
+                <div className="text-[10px] font-bold uppercase text-[#0A84FF]">EPFO / PF Claims</div>
+                <div className="text-lg font-bold font-mono mt-1 text-[#0A84FF]">₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">Statutory Inflow</div>
               </div>
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-200'}`}>
-                <div className="text-[10px] font-bold uppercase text-emerald-400">Savings Bank Interest</div>
-                <div className="text-lg font-black font-mono mt-1 text-emerald-400">₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-                <div className="text-[10px] text-emerald-400/80 mt-0.5">{forensicData.bankInterestCredits.length} Quarterly Credits</div>
+              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
+                <div className="text-[10px] font-bold uppercase text-[#30D158]">Savings Bank Interest</div>
+                <div className="text-lg font-bold font-mono mt-1 text-[#30D158]">₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">{forensicData.bankInterestCredits.length} Credits</div>
               </div>
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-rose-950/20 border-rose-500/30' : 'bg-rose-50 border-rose-200'}`}>
-                <div className="text-[10px] font-bold uppercase text-rose-400">Bank Fees & Charges</div>
-                <div className="text-lg font-black font-mono mt-1 text-rose-400">₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
-                <div className="text-[10px] text-rose-400/80 mt-0.5">{forensicData.bankChargesCount} Deductions</div>
+              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
+                <div className="text-[10px] font-bold uppercase text-[#FF453A]">Bank Fees & Charges</div>
+                <div className="text-lg font-bold font-mono mt-1 text-[#FF453A]">₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">{forensicData.bankChargesCount} Deductions</div>
               </div>
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-amber-950/20 border-amber-500/30' : 'bg-amber-50 border-amber-200'}`}>
-                <div className="text-[10px] font-bold uppercase text-amber-400">Loan Disbursals</div>
-                <div className="text-lg font-black font-mono mt-1 text-amber-400">₹{forensicData.loanCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-amber-400/80 mt-0.5">Borrowed Debt</div>
+              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
+                <div className="text-[10px] font-bold uppercase text-[#FF9F0A]">Loan Disbursals</div>
+                <div className="text-lg font-bold font-mono mt-1 text-[#FF9F0A]">₹{forensicData.loanCreditsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">Borrowed Debt</div>
               </div>
-              <div className={`p-4 rounded-2xl border ${isDark ? 'bg-[#142028] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="text-[10px] font-bold uppercase text-slate-400">Refunds & Reversals</div>
-                <div className="text-lg font-black font-mono mt-1 text-slate-200">₹{forensicData.refundsReversalsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Non-operating Inflow</div>
+              <div className="p-4 rounded-[14px] bg-white/5 border border-white/10">
+                <div className="text-[10px] font-bold uppercase text-white/50">Refunds & Reversals</div>
+                <div className="text-lg font-bold font-mono mt-1 text-white">₹{forensicData.refundsReversalsTotal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
+                <div className="text-[10px] text-white/40 mt-0.5">Non-operating</div>
               </div>
             </div>
 
             {/* Dedicated EPFO / PF Ledger Table */}
-            <div className="mt-6 pt-4 border-t border-white/[0.08] space-y-3">
+            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">🏛️</span>
-                  <h3 className="text-sm font-black text-sky-400 font-heading">Provident Fund (EPFO) Claims & Capital Withdrawals</h3>
+                  <span className="text-base text-[#0A84FF]">🏛️</span>
+                  <h3 className="text-sm font-bold text-white">Provident Fund (EPFO) Claims & Capital Withdrawals</h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-sky-400">
+                <span className="text-xs font-mono font-bold text-[#0A84FF]">
                   Total: ₹{forensicData.epfoCreditsTotal.toLocaleString('en-IN')}
                 </span>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                      <th className="p-3">Date</th>
-                      <th className="p-3">Narration / Claim Reference</th>
-                      <th className="p-3 text-right">Amount</th>
-                      <th className="p-3 text-right">Balance After</th>
-                      <th className="p-3 text-center">Status</th>
+                  <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
+                    <tr className="border-b border-white/10">
+                      <th className="p-3.5">Date</th>
+                      <th className="p-3.5">Narration / Claim Reference</th>
+                      <th className="p-3.5 text-right">Amount</th>
+                      <th className="p-3.5 text-right">Balance After</th>
+                      <th className="p-3.5 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.06]">
+                  <tbody className="divide-y divide-white/5">
                     {session.uniqueTransactions.filter(t => t.category === 'EPFO_PF').map((epfTx) => (
-                      <tr key={epfTx.id} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
-                        <td className="p-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">{epfTx.transactionDate}</td>
-                        <td className="p-3 font-semibold max-w-[300px]">
-                          <div className="truncate text-sky-300">{epfTx.rawNarration}</div>
+                      <tr key={epfTx.id} className="hover:bg-white/5 transition-colors">
+                        <td className="p-3.5 font-mono text-[11px] text-white/50 whitespace-nowrap">{epfTx.transactionDate}</td>
+                        <td className="p-3.5 font-semibold max-w-[300px]">
+                          <div className="truncate text-white">{epfTx.rawNarration}</div>
                           {epfTx.referenceNumber && (
-                            <div className="text-[10px] font-mono text-slate-500">Ref / UTR: {epfTx.referenceNumber}</div>
+                            <div className="text-[10px] font-mono text-white/40">Ref / UTR: {epfTx.referenceNumber}</div>
                           )}
                         </td>
-                        <td className="p-3 text-right font-mono font-bold text-sky-400 text-sm">
+                        <td className="p-3.5 text-right font-mono font-bold text-[#0A84FF] text-sm">
                           +₹{epfTx.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </td>
-                        <td className="p-3 text-right font-mono text-slate-400">
+                        <td className="p-3.5 text-right font-mono text-white/60">
                           {epfTx.balanceAfter != null ? `₹${epfTx.balanceAfter.toLocaleString('en-IN')}` : '—'}
                         </td>
-                        <td className="p-3 text-center">
-                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                        <td className="p-3.5 text-center">
+                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#0A84FF]/20 text-[#0A84FF] border border-[#0A84FF]/30">
                             SETTLED
                           </span>
                         </td>
@@ -1427,45 +1280,41 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                 </table>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      
             {/* Dedicated Bank Savings Interest Audit Table */}
-            <div className="mt-6 pt-4 border-t border-white/[0.08] space-y-3">
+            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">💰</span>
-                  <h3 className="text-sm font-black text-emerald-400 font-heading">Bank Savings Account Interest Added by Bank</h3>
+                  <span className="text-base text-[#30D158]">💰</span>
+                  <h3 className="text-sm font-bold text-white">Bank Savings Account Interest Added by Bank</h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-emerald-400">
+                <span className="text-xs font-mono font-bold text-[#30D158]">
                   Total Interest Earned: ₹{forensicData.interestCreditsTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                      <th className="p-3">Payout Date</th>
-                      <th className="p-3">Quarter Period</th>
-                      <th className="p-3">Bank Narration</th>
-                      <th className="p-3 text-right">Interest Credited</th>
-                      <th className="p-3 text-center">Status</th>
+                  <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
+                    <tr className="border-b border-white/10">
+                      <th className="p-3.5">Payout Date</th>
+                      <th className="p-3.5">Quarter Period</th>
+                      <th className="p-3.5">Bank Narration</th>
+                      <th className="p-3.5 text-right">Interest Credited</th>
+                      <th className="p-3.5 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.06]">
+                  <tbody className="divide-y divide-white/5">
                     {forensicData.bankInterestCredits.map((intTx, idx) => (
-                      <tr key={idx} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
-                        <td className="p-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">{intTx.date}</td>
-                        <td className="p-3 font-bold text-emerald-300">{intTx.quarterLabel}</td>
-                        <td className="p-3 font-mono text-[10px] text-slate-400">{intTx.narration}</td>
-                        <td className="p-3 text-right font-mono font-bold text-emerald-400 text-sm">
+                      <tr key={idx} className="hover:bg-white/5 transition-colors">
+                        <td className="p-3.5 font-mono text-[11px] text-white/50 whitespace-nowrap">{intTx.date}</td>
+                        <td className="p-3.5 font-bold text-white">{intTx.quarterLabel}</td>
+                        <td className="p-3.5 font-mono text-[10px] text-white/40">{intTx.narration}</td>
+                        <td className="p-3.5 text-right font-mono font-bold text-[#30D158] text-sm">
                           +₹{intTx.amount.toFixed(2)}
                         </td>
-                        <td className="p-3 text-center">
-                          <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <td className="p-3.5 text-center">
+                          <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30">
                             CREDITED
                           </span>
                         </td>
@@ -1477,40 +1326,40 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             </div>
 
             {/* Dedicated Bank Fees & Charges Deducted Audit Table */}
-            <div className="mt-6 pt-4 border-t border-white/[0.08] space-y-3">
+            <div className="mt-6 pt-4 border-t border-white/10 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">🏦</span>
-                  <h3 className="text-sm font-black text-rose-400 font-heading">Bank Service Charges, Penalty Fees & Taxes Deducted</h3>
+                  <span className="text-base text-[#FF453A]">🏦</span>
+                  <h3 className="text-sm font-bold text-white">Bank Service Charges & Penalty Fees Deducted</h3>
                 </div>
-                <span className="text-xs font-mono font-bold text-rose-400">
+                <span className="text-xs font-mono font-bold text-[#FF453A]">
                   Total Bank Charges: ₹{forensicData.bankChargesTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden">
                 <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className={`border-b font-black text-[10px] uppercase tracking-wider ${isDark ? 'border-white/10 text-slate-400' : 'border-slate-200 text-slate-500'}`}>
-                      <th className="p-3">Deduction Date</th>
-                      <th className="p-3">Fee / Charge Classification</th>
-                      <th className="p-3">Bank Narration</th>
-                      <th className="p-3 text-right">Fee Deducted</th>
-                      <th className="p-3 text-center">Impact</th>
+                  <thead className="bg-white/5 text-white/50 text-[10px] font-bold uppercase tracking-wider">
+                    <tr className="border-b border-white/10">
+                      <th className="p-3.5">Deduction Date</th>
+                      <th className="p-3.5">Fee / Charge Classification</th>
+                      <th className="p-3.5">Bank Narration</th>
+                      <th className="p-3.5 text-right">Fee Deducted</th>
+                      <th className="p-3.5 text-center">Impact</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.06]">
+                  <tbody className="divide-y divide-white/5">
                     {forensicData.bankChargesList.map((chgTx, idx) => (
-                      <tr key={idx} className={isDark ? 'hover:bg-white/[0.02]' : 'hover:bg-slate-50'}>
-                        <td className="p-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">{chgTx.date}</td>
-                        <td className="p-3 font-bold text-rose-300">{chgTx.chargeType}</td>
-                        <td className="p-3 font-mono text-[10px] text-slate-400">{chgTx.narration}</td>
-                        <td className="p-3 text-right font-mono font-bold text-rose-400 text-sm">
+                      <tr key={idx} className="hover:bg-white/5 transition-colors">
+                        <td className="p-3.5 font-mono text-[11px] text-white/50 whitespace-nowrap">{chgTx.date}</td>
+                        <td className="p-3.5 font-bold text-white">{chgTx.chargeType}</td>
+                        <td className="p-3.5 font-mono text-[10px] text-white/40">{chgTx.narration}</td>
+                        <td className="p-3.5 text-right font-mono font-bold text-[#FF453A] text-sm">
                           -₹{chgTx.amount.toFixed(2)}
                         </td>
-                        <td className="p-3 text-center">
-                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                            chgTx.amount >= 500 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                        <td className="p-3.5 text-center">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                            chgTx.amount >= 500 ? 'bg-[#FF453A]/20 text-[#FF453A] border border-[#FF453A]/30' : 'bg-[#FF9F0A]/20 text-[#FF9F0A] border border-[#FF9F0A]/30'
                           }`}>
                             {chgTx.amount >= 500 ? 'HIGH PENALTY' : 'NOMINAL FEE'}
                           </span>
@@ -1521,29 +1370,33 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                 </table>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
       {/* ── 10. SECTION: RECONCILIATION AUDIT NOTES ───────────────────────── */}
       {hasData && activeSection === 'AUDIT' && (
-        <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
-          <h2 className="text-base font-black flex items-center gap-2 font-heading">
+        <div className="spatial-card p-6 space-y-4">
+          <h2 className="text-base font-bold flex items-center gap-2 text-white">
             <span>🛡️</span>
             <span>Forensic Ledger Audit & Integrity Notes</span>
           </h2>
           <div className="space-y-3">
-            <div className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-1 ${isDark ? 'bg-black/20 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="font-bold text-emerald-400">1. Cryptographic File Fingerprinting (SHA-256)</div>
-              <p className="opacity-80">
+            <div className="p-5 rounded-[16px] bg-white/5 border border-white/10 text-xs leading-relaxed space-y-1.5">
+              <div className="font-bold text-[#30D158]">1. Cryptographic File Fingerprinting (SHA-256)</div>
+              <p className="text-white/70">
                 All uploaded statement files are cryptographically fingerprinted using client-side SHA-256. Exact duplicate files uploaded concurrently or in separate sessions are rejected with zero double-counting.
               </p>
             </div>
-            <div className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-1 ${isDark ? 'bg-black/20 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="font-bold text-indigo-400">2. Single Source of Truth Ledger Reconciliation</div>
-              <p className="opacity-80">
+            <div className="p-5 rounded-[16px] bg-white/5 border border-white/10 text-xs leading-relaxed space-y-1.5">
+              <div className="font-bold text-[#0A84FF]">2. Single Source of Truth Ledger Reconciliation</div>
+              <p className="text-white/70">
                 Opening Balance (₹{forensicData.openingBalance?.toFixed(2) || '0.00'}) + Total Inflow (₹{forensicData.totalCredits.toFixed(2)}) - Total Outflow (₹{forensicData.totalDebits.toFixed(2)}) = Closing Balance (₹{forensicData.closingBalance?.toFixed(2) || '0.00'}).
               </p>
             </div>
-            <div className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-1 ${isDark ? 'bg-black/20 border-white/10' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="font-bold text-emerald-400">3. Cross-File Lineage & Provenance</div>
-              <p className="opacity-80">
+            <div className="p-5 rounded-[16px] bg-white/5 border border-white/10 text-xs leading-relaxed space-y-1.5">
+              <div className="font-bold text-[#30D158]">3. Cross-File Lineage & Provenance</div>
+              <p className="text-white/70">
                 Every transaction retains exact file origin tracking. Overlapping statements generated zero artificial duplicate transactions in master aggregates.
               </p>
             </div>
@@ -1554,22 +1407,22 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       {/* ── 11. SECTION: AI FORENSIC COPILOT ────────────────────────────── */}
       {hasData && activeSection === 'AI_AGENT' && (
         <div className="space-y-4">
-          <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
+          <div className="spatial-card p-6 space-y-4">
             {/* Header with Engine Status & API Key Toggle */}
-            <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-brand-viridian flex items-center justify-center text-xl shadow-lg shadow-indigo-500/20">
+                <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xl shadow-lg">
                   🤖
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base font-black font-heading">AI Forensic Copilot</h2>
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <h2 className="text-base font-bold text-white">AI Forensic Copilot</h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#30D158] animate-pulse" />
                       Gemini 2.5 Flash Active
                     </span>
                   </div>
-                  <p className={`text-[11px] mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <p className="text-xs text-white/50 mt-0.5">
                     Real-data personal financial auditor querying {session.uniqueTransactions.length.toLocaleString('en-IN')} ledger transactions
                   </p>
                 </div>
@@ -1578,9 +1431,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowApiKeyModal(!showApiKeyModal)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${
-                    isDark ? 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                  }`}
+                  className="spatial-btn px-3.5 py-1.5 text-xs font-semibold text-white/80"
                   title="Configure Gemini API Key"
                 >
                   <span>🔑</span>
@@ -1595,9 +1446,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                       timestamp: 'Just now',
                     }
                   ])}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
-                    isDark ? 'border-white/10 text-slate-400 hover:text-white hover:bg-white/5' : 'border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
+                  className="spatial-btn px-3.5 py-1.5 text-xs font-semibold text-white/80"
                 >
                   Clear History
                 </button>
@@ -1606,13 +1455,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
             {/* API Key Modal / Drawer */}
             {showApiKeyModal && (
-              <div className={`p-4 rounded-2xl border space-y-3 ${isDark ? 'bg-black/40 border-indigo-500/30' : 'bg-slate-50 border-indigo-200'}`}>
+              <div className="p-4 rounded-[16px] bg-white/10 border border-white/20 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-xs font-black flex items-center gap-2 text-indigo-400">
+                  <div className="text-xs font-bold flex items-center gap-2 text-white">
                     <span>⚡</span>
                     <span>Google Gemini API Key Configuration</span>
                   </div>
-                  <button onClick={() => setShowApiKeyModal(false)} className="text-xs text-slate-400 hover:text-white">✕</button>
+                  <button onClick={() => setShowApiKeyModal(false)} className="text-xs text-white/50 hover:text-white">✕</button>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -1620,9 +1469,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     value={geminiApiKey}
                     onChange={(e) => setGeminiApiKey(e.target.value)}
                     placeholder="Enter your Gemini API key..."
-                    className={`flex-1 px-3 py-2 rounded-xl text-xs font-mono border outline-none ${
-                      isDark ? 'bg-[#142028] border-white/10 text-white focus:border-indigo-400' : 'bg-white border-slate-300 text-slate-900 focus:border-indigo-500'
-                    }`}
+                    className="flex-1 px-4 py-2.5 rounded-full text-xs font-mono bg-white/10 border border-white/20 text-white placeholder:text-white/30 outline-none focus:border-white"
                   />
                   <button
                     onClick={() => {
@@ -1633,21 +1480,21 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                       }
                       setShowApiKeyModal(false);
                     }}
-                    className="px-4 py-2 rounded-xl text-xs font-black bg-indigo-600 hover:bg-indigo-700 text-white transition"
+                    className="spatial-btn-selected px-5 py-2.5 rounded-full text-xs font-bold"
                   >
                     Save Key
                   </button>
                 </div>
-                <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <div className="text-[10px] text-white/50">
                   Your API key is kept securely in your browser session for live forensic analysis.
                 </div>
               </div>
             )}
 
             {/* Suggested Forensic Query Pills */}
-            <div className="space-y-1.5">
-              <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Suggested Forensic Queries</div>
-              <div className="flex flex-wrap gap-1.5">
+            <div className="space-y-2">
+              <div className="text-[10px] font-bold uppercase text-white/50 tracking-wider">Suggested Forensic Queries</div>
+              <div className="flex flex-wrap gap-2">
                 {[
                   'Where is my money going most in a single month?',
                   'How much interest/extra have I paid till now for loans?',
@@ -1661,11 +1508,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                     key={idx}
                     disabled={isAiTyping}
                     onClick={() => handleSendChatMessage(promptText)}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition text-left ${
-                      isDark 
-                        ? 'bg-white/[0.04] border-white/[0.08] hover:bg-white/[0.08] hover:border-emerald-400/40 text-slate-200' 
-                        : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-emerald-500 text-slate-700'
-                    }`}
+                    className="spatial-btn px-3.5 py-1.5 text-xs text-white/80 hover:text-white"
                   >
                     {promptText}
                   </button>
@@ -1674,19 +1517,17 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             </div>
 
             {/* Chat Messages Log */}
-            <div className={`p-4 rounded-2xl border min-h-[350px] max-h-[500px] overflow-y-auto space-y-4 ${
-              isDark ? 'bg-black/30 border-white/[0.06]' : 'bg-slate-50 border-slate-200'
-            }`}>
+            <div className="p-4 rounded-[20px] bg-white/5 border border-white/10 min-h-[350px] max-h-[500px] overflow-y-auto space-y-4">
               {chatMessages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`p-4 rounded-2xl text-xs leading-relaxed max-w-[90%] shadow-sm ${
+                    className={`p-4 rounded-[18px] text-xs leading-relaxed max-w-[90%] ${
                       msg.role === 'assistant'
-                        ? (isDark ? 'bg-[#142028] text-slate-100 border border-white/[0.08]' : 'bg-white text-slate-900 border border-slate-200')
-                        : (isDark ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold' : 'bg-emerald-600 text-white font-bold')
+                        ? 'bg-white/10 text-white border border-white/15'
+                        : 'bg-white text-black font-semibold'
                     }`}
                   >
                     <div className="whitespace-pre-line prose prose-invert prose-xs max-w-none">
@@ -1701,7 +1542,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
               ))}
 
               {isAiTyping && (
-                <div className="flex items-center gap-2 p-3 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-indigo-400 text-xs animate-pulse">
+                <div className="flex items-center gap-2 p-3.5 rounded-[14px] bg-white/10 border border-white/15 text-white text-xs animate-pulse">
                   <span className="animate-spin text-sm">⚙️</span>
                   <span className="font-semibold">Querying Gemini 2.5 Flash & calculating ledger facts...</span>
                 </div>
@@ -1722,19 +1563,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                 disabled={isAiTyping}
                 onChange={(e) => setChatInput(e.target.value)}
                 placeholder="Ask any question about your transactions, interest, salary, lenders, or daily spend..."
-                className={`flex-1 px-4 py-3 rounded-xl text-xs border outline-none transition ${
-                  isDark 
-                    ? 'bg-[#142028] border-white/[0.08] text-white focus:border-emerald-400 placeholder:text-slate-500' 
-                    : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500 placeholder:text-slate-400 shadow-sm'
-                }`}
+                className="flex-1 px-4 py-3 rounded-full text-xs bg-white/10 border border-white/20 text-white focus:border-white placeholder:text-white/40 outline-none transition"
               />
               <button
                 type="submit"
                 disabled={isAiTyping || !chatInput.trim()}
-                className={`px-6 py-3 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-md ${
-                  isAiTyping || !chatInput.trim()
-                    ? 'opacity-50 cursor-not-allowed bg-slate-700 text-slate-400'
-                    : (isDark ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 hover:brightness-110' : 'bg-emerald-600 text-white hover:bg-emerald-700')
+                className={`spatial-btn-selected px-6 py-3 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                  isAiTyping || !chatInput.trim() ? 'opacity-40 cursor-not-allowed' : ''
                 }`}
               >
                 <span>Send</span>
@@ -1749,7 +1584,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         <ForensicReportModal
           dataset={forensicData}
           transactions={session.uniqueTransactions}
-          isDark={isDark}
+          isDark={true}
           onClose={() => setShowReportModal(false)}
         />
       )}

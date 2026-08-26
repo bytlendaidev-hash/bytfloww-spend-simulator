@@ -4,14 +4,13 @@ import { MerchantLogoView } from './MerchantLogoView';
 
 interface SpendTransactionsTabProps {
   events: FinancialEvent[];
-  isDark: boolean;
+  isDark?: boolean;
   onSelectEvent: (event: FinancialEvent) => void;
   onSplitBill: (event: FinancialEvent) => void;
 }
 
 export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
   events,
-  isDark,
   onSelectEvent,
   onSplitBill,
 }) => {
@@ -62,32 +61,28 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
   const displayedEvents = filteredEvents.slice(0, page * pageSize);
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8 animate-emergence">
-      {/* ── 1. SEARCH INPUT ─────────────────────────────────────────────── */}
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
+      {/* ── 1. SEARCH INPUT PILL (GAZE FOCUS) ────────────────────────────── */}
       <div className="relative">
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-          placeholder="Search merchant, amount, UPI ID, Reference No..."
-          className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-200 backdrop-blur-xl ${
-            isDark 
-              ? 'bg-[#0E1720]/80 border-white/[0.1] text-white placeholder-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-inner' 
-              : 'bg-white/90 border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 shadow-sm'
-          }`}
+          placeholder="Search merchant, amount, UPI ID, reference..."
+          className="w-full px-6 py-4 pl-12 rounded-full text-sm bg-white/10 backdrop-blur-[30px] border border-white/20 text-white placeholder-white/40 outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]"
         />
-        <span className="absolute left-4 top-3.5 text-xs text-slate-400">🔍</span>
+        <span className="absolute left-4.5 top-4 text-sm text-white/50">🔍</span>
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-4 top-3.5 text-xs text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded-full"
+            className="absolute right-4.5 top-4 text-xs text-white/50 hover:text-white px-2 py-0.5 rounded-full bg-white/10"
           >
             ✕
           </button>
         )}
       </div>
 
-      {/* ── 2. QUICK FILTER CHIPS ────────────────────────────────────────── */}
+      {/* ── 2. QUICK FILTER CHIPS (GAZE INTERACTIVE PILLS) ───────────────── */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs">
         {[
           { key: 'ALL', label: 'All Transactions' },
@@ -102,14 +97,10 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
             <button
               key={chip.key}
               onClick={() => { setActiveFilter(chip.key as any); setPage(1); }}
-              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
+              className={`px-4 py-2 font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isSelected
-                  ? isDark
-                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25'
-                    : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
-                  : isDark
-                  ? 'border-white/[0.08] text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] hover:text-white'
-                  : 'border-slate-200/90 text-slate-700 bg-white/80 hover:bg-white hover:text-slate-900 shadow-sm'
+                  ? 'spatial-btn-selected rounded-full'
+                  : 'spatial-btn'
               }`}
             >
               {chip.label}
@@ -118,119 +109,109 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
         })}
       </div>
 
-      <div className={`text-xs font-bold px-1 flex items-center justify-between ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-        <span>{filteredEvents.length} filtered transactions</span>
-        <span>Showing {displayedEvents.length} items</span>
-      </div>
-
-      {/* ── 3. MONTH SUMMARY BANNER ─────────────────────────────────────── */}
-      <div className={`p-5 rounded-[28px] border flex items-center justify-between shadow-sm transition-all duration-300 backdrop-blur-2xl ${
-        isDark 
-          ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-lg shadow-black/40' 
-          : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
+      {/* ── 3. SUMMARY BANNER SPATIAL CARD ───────────────────────────────── */}
+      <div className="spatial-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h4 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            August 2026 Live Ledger
+          <h4 className="text-base sm:text-lg font-bold tracking-tight text-white">
+            Verified Forensic Ledger
           </h4>
-          <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {filteredEvents.length} parsed events
+          <span className="text-xs text-white/60 font-medium">
+            {filteredEvents.length} events • Showing {displayedEvents.length} items
           </span>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-bold font-mono">
+        <div className="flex items-center gap-6 text-xs font-bold font-mono">
           <div className="text-right">
-            <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Spend</span>
-            <span className="text-rose-500 dark:text-rose-400 font-black text-sm">₹{Math.round(totalFilteredSpend).toLocaleString('en-IN')}</span>
+            <span className="block text-[10px] uppercase font-sans text-white/40">Total Spend</span>
+            <span className="text-white font-bold text-sm sm:text-base">
+              ₹{Math.round(totalFilteredSpend).toLocaleString('en-IN')}
+            </span>
           </div>
           <div className="text-right">
-            <span className={`block text-[10px] uppercase font-sans font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Income</span>
-            <span className={`font-black text-sm ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>₹{Math.round(totalFilteredIncome).toLocaleString('en-IN')}</span>
+            <span className="block text-[10px] uppercase font-sans text-white/40">Total Income</span>
+            <span className="text-[#30D158] font-bold text-sm sm:text-base">
+              ₹{Math.round(totalFilteredIncome).toLocaleString('en-IN')}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* ── 4. TRANSACTION CARD ITEMS ────────────────────────────────────── */}
-      <div className="space-y-2.5">
-        {displayedEvents.map((ev) => {
-          const isCredit = ev.direction === 'INFLOW';
+      {/* ── 4. VISIONOS SPATIAL TABLE WRAPPER ────────────────────────────── */}
+      <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.30)]">
+        {/* Table Header Bar */}
+        <div className="bg-white/5 px-5 py-3 border-b border-white/10 flex items-center justify-between text-xs font-semibold text-white/50 uppercase tracking-wider">
+          <span>Transaction Details</span>
+          <span>Amount & Time</span>
+        </div>
 
-          return (
-            <div
-              key={ev.id}
-              onClick={() => onSelectEvent(ev)}
-              className={`p-4 rounded-[24px] border cursor-pointer flex items-center justify-between transition-all duration-200 active:scale-[0.99] group backdrop-blur-xl ${
-                isDark 
-                  ? 'bg-white/[0.03] border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06] shadow-sm' 
-                  : 'bg-white/85 border-slate-200/80 hover:border-slate-300 hover:bg-white shadow-sm'
-              }`}
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="relative flex-shrink-0">
-                  <MerchantLogoView merchantName={ev.merchant} size={42} isDark={isDark} />
-                  <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black shadow-sm ${
-                    isCredit ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'
-                  }`}>
-                    {isCredit ? '↓' : '↑'}
-                  </span>
+        {/* Table Rows */}
+        <div className="divide-y divide-white/10">
+          {displayedEvents.map((ev) => {
+            const isCredit = ev.direction === 'INFLOW';
+
+            return (
+              <div
+                key={ev.id}
+                onClick={() => onSelectEvent(ev)}
+                className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors duration-200"
+              >
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="relative shrink-0">
+                    <MerchantLogoView merchantName={ev.merchant} size={42} />
+                    <span className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shadow-sm ${
+                      isCredit ? 'bg-[#30D158] text-white' : 'bg-white/20 text-white'
+                    }`}>
+                      {isCredit ? '↓' : '↑'}
+                    </span>
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-white truncate max-w-[180px] sm:max-w-md">
+                      {ev.merchant}
+                    </div>
+                    <div className="text-xs text-white/50 font-medium truncate mt-0.5">
+                      {ev.category} {ev.accountHint ? `• ${ev.accountHint}` : ''}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="min-w-0">
-                  <div className={`text-xs sm:text-sm font-black font-heading tracking-tight truncate max-w-[170px] sm:max-w-xs ${
-                    isDark ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {ev.merchant}
-                  </div>
-                  <div className={`text-[11px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {ev.category} {ev.accountHint ? `• ${ev.accountHint}` : ''}
+                <div className="flex items-center gap-4 shrink-0 pl-3">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSplitBill(ev);
+                    }}
+                    className="spatial-btn hidden sm:flex items-center gap-1.5 px-3 py-1 text-[11px]"
+                    title="Split bill with friends"
+                  >
+                    <span>➗</span>
+                    <span>Split</span>
+                  </button>
+
+                  <div className="text-right">
+                    <div className={`text-sm sm:text-base font-bold font-mono ${
+                      isCredit ? 'text-[#30D158]' : 'text-white'
+                    }`}>
+                      {isCredit ? '+' : '-'}₹{ev.amount.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] text-white/40 font-mono mt-0.5">
+                      {ev.dateFormatted}, {ev.timeFormatted}
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="flex items-center gap-3 flex-shrink-0 pl-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSplitBill(ev);
-                  }}
-                  className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition backdrop-blur-md ${
-                    isDark
-                      ? 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:bg-white/[0.1]'
-                      : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
-                  }`}
-                  title="Split bill with friends"
-                >
-                  <span>➗</span>
-                  <span>Split</span>
-                </button>
-
-                <div className="text-right">
-                  <div className={`text-xs sm:text-sm font-black font-mono ${
-                    isCredit ? (isDark ? 'text-emerald-400' : 'text-emerald-700') : 'text-rose-500 dark:text-rose-400'
-                  }`}>
-                    {isCredit ? '+' : '-'}₹{ev.amount.toLocaleString('en-IN')}
-                  </div>
-                  <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {ev.dateFormatted}, {ev.timeFormatted}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
-      {/* Load More Button */}
+      {/* ── 5. LOAD MORE GAZE BUTTON ─────────────────────────────────────── */}
       {filteredEvents.length > page * pageSize && (
         <div className="pt-2 text-center">
           <button
             onClick={() => setPage(p => p + 1)}
-            className={`w-full py-3.5 rounded-2xl border text-xs font-black transition-all duration-150 active:scale-[0.99] backdrop-blur-xl ${
-              isDark 
-                ? 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.08] text-slate-200' 
-                : 'bg-white/80 border-slate-200/90 text-slate-800 hover:bg-white shadow-sm'
-            }`}
+            className="spatial-btn w-full py-4 text-xs font-bold text-white"
           >
             Load More Transactions ({filteredEvents.length - page * pageSize} remaining)
           </button>
@@ -239,5 +220,3 @@ export const SpendTransactionsTab: React.FC<SpendTransactionsTabProps> = ({
     </div>
   );
 };
-
-

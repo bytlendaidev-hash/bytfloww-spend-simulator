@@ -6,7 +6,7 @@ interface AccountManagementScreenProps {
   accounts: DetectedAccount[];
   creditCards: DetectedAccount[];
   events: FinancialEvent[];
-  isDark: boolean;
+  isDark?: boolean;
   onSelectAccount: (account: DetectedAccount) => void;
 }
 
@@ -14,38 +14,34 @@ export const AccountManagementScreen: React.FC<AccountManagementScreenProps> = (
   accounts,
   creditCards,
   events,
-  isDark,
   onSelectAccount,
 }) => {
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-8 animate-emergence">
-      {/* 1. Accounts Header Card */}
-      <div className={`p-6 sm:p-8 rounded-[32px] border transition-all duration-300 backdrop-blur-2xl ${
-        isDark ? 'bg-[#0E1720]/80 border-white/[0.08] shadow-2xl shadow-black/60' : 'bg-white/85 border-slate-200/90 shadow-sm'
-      }`}>
-        <div className={`text-[11px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
+      {/* ── 1. ACCOUNTS HEADER SPATIAL CARD ──────────────────────────────── */}
+      <div className="spatial-card p-6 sm:p-8 space-y-3">
+        <span className="text-xs uppercase font-semibold tracking-wider text-white/60 block">
           Synchronized Bank Accounts & Cards
-        </div>
-        <div className={`text-2xl sm:text-4xl font-black font-mono mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+        </span>
+        <div className="text-2xl sm:text-5xl font-bold font-mono text-white">
           {accounts.length + creditCards.length} Accounts Reconciled
         </div>
-        <p className={`text-xs sm:text-sm font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className="text-xs sm:text-sm font-medium text-white/70">
           Reconciled across live SMS transaction feeds, UPI mandates, and balance notifications
         </p>
       </div>
 
-      {/* 2. Credit Card Grace Period Advisor */}
+      {/* ── 2. CREDIT CARD GRACE PERIOD ADVISOR ───────────────────────────── */}
       {creditCards.length > 0 && (
         <CreditCardAdvisorCard
           creditCards={creditCards}
           events={events}
-          isDark={isDark}
         />
       )}
 
-      {/* 3. Bank Accounts Grid */}
+      {/* ── 3. BANK ACCOUNTS GRID ────────────────────────────────────────── */}
       <div className="space-y-4">
-        <h4 className={`text-sm font-black font-heading uppercase tracking-wider px-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+        <h4 className="text-base font-bold tracking-tight text-white px-1">
           Savings & Current Accounts
         </h4>
 
@@ -54,49 +50,41 @@ export const AccountManagementScreen: React.FC<AccountManagementScreenProps> = (
             <div
               key={`${acc.institution}_${acc.accountMask}`}
               onClick={() => onSelectAccount(acc)}
-              className={`p-6 rounded-[28px] border transition-all duration-200 cursor-pointer hover:scale-[1.01] active:scale-[0.99] group backdrop-blur-xl ${
-                isDark 
-                  ? 'bg-white/[0.03] border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06] shadow-xl shadow-black/40' 
-                  : 'bg-white/85 border-slate-200/90 shadow-sm hover:border-slate-300'
-              }`}
+              className="spatial-card p-6 space-y-4 cursor-pointer group"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm flex-shrink-0 ${
-                    isDark ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-lg bg-white/10 text-white border border-white/15 shrink-0">
                     🏦
                   </div>
                   <div className="min-w-0">
-                    <div className={`text-sm sm:text-base font-black font-heading tracking-tight truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{acc.institution}</div>
-                    <div className={`text-xs font-mono font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Account ending *{acc.accountMask}</div>
+                    <div className="text-base font-bold text-white tracking-tight truncate">{acc.institution}</div>
+                    <div className="text-xs font-mono text-white/50 font-medium truncate">Account ending *{acc.accountMask}</div>
                   </div>
                 </div>
 
-                <div className="text-right flex-shrink-0 pl-2">
-                  <div className={`text-base sm:text-lg font-black font-mono ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
+                <div className="text-right shrink-0 pl-3">
+                  <div className="text-base sm:text-lg font-bold font-mono text-white">
                     {acc.latestBalance ? `₹${acc.latestBalance.toLocaleString('en-IN')}` : `₹${Math.round(acc.totalDebits).toLocaleString('en-IN')}`}
                   </div>
-                  <div className={`text-[10px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <div className="text-[10px] font-mono text-white/40">
                     {acc.latestBalance ? 'Available Balance' : 'Tracked Volume'}
                   </div>
                 </div>
               </div>
 
-              <div className={`grid grid-cols-3 gap-2 pt-3 border-t text-xs text-center ${
-                isDark ? 'border-white/[0.06]' : 'border-slate-100'
-              }`}>
-                <div className={`p-2.5 rounded-xl backdrop-blur-md ${isDark ? 'bg-white/[0.03]' : 'bg-slate-50'}`}>
-                  <span className={`block text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Total Debits</span>
-                  <span className="font-black text-rose-500 dark:text-rose-400 font-mono">₹{Math.round(acc.totalDebits).toLocaleString('en-IN')}</span>
+              <div className="grid grid-cols-3 gap-2.5 pt-3 border-t border-white/10 text-xs text-center">
+                <div className="p-3 rounded-[12px] bg-white/5 border border-white/10">
+                  <span className="block text-[10px] uppercase font-semibold text-white/50">Debits</span>
+                  <span className="font-bold text-white font-mono mt-0.5 block">₹{Math.round(acc.totalDebits).toLocaleString('en-IN')}</span>
                 </div>
-                <div className={`p-2.5 rounded-xl backdrop-blur-md ${isDark ? 'bg-white/[0.03]' : 'bg-slate-50'}`}>
-                  <span className={`block text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Total Credits</span>
-                  <span className={`font-black font-mono ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>₹{Math.round(acc.totalCredits).toLocaleString('en-IN')}</span>
+                <div className="p-3 rounded-[12px] bg-white/5 border border-white/10">
+                  <span className="block text-[10px] uppercase font-semibold text-white/50">Credits</span>
+                  <span className="font-bold font-mono text-[#30D158] mt-0.5 block">₹{Math.round(acc.totalCredits).toLocaleString('en-IN')}</span>
                 </div>
-                <div className={`p-2.5 rounded-xl backdrop-blur-md ${isDark ? 'bg-white/[0.03]' : 'bg-slate-50'}`}>
-                  <span className={`block text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Volume</span>
-                  <span className={`font-black font-mono ${isDark ? 'text-white' : 'text-slate-800'}`}>{acc.txCount} txns</span>
+                <div className="p-3 rounded-[12px] bg-white/5 border border-white/10">
+                  <span className="block text-[10px] uppercase font-semibold text-white/50">Volume</span>
+                  <span className="font-bold font-mono text-white mt-0.5 block">{acc.txCount} txns</span>
                 </div>
               </div>
             </div>
@@ -106,5 +94,3 @@ export const AccountManagementScreen: React.FC<AccountManagementScreenProps> = (
     </div>
   );
 };
-
-

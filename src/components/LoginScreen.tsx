@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { ActiveModule } from '../types';
 
 interface LoginScreenProps {
-  isDark: boolean;
+  isDark?: boolean;
   onLoginSuccess: (user: { name: string; email: string; phone: string }, preferredModule?: ActiveModule) => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({
-  isDark,
   onLoginSuccess,
 }) => {
   const [authMode, setAuthMode] = useState<'EMAIL' | 'PHONE'>('EMAIL');
@@ -101,43 +100,33 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
 
   return (
     <div className="min-h-[82vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
-      <div className={`w-full max-w-md p-8 sm:p-10 rounded-[36px] border text-center transition-all duration-300 backdrop-blur-2xl ${
-        isDark 
-          ? 'bg-[#0E1720]/80 border-white/[0.1] text-[#F8FAFC] shadow-2xl shadow-black/80' 
-          : 'bg-white/85 border-slate-200/90 text-slate-900 shadow-2xl shadow-slate-900/10'
-      }`}>
-        {/* Brand Icon Badge with glowing ambient halo */}
-        <div className="relative mx-auto mb-5 w-16 h-16">
-          <div className={`w-16 h-16 rounded-3xl flex items-center justify-center font-black text-2xl shadow-xl transition-all ${
-            isDark 
-              ? 'bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 text-slate-950 shadow-emerald-500/30' 
-              : 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-emerald-600/25'
-          }`}>
+      <div className="spatial-card w-full max-w-md p-8 sm:p-10 text-center space-y-6">
+        {/* Brand Icon Badge */}
+        <div className="relative mx-auto w-16 h-16">
+          <div className="w-16 h-16 rounded-[20px] flex items-center justify-center font-bold text-2xl bg-white/10 border border-white/20 text-white shadow-lg">
             BF
           </div>
-          <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-[#0E1720] animate-pulse" />
+          <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#30D158] border-2 border-black animate-pulse" />
         </div>
 
-        <div className="space-y-1.5 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-black font-heading tracking-tight">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
             BytFloww Spatial OS
           </h1>
-          <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            Personal Financial Forensics & Multi-Statement Intelligence
+          <p className="text-xs text-white/60 font-medium">
+            Financial Forensics & Spatial Ledger Intelligence
           </p>
         </div>
 
         {/* Auth Mode Tabs Pill */}
-        <div className={`p-1 rounded-2xl border flex mb-6 backdrop-blur-xl ${
-          isDark ? 'bg-black/40 border-white/[0.08]' : 'bg-slate-100/90 border-slate-200/90'
-        }`}>
+        <div className="p-1 rounded-full bg-white/5 border border-white/10 flex">
           <button
             type="button"
             onClick={() => { setAuthMode('EMAIL'); setErrorMessage(''); setStep('INPUT'); }}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all duration-150 ${
+            className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${
               authMode === 'EMAIL'
-                ? (isDark ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20')
-                : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
+                ? 'spatial-btn-selected'
+                : 'text-white/60 hover:text-white'
             }`}
           >
             📧 Email Login
@@ -145,10 +134,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <button
             type="button"
             onClick={() => { setAuthMode('PHONE'); setErrorMessage(''); setStep('INPUT'); }}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all duration-150 ${
+            className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all duration-300 ${
               authMode === 'PHONE'
-                ? (isDark ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20')
-                : (isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')
+                ? 'spatial-btn-selected'
+                : 'text-white/60 hover:text-white'
             }`}
           >
             📱 Mobile OTP
@@ -159,9 +148,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {authMode === 'EMAIL' && (
           <form onSubmit={handleEmailLogin} className="space-y-4 text-left">
             <div>
-              <label className={`text-[10px] font-black uppercase tracking-wider block mb-1.5 ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}>
+              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-white/60">
                 Work / Personal Email
               </label>
               <input
@@ -170,18 +157,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className={`w-full px-4 py-3 rounded-2xl text-xs border outline-none transition-all duration-150 ${
-                  isDark 
-                    ? 'bg-[#142028]/80 border-white/10 text-white focus:border-emerald-400 placeholder:text-slate-500 shadow-inner' 
-                    : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500 placeholder:text-slate-400 shadow-sm'
-                }`}
+                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
               />
             </div>
 
             <div>
-              <label className={`text-[10px] font-black uppercase tracking-wider block mb-1.5 ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}>
+              <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-white/60">
                 Password
               </label>
               <input
@@ -190,16 +171,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 rounded-2xl text-xs border outline-none transition-all duration-150 ${
-                  isDark 
-                    ? 'bg-[#142028]/80 border-white/10 text-white focus:border-emerald-400 placeholder:text-slate-500 shadow-inner' 
-                    : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500 placeholder:text-slate-400 shadow-sm'
-                }`}
+                className="w-full px-4 py-3.5 rounded-[14px] text-xs bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
               />
             </div>
 
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-bold text-center">
+              <div className="p-3 rounded-[12px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold text-center">
                 ⚠️ {errorMessage}
               </div>
             )}
@@ -207,17 +184,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 rounded-2xl text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 shadow-lg active:scale-95 ${
-                isDark 
-                  ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 text-slate-950 hover:brightness-110 shadow-emerald-500/20' 
-                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105 shadow-emerald-600/20'
-              }`}
+              className="spatial-btn-selected w-full py-4 rounded-full text-xs font-bold flex items-center justify-center gap-2"
             >
               {loading ? (
-                <>
-                  <span className="animate-spin">⚙️</span>
-                  <span>Authenticating...</span>
-                </>
+                <span>Authenticating...</span>
               ) : (
                 <span>Sign In to Spatial OS →</span>
               )}
@@ -230,15 +200,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           <form onSubmit={step === 'INPUT' ? handleSendOtp : handleVerifyOtp} className="space-y-4 text-left">
             {step === 'INPUT' ? (
               <div>
-                <label className={`text-[10px] font-black uppercase tracking-wider block mb-1.5 ${
-                  isDark ? 'text-slate-400' : 'text-slate-600'
-                }`}>
+                <label className="text-[10px] font-bold uppercase tracking-wider block mb-1 text-white/60">
                   Indian Mobile Number
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className={`px-3 py-3 rounded-2xl text-xs font-bold border ${
-                    isDark ? 'bg-[#142028]/80 border-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                  }`}>
+                  <span className="px-3.5 py-3.5 rounded-[14px] text-xs font-bold bg-white/10 border border-white/15 text-white/80">
                     +91
                   </span>
                   <input
@@ -248,26 +214,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                     placeholder="98765 43210"
-                    className={`flex-1 px-4 py-3 rounded-2xl text-xs font-mono border outline-none transition-all duration-150 ${
-                      isDark 
-                        ? 'bg-[#142028]/80 border-white/10 text-white focus:border-emerald-400 placeholder:text-slate-500 shadow-inner' 
-                        : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500 placeholder:text-slate-400 shadow-sm'
-                    }`}
+                    className="flex-1 px-4 py-3.5 rounded-[14px] text-xs font-mono bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
                   />
                 </div>
               </div>
             ) : (
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className={`text-[10px] font-black uppercase tracking-wider ${
-                    isDark ? 'text-slate-400' : 'text-slate-600'
-                  }`}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-white/60">
                     Enter 6-Digit OTP
                   </label>
                   <button
                     type="button"
                     onClick={() => setStep('INPUT')}
-                    className="text-[10px] font-bold text-emerald-400 hover:underline"
+                    className="text-[10px] font-bold text-[#0A84FF] hover:underline"
                   >
                     Change Number
                   </button>
@@ -279,17 +239,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
                   placeholder="123456"
-                  className={`w-full px-4 py-3 rounded-2xl text-base font-mono font-bold tracking-widest text-center border outline-none transition-all duration-150 ${
-                    isDark 
-                      ? 'bg-[#142028]/80 border-white/10 text-white focus:border-emerald-400 placeholder:text-slate-500 shadow-inner' 
-                      : 'bg-white border-slate-200 text-slate-900 focus:border-emerald-500 placeholder:text-slate-400 shadow-sm'
-                  }`}
+                  className="w-full px-4 py-3.5 rounded-[14px] text-base font-mono font-bold tracking-widest text-center bg-white/10 border border-white/15 text-white placeholder-white/40 outline-none focus:border-white/40"
                 />
               </div>
             )}
 
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-bold text-center">
+              <div className="p-3 rounded-[12px] bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF453A] text-xs font-bold text-center">
                 ⚠️ {errorMessage}
               </div>
             )}
@@ -297,17 +253,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 rounded-2xl text-xs font-black transition-all duration-150 flex items-center justify-center gap-2 shadow-lg active:scale-95 ${
-                isDark 
-                  ? 'bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 text-slate-950 hover:brightness-110 shadow-emerald-500/20' 
-                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105 shadow-emerald-600/20'
-              }`}
+              className="spatial-btn-selected w-full py-4 rounded-full text-xs font-bold flex items-center justify-center gap-2"
             >
               {loading ? (
-                <>
-                  <span className="animate-spin">⚙️</span>
-                  <span>Processing...</span>
-                </>
+                <span>Processing...</span>
               ) : step === 'INPUT' ? (
                 <span>Send Verification OTP →</span>
               ) : (
@@ -317,36 +266,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </form>
         )}
 
-        {/* Quick Demo / Guest Bypass Actions */}
-        <div className="mt-8 pt-6 border-t border-white/[0.08] space-y-3">
-          <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+        {/* Quick Demo Access */}
+        <div className="pt-4 border-t border-white/10 space-y-3">
+          <div className="text-[10px] font-bold uppercase text-white/50 tracking-wider">
             Quick One-Click Access (Authorized Session)
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => handleGuestAccess('BANK_STATEMENTS')}
-              className={`p-3 rounded-2xl border text-xs font-black text-center transition-all duration-150 active:scale-95 ${
-                isDark 
-                  ? 'bg-emerald-500/10 border-emerald-500/25 hover:bg-emerald-500/20 text-emerald-300 shadow-sm' 
-                  : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100 text-emerald-800 shadow-sm'
-              }`}
+              className="spatial-btn p-3 text-xs text-white"
             >
-              <div>🏛️ Bank Forensics</div>
-              <div className="text-[9px] font-normal opacity-80 mt-0.5">Direct Statement Mode</div>
+              <div className="font-bold">🏛️ Statement Hub</div>
+              <div className="text-[9px] text-white/50 mt-0.5 font-normal">Forensics Engine</div>
             </button>
 
             <button
               type="button"
               onClick={() => handleGuestAccess('SMS_INTELLIGENCE')}
-              className={`p-3 rounded-2xl border text-xs font-black text-center transition-all duration-150 active:scale-95 ${
-                isDark 
-                  ? 'bg-indigo-500/10 border-indigo-500/25 hover:bg-indigo-500/20 text-indigo-300 shadow-sm' 
-                  : 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-800 shadow-sm'
-              }`}
+              className="spatial-btn p-3 text-xs text-white"
             >
-              <div>📱 SMS Simulator</div>
-              <div className="text-[9px] font-normal opacity-80 mt-0.5">Android XML Ingestion</div>
+              <div className="font-bold">📱 SMS Simulator</div>
+              <div className="text-[9px] text-white/50 mt-0.5 font-normal">Android XML Parser</div>
             </button>
           </div>
         </div>

@@ -4,13 +4,12 @@ import { MerchantLogoView } from './MerchantLogoView';
 
 interface SpendMerchantsTabProps {
   merchants: MerchantItem[];
-  isDark: boolean;
+  isDark?: boolean;
   onSelectMerchant: (merchantName: string) => void;
 }
 
 export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
   merchants,
-  isDark,
   onSelectMerchant,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,37 +28,29 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
 
   const totalMerchantSpend = merchants.reduce((s, m) => s + m.totalSpend, 0);
 
-  const colors = ['#059669', '#4F46E5', '#D97706', '#E11D48', '#2563EB', '#0284C7', '#7C3AED'];
-
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8 animate-emergence">
-      {/* ── 1. SEARCH & FILTER BAR ─────────────────────────────────────── */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search merchants, brands, platforms..."
-            className={`w-full px-5 py-3.5 pl-11 rounded-2xl text-xs sm:text-sm outline-none border transition-all duration-200 backdrop-blur-xl ${
-              isDark 
-                ? 'bg-[#0E1720]/80 border-white/[0.1] text-white placeholder-slate-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-inner' 
-                : 'bg-white/90 border-slate-200/90 text-slate-900 placeholder-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 shadow-sm'
-            }`}
-          />
-          <span className="absolute left-4 top-3.5 text-xs text-slate-400">🔍</span>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-4 top-3.5 text-xs text-slate-400 hover:text-slate-200 px-1.5 py-0.5 rounded-full"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+    <div className="space-y-6 max-w-5xl mx-auto pb-12 animate-emergence">
+      {/* ── 1. SEARCH & GAZE FILTER PILLS ────────────────────────────────── */}
+      <div className="relative">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search merchants, brands, platforms..."
+          className="w-full px-6 py-4 pl-12 rounded-full text-sm bg-white/10 backdrop-blur-[30px] border border-white/20 text-white placeholder-white/40 outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]"
+        />
+        <span className="absolute left-4.5 top-4 text-sm text-white/50">🔍</span>
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-4.5 top-4 text-xs text-white/50 hover:text-white px-2 py-0.5 rounded-full bg-white/10"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
-      {/* Filter Chips */}
+      {/* Filter Chips (Gaze Interactive) */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 text-xs">
         {[
           { key: 'ALL', label: 'All Merchants' },
@@ -72,14 +63,10 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
             <button
               key={chip.key}
               onClick={() => setFilterType(chip.key as any)}
-              className={`px-4 py-2 rounded-2xl font-black whitespace-nowrap transition-all duration-150 border flex-shrink-0 active:scale-95 backdrop-blur-xl ${
+              className={`px-4 py-2 font-semibold whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isSelected
-                  ? isDark
-                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 border-emerald-400/50 shadow-md shadow-emerald-500/25'
-                    : 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
-                  : isDark
-                  ? 'border-white/[0.08] text-slate-300 bg-white/[0.04] hover:bg-white/[0.08] hover:text-white'
-                  : 'border-slate-200/90 text-slate-700 bg-white/80 hover:bg-white hover:text-slate-900 shadow-sm'
+                  ? 'spatial-btn-selected rounded-full'
+                  : 'spatial-btn'
               }`}
             >
               {chip.label}
@@ -88,69 +75,64 @@ export const SpendMerchantsTab: React.FC<SpendMerchantsTabProps> = ({
         })}
       </div>
 
-      {/* ── 2. MERCHANT DIRECTORY HEADER ───────────────────────────────── */}
+      {/* ── 2. SUMMARY STRIP ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <span className="text-base text-emerald-400">🏪</span>
-          <h3 className={`text-base font-black font-heading tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+          <span className="text-base text-[#0A84FF]">🏪</span>
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-white">
             Merchant Directory & Spend DNA
           </h3>
         </div>
-        <span className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+        <span className="text-xs text-white/50 font-medium">
           {filteredMerchants.length} detected entities
         </span>
       </div>
 
-      {/* ── 3. MERCHANT CARDS LIST ─────────────────────────────────────── */}
-      <div className="space-y-2.5">
-        {filteredMerchants.map((m, idx) => {
-          const accentColor = colors[idx % colors.length];
-          const pct = totalMerchantSpend > 0 ? ((m.totalSpend / totalMerchantSpend) * 100).toFixed(1) : '0';
+      {/* ── 3. VISIONOS SPATIAL TABLE WRAPPER ────────────────────────────── */}
+      <div className="bg-white/5 border border-white/10 rounded-[16px] overflow-hidden shadow-[0_8px_32px_0_rgba(0,0,0,0.30)]">
+        <div className="bg-white/5 px-5 py-3 border-b border-white/10 flex items-center justify-between text-xs font-semibold text-white/50 uppercase tracking-wider">
+          <span>Merchant & Transaction Velocity</span>
+          <span>Cumulative Spend</span>
+        </div>
 
-          return (
-            <div
-              key={m.name}
-              onClick={() => onSelectMerchant(m.name)}
-              style={{ borderLeftColor: accentColor, borderLeftWidth: '4px' }}
-              className={`p-4 rounded-[24px] border transition-all duration-200 cursor-pointer flex items-center justify-between hover:scale-[1.005] active:scale-[0.99] group backdrop-blur-xl ${
-                isDark 
-                  ? 'bg-white/[0.03] border-white/[0.06] hover:border-emerald-400/40 hover:bg-white/[0.06] shadow-sm' 
-                  : 'bg-white/85 border-slate-200/80 hover:border-slate-300 hover:bg-white shadow-sm'
-              }`}
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <MerchantLogoView merchantName={m.name} size={42} isDark={isDark} />
-                <div className="min-w-0">
-                  <div className={`text-xs sm:text-sm font-black font-heading tracking-tight truncate max-w-[180px] sm:max-w-xs ${
-                    isDark ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    {m.name}
-                  </div>
-                  <div className={`text-[11px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {m.txCount} transaction{m.txCount > 1 ? 's' : ''} • Avg ₹{m.avgTicket.toLocaleString('en-IN')}
+        <div className="divide-y divide-white/10">
+          {filteredMerchants.map((m) => {
+            const pct = totalMerchantSpend > 0 ? ((m.totalSpend / totalMerchantSpend) * 100).toFixed(1) : '0';
+
+            return (
+              <div
+                key={m.name}
+                onClick={() => onSelectMerchant(m.name)}
+                className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-colors duration-200 group"
+              >
+                <div className="flex items-center gap-4 min-w-0">
+                  <MerchantLogoView merchantName={m.name} size={42} />
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-white truncate max-w-[180px] sm:max-w-md">
+                      {m.name}
+                    </div>
+                    <div className="text-xs text-white/50 font-medium truncate mt-0.5">
+                      {m.txCount} transaction{m.txCount > 1 ? 's' : ''} • Avg ₹{m.avgTicket.toLocaleString('en-IN')}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-3 text-right flex-shrink-0 pl-2">
-                <div>
-                  <div className={`text-xs sm:text-sm font-black font-mono ${
-                    isDark ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    ₹{m.totalSpend.toLocaleString('en-IN')}
+                <div className="flex items-center gap-4 text-right shrink-0 pl-3">
+                  <div>
+                    <div className="text-sm sm:text-base font-bold font-mono text-white">
+                      ₹{m.totalSpend.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[11px] font-semibold text-white/50">
+                      {pct}% of spend
+                    </div>
                   </div>
-                  <div className="text-[11px] font-black" style={{ color: accentColor }}>
-                    {pct}% of spend
-                  </div>
+                  <span className="text-white/40 text-base font-bold group-hover:text-white group-hover:translate-x-0.5 transition">›</span>
                 </div>
-                <span className={`text-sm font-black ${isDark ? 'text-slate-400' : 'text-slate-400'} group-hover:translate-x-0.5 transition-transform`}>›</span>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 };
-
-
