@@ -246,7 +246,7 @@ export function buildMoneyFlowGraph(dataset: ForensicDataset): MoneyFlowGraphDat
   });
 
   const inflowSources = [
-    { id: 'in_salary', name: 'Corporate Salary (Newgen)', amount: dataset.salaryTotal, icon: '💼', color: '#10B981', cat: 'SALARY' },
+    { id: 'in_salary', name: 'Corporate Earned Salary', amount: dataset.salaryTotal, icon: '💼', color: '#10B981', cat: 'SALARY' },
     { id: 'in_epfo', name: 'EPFO / PF Claims', amount: dataset.epfoCreditsTotal, icon: '🏛️', color: '#00F2FE', cat: 'STATUTORY' },
     { id: 'in_loans', name: 'Loan Disbursals (Debt)', amount: dataset.loanCreditsTotal, icon: '🏦', color: '#F59E0B', cat: 'LOANS' },
     { id: 'in_other', name: 'Refunds & Interest', amount: Math.max(0, totalInflow - dataset.salaryTotal - dataset.epfoCreditsTotal - dataset.loanCreditsTotal), icon: '↩️', color: '#6366F1', cat: 'REFUNDS' },

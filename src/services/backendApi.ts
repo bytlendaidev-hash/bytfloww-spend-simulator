@@ -1391,7 +1391,7 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
               {
                 type: 'SALARY_DETECTED',
                 title: 'Corporate Payroll Detected',
-                description: `Primary salary credits from Newgen Software totaling ₹${salaryInflowTotal.toLocaleString('en-IN')} (~₹${Math.round(salaryInflowTotal / 13).toLocaleString('en-IN')}/mo).`,
+                description: `Corporate salary credits from ${primaryEmployerName} totaling ₹${salaryInflowTotal.toLocaleString('en-IN')} (~₹${Math.round(salaryInflowTotal / Math.max(1, salaryCount)).toLocaleString('en-IN')}/mo).`,
                 severity: 'SUCCESS' as const,
               },
             ]

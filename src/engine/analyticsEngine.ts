@@ -24,6 +24,11 @@ import {
   generateForensicDataFromTransactions, 
   EMPTY_FORENSIC_DATA 
 } from './statementForensicsData';
+import { 
+  isSalaryTransaction, 
+  extractEmployerFromNarration, 
+  analyzeAllEmployers 
+} from './salaryIntelligence';
 
 // ── MULTI-STATEMENT SESSION & DEDUPLICATION TYPES ─────────────────────────────
 export type DuplicateStatus =
@@ -730,6 +735,11 @@ export function normalizeDate(raw: string): string {
 function extractEntity(narration: string): { name: string; upiHandle: string | null } {
   const n = narration.trim();
 
+  // Salary / Corporate Employer detection first
+  if (isSalaryTransaction(n, true)) {
+    return { name: extractEmployerFromNarration(n), upiHandle: null };
+  }
+
   // UPI: "UPI-NAME-upi@bank-..."
   const upiMatch = n.match(/UPI[\/\-]([A-Za-z0-9\s.\-'&]+?)[\/\-]([A-Za-z0-9._\-]+@[A-Za-z0-9]+)/i);
   if (upiMatch) {
@@ -946,21 +956,9 @@ function classifyTransaction(row: ParsedRow, entityName: string): Classification
       return cls('INTEREST_INCOME', 'HIGH', 'Bank savings account interest credited', 'BANK', true, false, false, false, false, false, false, false, false, false);
     }
 
-    // 6. Corporate Salary / Payroll (Explicit corporate employer or periodic payroll)
-    // Strictly requires employer identity or explicit payroll keywords, AND cannot match any lender/NBFC
-    if (
-      !isLenderEntity(n, entityName) && (
-        (n.includes('newgen') && !n.includes('reimburs') && !n.includes('food bill')) ||
-        n.includes('salary for') || n.includes('sal for') || n.includes('monthly salary') ||
-        n.includes('payroll') || n.includes('sal cr') || n.includes('stipend')
-      )
-    ) {
+    // 6. Corporate Salary / Payroll (Universal deterministic salary intelligence engine)
+    if (isSalaryTransaction(row.narration, isCredit, amount)) {
       return cls('SALARY', 'HIGH', 'Corporate payroll salary credit', 'EMPLOYER', true, false, false, false, false, false, false, false, false, false);
-    }
-
-    // 7. General NEFT Corporate Credits (Only if NOT matching any lender or loan keyword)
-    if (n.includes('neft cr') && amount >= 25000 && !n.includes('upi') && !isLenderEntity(n, entityName)) {
-      return cls('SALARY', 'MEDIUM', 'Inferred recurring corporate salary', 'EMPLOYER', true, false, false, false, false, false, false, false, false, false);
     }
 
     // Refunds / reversals
