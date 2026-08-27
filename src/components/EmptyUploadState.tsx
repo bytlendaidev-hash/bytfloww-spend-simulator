@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { SAMPLE_SMS_XML } from '../engine/sampleData';
 
 interface EmptyUploadStateProps {
   isDark?: boolean;
@@ -54,11 +53,11 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
         </div>
 
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-abyss-textPrimary mb-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-abyss-textPrimary mb-2 font-fraunces">
             Import SMS Backup XML
           </h2>
           <p className="text-xs sm:text-sm max-w-md mx-auto text-abyss-textMuted leading-relaxed font-medium">
-            Import an Android SMS Backup XML file to extract real bank accounts, spending categories, merchant intelligence, and loan commitments.
+            Import your Android SMS Backup XML file to extract real bank accounts, spending categories, merchant intelligence, and loan commitments.
           </p>
         </div>
 
@@ -70,8 +69,8 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
           onClick={() => fileInputRef.current?.click()}
           className={`p-8 sm:p-10 rounded-[20px] border-2 border-dashed cursor-pointer transition-all duration-200 ${
             isDragging
-              ? 'border-jade-500 bg-jade-500/10 scale-[1.01]'
-              : 'border-abyss-border bg-abyss-well hover:border-jade-500/40 hover:bg-abyss-elevated'
+              ? 'border-emerald-500 bg-emerald-500/10 scale-[1.01]'
+              : 'border-abyss-border bg-abyss-well hover:border-emerald-500/40 hover:bg-abyss-elevated'
           }`}
         >
           <input
@@ -96,41 +95,23 @@ export const EmptyUploadState: React.FC<EmptyUploadStateProps> = ({
         </div>
 
         {error && (
-          <div className="p-3.5 rounded-[12px] bg-pulse-500/15 border border-pulse-500/30 text-pulse-500 text-xs font-bold animate-fade-in flex items-center justify-center gap-2">
+          <div className="p-3.5 rounded-[12px] bg-rose-500/15 border border-rose-500/30 text-rose-500 text-xs font-bold animate-fade-in flex items-center justify-center gap-2">
             <span>⚠️</span>
             <span>{error}</span>
           </div>
         )}
 
         {isProcessing && (
-          <div className="flex items-center justify-center gap-3 text-xs font-bold text-jade-500 animate-pulse">
+          <div className="flex items-center justify-center gap-3 text-xs font-bold text-[#00884E] dark:text-[#1AE893] animate-pulse">
             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             <span>Parsing Real Indian Bank Messages...</span>
           </div>
         )}
 
-        {/* ── DIVIDER / SAMPLE BUTTON ─────────────────────────────────── */}
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center border-t border-abyss-border" />
-          <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-            <span className="px-3 font-bold bg-abyss-card text-abyss-textMuted rounded-full">
-              or test with pre-loaded dataset
-            </span>
-          </div>
-        </div>
-
-        <button
-          onClick={() => onXmlLoaded(SAMPLE_SMS_XML)}
-          className="spatial-btn w-full py-4 text-xs font-bold text-abyss-textPrimary flex items-center justify-center gap-2"
-        >
-          <span>⚡</span>
-          <span>Load 3,979 Real SMS Dataset (sms_20260804131919.xml)</span>
-        </button>
-
         {/* Privacy Note */}
         <div className="pt-4 border-t border-abyss-border text-xs text-abyss-textMuted flex items-center justify-center gap-2">
           <span>🔒</span>
-          <span>100% Client-Side Privacy: SMS parsed locally in browser memory.</span>
+          <span>100% Client-Side Privacy: SMS parsed locally in browser memory. Zero external server uploads.</span>
         </div>
       </div>
     </div>

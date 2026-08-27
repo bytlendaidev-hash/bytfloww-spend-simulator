@@ -31,17 +31,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
   const varianceAmount = Math.abs(snapshot.totalSpend - budgetLimit);
   const budgetPct = Math.round((snapshot.totalSpend / Math.max(1, budgetLimit)) * 100);
 
-  const primaryCreditCard = snapshot.creditCards[0] || {
-    institution: 'Axis Bank',
-    accountMask: '2261',
-    accountType: 'CREDIT_CARD',
-    totalLimit: 16000,
-    availableLimit: 15730,
-    totalDebits: 270,
-    totalCredits: 0,
-    netCashflow: -270,
-    txCount: 1,
-  };
+  const primaryCreditCard = snapshot.creditCards[0] || null;
 
   const topMerchant = snapshot.topMerchants[0];
 
@@ -419,7 +409,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
                   </span>
                   <div className="text-xl sm:text-3xl font-bold font-mono mt-0.5 text-abyss-textPrimary flex items-baseline gap-1">
                     <span className="text-base sm:text-lg text-abyss-textMuted font-sans">₹</span>
-                    {(acc.latestBalance !== undefined ? acc.latestBalance : (isAirtel ? 33.09 : 26860)).toLocaleString('en-IN')}
+                    {(acc.latestBalance !== undefined ? acc.latestBalance : 0).toLocaleString('en-IN')}
                   </div>
                 </div>
 
@@ -434,23 +424,24 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       </div>
 
       {/* ── 8. DETECTED CREDIT CARDS & SPEND LIMITS ──────────────────────── */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-abyss-textSecondary">
-            <span>●</span> DETECTED CREDIT CARDS & SPEND LIMITS
+      {snapshot.creditCards.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-abyss-textSecondary">
+              <span>●</span> DETECTED CREDIT CARDS & SPEND LIMITS
+            </div>
+            <span className="text-[11px] sm:text-xs text-abyss-textMuted font-medium">
+              {snapshot.creditCards.length} Card • Tap for Drilldown 🔍
+            </span>
           </div>
-          <span className="text-[11px] sm:text-xs text-abyss-textMuted font-medium">
-            {snapshot.creditCards.length} Card • Tap for Drilldown 🔍
-          </span>
-        </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:gap-4">
-          {snapshot.creditCards.slice(0, 2).map((card) => (
-            <div 
-              key={`${card.institution}_${card.accountMask}`}
-              onClick={() => onSelectCreditCard && onSelectCreditCard(card)}
-              className="spatial-card p-4 sm:p-6 relative overflow-hidden cursor-pointer group hover:border-synapse-500/40 active:scale-[0.99] transition-all"
-            >
+          <div className="grid grid-cols-1 gap-3 sm:gap-4">
+            {snapshot.creditCards.slice(0, 2).map((card) => (
+              <div 
+                key={`${card.institution}_${card.accountMask}`}
+                onClick={() => onSelectCreditCard && onSelectCreditCard(card)}
+                className="spatial-card p-4 sm:p-6 relative overflow-hidden cursor-pointer group hover:border-synapse-500/40 active:scale-[0.99] transition-all"
+              >
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold tracking-widest uppercase text-abyss-textPrimary">
@@ -500,6 +491,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           ))}
         </div>
       </div>
+      )}
     </div>
   );
 };

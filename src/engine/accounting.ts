@@ -240,14 +240,9 @@ export function buildSpendSnapshot(
     accountMap.set(key, cur);
   }
 
-  // Ensure primary bank accounts exist with verified balances if found in SMS
+  // Real accounts parsed directly from user financial events
   let detectedAccountsList: DetectedAccount[] = Array.from(accountMap.values())
-    .filter(a => a.txCount >= 3 || a.latestBalance !== undefined || a.institution.includes('HDFC') || a.institution.includes('Airtel') || a.institution.includes('Axis'))
     .map(a => {
-      const isAirtel = a.institution.includes('Airtel');
-      const isHdfc = a.institution.includes('HDFC');
-      const isAxis = a.institution.includes('Axis');
-
       return {
         institution: a.institution,
         accountMask: a.accountMask,
@@ -256,66 +251,20 @@ export function buildSpendSnapshot(
         totalCredits: Math.round(a.totalCredits),
         netCashflow: Math.round(a.totalCredits - a.totalDebits),
         txCount: a.txCount,
-        latestBalance: a.latestBalance !== undefined 
-          ? Math.round(a.latestBalance) 
-          : (isHdfc ? 26860 : (isAirtel ? 33 : undefined)),
-        totalLimit: a.accountType === 'CREDIT_CARD' ? 16000 : undefined,
-        availableLimit: a.accountType === 'CREDIT_CARD' ? 54 : undefined,
+        latestBalance: a.latestBalance !== undefined ? Math.round(a.latestBalance) : undefined,
+        totalLimit: a.accountType === 'CREDIT_CARD' ? a.totalDebits : undefined,
+        availableLimit: a.accountType === 'CREDIT_CARD' ? undefined : undefined,
       };
     });
 
-  // Strict whitelist for legitimate verified banks
-  const LEGITIMATE_BANKS = ['hdfc', 'airtel', 'axis', 'sbi', 'state bank', 'icici', 'kotak', 'pnb', 'bob', 'paytm', 'idfc'];
-
-  // Separate credit cards vs bank savings accounts
+  // Separate credit cards vs bank savings accounts based solely on parsed data
   const creditCards = detectedAccountsList
-    .filter(a => a.accountType === 'CREDIT_CARD' && LEGITIMATE_BANKS.some(b => a.institution.toLowerCase().includes(b)))
+    .filter(a => a.accountType === 'CREDIT_CARD')
     .sort((a, b) => b.txCount - a.txCount);
 
   const accounts = detectedAccountsList
-    .filter(a => a.accountType !== 'CREDIT_CARD' && !a.institution.toLowerCase().includes('card') && !a.institution.toLowerCase().includes('axis') && LEGITIMATE_BANKS.some(b => a.institution.toLowerCase().includes(b)))
+    .filter(a => a.accountType !== 'CREDIT_CARD')
     .sort((a, b) => b.txCount - a.txCount);
-
-  // Ensure clean primary bank accounts exist
-  if (!accounts.some(a => a.institution.includes('HDFC'))) {
-    accounts.unshift({
-      institution: 'HDFC Bank',
-      accountMask: '9082',
-      accountType: 'SAVINGS',
-      latestBalance: 26860,
-      totalDebits: Math.round(totalSpend * 0.90),
-      totalCredits: Math.round(totalIncome),
-      netCashflow: Math.round(totalIncome - (totalSpend * 0.90)),
-      txCount: Math.round(evaluatedEvents.length * 0.85),
-    });
-  }
-
-  if (!accounts.some(a => a.institution.includes('Airtel'))) {
-    accounts.push({
-      institution: 'Airtel Payments Bank',
-      accountMask: '9600',
-      accountType: 'SAVINGS',
-      latestBalance: 33,
-      totalDebits: Math.round(totalSpend * 0.10),
-      totalCredits: 0,
-      netCashflow: -Math.round(totalSpend * 0.10),
-      txCount: Math.round(evaluatedEvents.length * 0.15),
-    });
-  }
-
-  if (creditCards.length === 0) {
-    creditCards.push({
-      institution: 'Axis Bank Credit Card',
-      accountMask: '1157',
-      accountType: 'CREDIT_CARD',
-      totalLimit: 25000,
-      availableLimit: 9054,
-      totalDebits: 15946,
-      totalCredits: 0,
-      netCashflow: -15946,
-      txCount: 188,
-    });
-  }
 
   // 8. Commitments & Mandates Extracted Dynamically from Real SMS
   const detectedCommitments: CommitmentItem[] = [];
