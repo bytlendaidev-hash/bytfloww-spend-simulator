@@ -50,6 +50,8 @@ interface BankStatementModuleProps {
   onMergeTransactions?: (events: FinancialEvent[]) => void;
   onSelectEvent?: (event: FinancialEvent) => void;
   onSwitchToSmsModule?: () => void;
+  activeSection?: StatementSection;
+  onSelectSection?: (section: StatementSection) => void;
 }
 
 
@@ -122,9 +124,14 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   isDark,
   onMergeTransactions,
   onSwitchToSmsModule,
+  activeSection: propActiveSection,
+  onSelectSection: propOnSelectSection,
 }) => {
-  // Navigation Section
-  const [activeSection, setActiveSection] = useState<StatementSection>('OVERVIEW');
+  // Navigation Section (Controlled or Uncontrolled)
+  const [internalSection, setInternalSection] = useState<StatementSection>('OVERVIEW');
+  const activeSection = propActiveSection || internalSection;
+  const setActiveSection = propOnSelectSection || setInternalSection;
+  const [activeTabCategory, setActiveTabCategory] = useState<string>('ALL');
 
   // Multi-Statement Session & File State
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -558,72 +565,101 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
       {/* ── FILTER & TAB BAR ORNAMENT (STICKY) ────────────────────────────── */}
       {hasData && (
-        <div className="spatial-card p-3 sm:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sticky top-4 z-30">
-          {/* Section Navigation Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
-            {[
-              { id: 'OVERVIEW', label: '📊 Overview' },
-              { id: 'WHERE_100_WENT', label: '🎯 Where ₹100 Went' },
-              { id: 'MONEY_FLOW', label: '🕸️ Money Flow' },
-              { id: 'DEBT_SIMULATOR', label: '🧮 Debt Simulator' },
-              { id: 'ANOMALY_RADAR', label: '🚨 Anomaly Radar' },
-              { id: 'PREDICTIVE_RUNWAY', label: '📉 Cash Runway' },
-              { id: 'SUBSCRIPTIONS_AUTOPSY', label: '🔄 Subscriptions' },
-              { id: 'MERCHANT_DNA', label: '🛍️ Merchant DNA' },
-              { id: 'FIRE_RUNWAY', label: '🎯 Emergency & FIRE' },
-              { id: 'LOANS', label: '🏦 Loan Forensics' },
-              { id: 'INFLOW', label: '💰 Income & Salary' },
-              { id: 'DEBITS', label: '💳 14-Cat Debits' },
-              { id: 'PEOPLE', label: '👥 P2P Transfers' },
-              { id: 'VELOCITY', label: '📈 16-Mo Velocity' },
-              { id: 'VARIANCE_HEATMAP', label: '📊 MoM Variance' },
-              { id: 'RATIOS', label: '⚖️ 7 Health Ratios' },
-              { id: 'AUDIT', label: '🛡️ Audit Notes' },
-              { id: 'SPEND_CALENDAR', label: '📅 Spend Calendar' },
-              { id: 'LEDGER', label: '📋 Master Ledger' },
-              { id: 'AI_AGENT', label: '🤖 AI Copilot', badge: 'Gemini' },
-            ].map(tab => (
+        <div className="spatial-card p-3 sm:p-4 space-y-3 sticky top-2 z-30 shadow-solid-md bg-abyss-card/95 backdrop-blur-xl">
+          {/* Top Bar: Category Group Pills + Period Selector & Export */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+            {/* Category Groups */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+              {[
+                { id: 'ALL', label: '✨ All Sections' },
+                { id: 'OVERVIEW', label: '⚡ Overview' },
+                { id: 'CASHFLOW', label: '👥 P2P & Cashflow' },
+                { id: 'DEBT', label: '🏦 Loans & Debt' },
+                { id: 'MERCHANTS', label: '🛍️ Merchants' },
+                { id: 'AUDITS', label: '🚨 Audits & AI' },
+              ].map((cg) => (
+                <button
+                  key={cg.id}
+                  onClick={() => setActiveTabCategory(cg.id)}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                    activeTabCategory === cg.id
+                      ? 'bg-synapse-500 text-white shadow-solid-sm'
+                      : 'bg-abyss-well text-abyss-textSecondary hover:text-abyss-textPrimary border border-abyss-border'
+                  }`}
+                >
+                  {cg.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Dynamic Period Selector & Export Dossier Action Button */}
+            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
               <button
-                key={tab.id}
-                onClick={() => setActiveSection(tab.id as StatementSection)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-300 flex items-center gap-1.5 ${
-                  activeSection === tab.id
-                    ? 'spatial-btn-selected'
-                    : 'spatial-btn text-abyss-textSecondary hover:text-abyss-textPrimary'
-                }`}
+                onClick={() => setShowReportModal(true)}
+                className="spatial-btn px-3 py-1.5 text-xs font-bold text-abyss-textPrimary flex items-center gap-1.5"
+                title="Open Boardroom PDF Dossier & Export CSV"
               >
-                <span>{tab.label}</span>
-                {tab.badge && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[8px] font-bold uppercase bg-jade-500/20 text-jade-500">
-                    {tab.badge}
-                  </span>
-                )}
+                <span>📄</span>
+                <span>Export Dossier</span>
               </button>
-            ))}
+              <span className="text-xs font-semibold text-abyss-textMuted hidden md:inline">Period:</span>
+              <select
+                value={periodFilter}
+                onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
+                className="text-xs font-bold px-3 py-1.5 rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary outline-none cursor-pointer"
+              >
+                <option value="ALL_TIME" className="bg-abyss-card text-abyss-textPrimary">All Data ({session.coverage.totalMonths} Mos)</option>
+                <option value="CURRENT_FY" className="bg-abyss-card text-abyss-textPrimary">Current FY</option>
+                {availableFYs.map(fy => (
+                  <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`} className="bg-abyss-card text-abyss-textPrimary">{fy}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Dynamic Period Selector & Export Dossier Action Button */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            <button
-              onClick={() => setShowReportModal(true)}
-              className="spatial-btn px-4 py-1.5 text-xs font-bold text-abyss-textPrimary flex items-center gap-1.5"
-              title="Open Boardroom PDF Dossier & Export CSV"
-            >
-              <span>📄</span>
-              <span>Export Dossier</span>
-            </button>
-            <span className="text-xs font-semibold text-abyss-textMuted hidden sm:inline">Period:</span>
-            <select
-              value={periodFilter}
-              onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
-              className="text-xs font-bold px-3 py-1.5 rounded-full bg-abyss-well border border-abyss-border text-abyss-textPrimary outline-none cursor-pointer"
-            >
-              <option value="ALL_TIME" className="bg-abyss-card text-abyss-textPrimary">All Imported Data ({session.coverage.totalMonths} Mos)</option>
-              <option value="CURRENT_FY" className="bg-abyss-card text-abyss-textPrimary">Current Financial Year (FY)</option>
-              {availableFYs.map(fy => (
-                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`} className="bg-abyss-card text-abyss-textPrimary">{fy}</option>
+          {/* Sub-Tabs Ribbon */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-abyss-border/60">
+            {[
+              { id: 'OVERVIEW', label: '📊 Overview', group: 'OVERVIEW' },
+              { id: 'PEOPLE', label: '👥 P2P & UPI Transfers', group: 'CASHFLOW' },
+              { id: 'INFLOW', label: '💰 Income & Salary', group: 'CASHFLOW' },
+              { id: 'DEBITS', label: '💳 14-Cat Debits', group: 'CASHFLOW' },
+              { id: 'LEDGER', label: '📋 Master Ledger', group: 'CASHFLOW' },
+              { id: 'WHERE_100_WENT', label: '🎯 Where ₹100 Went', group: 'OVERVIEW' },
+              { id: 'MONEY_FLOW', label: '🕸️ Money Flow', group: 'OVERVIEW' },
+              { id: 'PREDICTIVE_RUNWAY', label: '📉 Cash Runway', group: 'OVERVIEW' },
+              { id: 'FIRE_RUNWAY', label: '🎯 FIRE & Emergency', group: 'OVERVIEW' },
+              { id: 'LOANS', label: '🏦 Loan Forensics', group: 'DEBT' },
+              { id: 'DEBT_SIMULATOR', label: '🧮 Debt Freedom Simulator', group: 'DEBT' },
+              { id: 'SUBSCRIPTIONS_AUTOPSY', label: '🔄 Subscriptions Autopsy', group: 'DEBT' },
+              { id: 'RATIOS', label: '⚖️ 7 Health Ratios', group: 'DEBT' },
+              { id: 'MERCHANT_DNA', label: '🛍️ Merchant DNA', group: 'MERCHANTS' },
+              { id: 'VELOCITY', label: '📈 16-Mo Velocity', group: 'MERCHANTS' },
+              { id: 'VARIANCE_HEATMAP', label: '📊 MoM Variance', group: 'MERCHANTS' },
+              { id: 'SPEND_CALENDAR', label: '📅 Spend Calendar', group: 'MERCHANTS' },
+              { id: 'ANOMALY_RADAR', label: '🚨 Anomaly Radar', group: 'AUDITS' },
+              { id: 'AUDIT', label: '🛡️ Audit Notes', group: 'AUDITS' },
+              { id: 'AI_AGENT', label: '🤖 AI Copilot', group: 'AUDITS', badge: 'Gemini' },
+            ]
+              .filter((tab) => activeTabCategory === 'ALL' || tab.group === activeTabCategory)
+              .map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id as StatementSection)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
+                    activeSection === tab.id
+                      ? 'bg-synapse-500 text-white shadow-solid-sm ring-1 ring-synapse-400'
+                      : 'bg-abyss-well/70 text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well border border-abyss-border/80'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  {tab.badge && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold uppercase bg-jade-500/20 text-jade-500">
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
               ))}
-            </select>
           </div>
         </div>
       )}

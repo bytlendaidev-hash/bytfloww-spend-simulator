@@ -112,7 +112,7 @@ export interface WeeklyDebriefSummary {
 
 export interface SpendSnapshot {
   periodLabel: string;
-  periodKey: string; // e.g. "2026-08", "2026-07", "ALL", "30D", "90D"
+  periodKey: string;
   totalSpend: number;
   totalIncome: number;
   netCashflow: number;
@@ -125,7 +125,6 @@ export interface SpendSnapshot {
   previousPeriodSpend: number;
   healthScore: number;
   healthScoreTier: 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR' | 'CRITICAL';
-  
   categoryDistribution: CategoryBreakdownItem[];
   topMerchants: MerchantItem[];
   commitments: CommitmentItem[];
@@ -133,13 +132,11 @@ export interface SpendSnapshot {
   filteredEvents: FinancialEvent[];
   accounts: DetectedAccount[];
   creditCards: DetectedAccount[];
-  
   totalEmis: number;
   totalSubscriptions: number;
   totalBills: number;
   totalInsurance: number;
   totalInvestments: number;
-  
   monthlyTrends: Array<{
     monthKey: string;
     label: string;
@@ -147,13 +144,11 @@ export interface SpendSnapshot {
     income: number;
     count: number;
   }>;
-  
   dayOfWeekTrends: Array<{
     day: string;
     spend: number;
     pct: number;
   }>;
-  
   dataQuality: {
     rawSmsCount: number;
     candidatesCount: number;
@@ -322,6 +317,7 @@ export interface CanonicalTransaction {
   valueDate: string;
   rawNarration: string;
   normalizedNarration: string;
+  description?: string;
   narration?: string;
   type?: string;
   sourceFiles?: string[];
@@ -339,8 +335,8 @@ export interface CanonicalTransaction {
   entityType: 'EMPLOYER' | 'LENDER' | 'MERCHANT' | 'PERSON' | 'UTILITY' | 'GOVERNMENT' | 'BANK' | 'WALLET' | 'SELF' | 'UNKNOWN';
   upiHandle: string | null;
   financialType: 'INCOME' | 'EXPENSE' | 'TRANSFER' | 'DEBT_REPAYMENT' | 'DEBT_DISBURSEMENT' | 'CASH_WITHDRAWAL' | 'FEE_TAX';
-  isEconomicExpense: boolean; // True lifestyle consumption
-  isMoneyMovement: boolean;   // Transfers, borrowings, self-sweeps
+  isEconomicExpense: boolean;
+  isMoneyMovement: boolean;
   isSalary: boolean;
   isLoan: boolean;
   isRecurring: boolean;
@@ -357,7 +353,7 @@ export interface CounterpartyEntity {
   aliases: string[];
   totalSent: number;
   totalReceived: number;
-  netFlow: number; // positive = received more, negative = sent more
+  netFlow: number;
   transactionCount: number;
   averageAmount: number;
   firstTransactionDate: string;
@@ -459,19 +455,16 @@ export interface BackendStatementUploadResult {
   branch?: string;
   periodStart?: string;
   periodEnd?: string;
-  // Deep Forensic Intelligence Arrays
   inflowDecomposition?: StatementInflowItem[];
   categoryDecomposition?: StatementCategoryItem[];
   lenderMatrix?: StatementLenderItem[];
   monthlyVelocity?: StatementMonthlyVelocityItem[];
   topPayees?: StatementPayeeItem[];
   channelSplit?: StatementChannelItem[];
-  // Canonical Intelligence Entities
   canonicalTransactions?: CanonicalTransaction[];
   peopleCounterparties?: CounterpartyEntity[];
   evidenceInsights?: EvidenceBackedInsight[];
   recurringMandates?: RecurringMandate[];
-  // Extended intelligence layers
   anomalies?: AnomalyAlert[];
   healthScore?: FinancialHealthScore;
   salaryTimeline?: SalaryMonthlyItem[];
@@ -491,6 +484,39 @@ export interface BackendStatementListItem {
   closingBalance?: number;
   bankName?: string;
   accountMask?: string;
+}
+
+export interface BackendFinancialAccount {
+  id: string;
+  accountName: string;
+  accountNumberMasked: string;
+  bankName: string;
+  accountType: 'SAVINGS' | 'CURRENT' | 'CREDIT_CARD';
+  currentBalance: number;
+  currency: string;
+  isPrimary: boolean;
+  lastSyncedAt?: string;
+}
+
+export interface BackendLoanItem {
+  id: string;
+  lenderName: string;
+  loanType: string;
+  monthlyEmi: number;
+  interestRate?: number;
+  principalAmount?: number;
+  outstandingBalance?: number;
+  nextDueDate?: string;
+}
+
+export interface BackendRecurringItem {
+  id: string;
+  merchantName: string;
+  amount: number;
+  frequency: 'MONTHLY' | 'YEARLY' | 'WEEKLY' | 'CUSTOM';
+  category: string;
+  nextBillingDate?: string;
+  status: 'ACTIVE' | 'PAUSED' | 'CANCELLED';
 }
 
 export type ActiveModule = 'SMS_INTELLIGENCE' | 'BANK_STATEMENTS';
@@ -535,40 +561,16 @@ export type StatementSection =
   | 'MERCHANT_DNA'
   | 'FIRE_RUNWAY'
   | 'VARIANCE_HEATMAP'
-  | 'SPEND_CALENDAR';
-
-export interface BackendFinancialAccount {
-  id: string;
-  accountName: string;
-  accountNumberMasked: string;
-  bankName: string;
-  accountType: 'SAVINGS' | 'CURRENT' | 'CREDIT_CARD';
-  currentBalance: number;
-  currency: string;
-  isPrimary: boolean;
-  lastSyncedAt?: string;
-}
-
-export interface BackendLoanItem {
-  id: string;
-  lenderName: string;
-  loanType: string;
-  monthlyEmi: number;
-  interestRate?: number;
-  principalAmount?: number;
-  outstandingBalance?: number;
-  nextDueDate?: string;
-}
-
-export interface BackendRecurringItem {
-  id: string;
-  merchantName: string;
-  amount: number;
-  frequency: 'MONTHLY' | 'YEARLY' | 'WEEKLY' | 'CUSTOM';
-  category: string;
-  nextBillingDate?: string;
-  status: 'ACTIVE' | 'PAUSED' | 'CANCELLED';
-}
-
-
-
+  | 'SPEND_CALENDAR'
+  | 'P2P_TRANSFERS'
+  | 'SALARY_AUDIT'
+  | 'LOANS_NBFC'
+  | 'CARDS_EMIS'
+  | 'EPFO_TRACKER'
+  | 'INVESTMENTS'
+  | 'RECONCILIATION'
+  | 'SPEND_DNA'
+  | 'MONTHLY_TRENDS'
+  | 'RISK_ANOMALIES'
+  | 'HEATMAP'
+  | 'RAW_VIEW';

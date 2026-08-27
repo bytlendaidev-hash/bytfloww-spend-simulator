@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { parseSmsXml } from './engine/xmlParser';
 import { generateWeeklyDebrief } from './engine/accounting';
 import { SAMPLE_SMS_XML } from './engine/sampleData';
-import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount, ActiveModule } from './types';
+import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount, ActiveModule, StatementSection } from './types';
 import { applyThemeVariables } from './theme/themes';
 
 // Components
@@ -58,6 +58,7 @@ export const App: React.FC = () => {
   });
 
   const [activeTab, setActiveTab] = useState<SpendTab>('OVERVIEW');
+  const [activeStatementSection, setActiveStatementSection] = useState<StatementSection>('OVERVIEW');
   const [events, setEvents] = useState<FinancialEvent[]>([]);
   const [snapshot, setSnapshot] = useState<SpendSnapshot | null>(null);
   const [rawCount, setRawCount] = useState(0);
@@ -197,8 +198,14 @@ export const App: React.FC = () => {
       onLogout={handleLogout}
       isDark={isDark}
       onToggleTheme={handleToggleTheme}
-      activeTab={activeTab}
-      onSelectTab={setActiveTab}
+      activeTab={activeModule === 'BANK_STATEMENTS' ? activeStatementSection : activeTab}
+      onSelectTab={(tab: any) => {
+        if (activeModule === 'BANK_STATEMENTS') {
+          setActiveStatementSection(tab);
+        } else {
+          setActiveTab(tab);
+        }
+      }}
       counts={{
         transactions: events.length,
         categories: snapshot?.categoryDistribution.length || 0,
@@ -215,28 +222,10 @@ export const App: React.FC = () => {
       ) : activeModule === 'BANK_STATEMENTS' ? (
         /* ── 2. SEPARATE MODULE: BANK STATEMENT FORENSICS HUB ──────────── */
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-1 text-xs">
-            <span className="font-semibold text-abyss-textMuted">
-              Session: <strong className="text-abyss-textPrimary">{currentUser.name}</strong> ({currentUser.phone})
-            </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setActiveModule('SMS_INTELLIGENCE')}
-                className="text-xs font-semibold text-telemetry-500 hover:underline"
-              >
-                📱 Open SMS Simulator
-              </button>
-              <button
-                onClick={handleLogout}
-                className="text-xs font-semibold text-pulse-500 hover:underline"
-              >
-                Sign Out 🚪
-              </button>
-            </div>
-          </div>
-
           <BankStatementModule
             isDark={isDark}
+            activeSection={activeStatementSection}
+            onSelectSection={setActiveStatementSection}
             onMergeTransactions={(newTxs) => {
               setEvents((prev) => [...newTxs, ...prev]);
             }}
