@@ -215,7 +215,7 @@ export function extractEmployerFromNarration(narration: string): string {
   s = s.replace(/\bSERVICES\b/gi, 'Services');
   s = s.replace(/\bINFOTECH\b/gi, 'Infotech');
 
-  // 5. Tokenize and split concatenated corporate words dynamically (e.g. CYIENTLIMITED -> Cyient Limited)
+  // 5. Tokenize and split concatenated corporate words dynamically (e.g. COMPANYLIMITED -> Company Limited)
   const rawTokens = s.split(/[^A-Za-z0-9&.]+/).filter(Boolean);
   const expandedTokens: string[] = [];
 

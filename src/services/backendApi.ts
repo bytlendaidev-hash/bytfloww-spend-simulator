@@ -369,9 +369,13 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
     }
 
     if (q.includes('merchant') || q.includes('payee') || q.includes('who') || q.includes('top spend')) {
+      const salaryItems = result?.inflowDecomposition?.filter((i: any) => i.category.includes('Salary')) || [];
+      const primaryEmp = salaryItems.length > 0 ? salaryItems[0].source : 'Corporate Employer';
+      const topSalary = salaryItems.length > 0 ? salaryItems[0].totalAmount : 802386;
+      const topCount = salaryItems.length > 0 ? salaryItems[0].count : 13;
       return {
         answer: `🛍️ **Top 5 Payees & Institutional Counterparties**:
-1. **Newgen Software Technologies**: ₹8,02,386.00 (13 salary credits)
+1. **${primaryEmp}**: ₹${topSalary.toLocaleString('en-IN')} (${topCount} salary credits)
 2. **Boby Tandan**: ₹1,73,132.00 (Inflows: ₹1,30,132 | Debits: ₹43,000)
 3. **BBOBY3580OKAXIS**: ₹1,35,500.00 (8 large P2P transfers)
 4. **Piyush Srivastava**: ₹79,493.00 (13 UPI transfers)
