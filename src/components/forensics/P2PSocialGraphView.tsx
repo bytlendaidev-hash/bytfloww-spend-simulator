@@ -18,7 +18,22 @@ type SortField = 'LATEST_DATE' | 'GROSS_VOLUME' | 'TOTAL_SENT' | 'TOTAL_RECEIVED
 type SortOrder = 'ASC' | 'DESC';
 type FilterCategory = 'ALL' | CounterpartyCategory | 'NET_CREDITOR' | 'NET_DEBTOR';
 
-const PRESET_AMOUNTS = [0, 1000, 2000, 3000, 5000, 10000, 25000, 50000];
+interface AmountRangePreset {
+  id: string;
+  label: string;
+  min: number;
+  max: number | null;
+}
+
+const AMOUNT_RANGE_PRESETS: AmountRangePreset[] = [
+  { id: 'ALL', label: 'All Amounts (₹0+)', min: 0, max: null },
+  { id: 'MICRO', label: '< ₹1,000 (Micro)', min: 0, max: 1000 },
+  { id: 'LOW', label: '₹1k – ₹5k', min: 1000, max: 5000 },
+  { id: 'MID', label: '₹5k – ₹10k', min: 5000, max: 10000 },
+  { id: 'HIGH', label: '₹10k – ₹25k', min: 10000, max: 25000 },
+  { id: 'VERY_HIGH', label: '₹25k – ₹50k', min: 25000, max: 50000 },
+  { id: 'WHALE', label: '> ₹50,000 (Major)', min: 50000, max: null },
+];
 
 export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
   transactions,
@@ -27,12 +42,21 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
   const [viewMode, setViewMode] = useState<ViewMode>('CLUSTERED_ENTITIES');
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  
+  // Dual Amount Range Filters: Greater Than (Min) & Less Than (Max)
   const [minAmount, setMinAmount] = useState<number>(0);
+  const [maxAmount, setMaxAmount] = useState<number | null>(null);
   const [minAmountInput, setMinAmountInput] = useState<string>('');
+  const [maxAmountInput, setMaxAmountInput] = useState<string>('');
+  const [activeRangePreset, setActiveRangePreset] = useState<string>('ALL');
+
   const [sortField, setSortField] = useState<SortField>('LATEST_DATE');
   const [sortOrder, setSortOrder] = useState<SortOrder>('DESC');
   const [selectedCluster, setSelectedCluster] = useState<CounterpartyCluster | null>(null);
+  
+  // In-modal filter state for selected peer
   const [modalMinAmount, setModalMinAmount] = useState<number>(0);
+  const [modalMaxAmount, setModalMaxAmount] = useState<number | null>(null);
   const [copiedVpa, setCopiedVpa] = useState<string | null>(null);
 
   // Analyze all counterparties with universal clustering
@@ -40,9 +64,19 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
     return analyzeCounterparties(transactions);
   }, [transactions]);
 
-  // Handle custom minimum amount typing
-  const handleMinAmountInputChange = (val: string) => {
+  // Handle Preset selection
+  const handleSelectPreset = (preset: AmountRangePreset) => {
+    setActiveRangePreset(preset.id);
+    setMinAmount(preset.min);
+    setMaxAmount(preset.max);
+    setMinAmountInput(preset.min === 0 ? '' : preset.min.toString());
+    setMaxAmountInput(preset.max === null ? '' : preset.max.toString());
+  };
+
+  // Handle Min Amount Input typing (Greater than)
+  const handleMinAmountChange = (val: string) => {
     setMinAmountInput(val);
+    setActiveRangePreset('CUSTOM');
     const parsed = parseFloat(val.replace(/[^0-9.]/g, ''));
     if (!isNaN(parsed) && parsed >= 0) {
       setMinAmount(parsed);
@@ -51,9 +85,25 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
     }
   };
 
-  const handleSelectPresetAmount = (amt: number) => {
-    setMinAmount(amt);
-    setMinAmountInput(amt === 0 ? '' : amt.toString());
+  // Handle Max Amount Input typing (Less than)
+  const handleMaxAmountChange = (val: string) => {
+    setMaxAmountInput(val);
+    setActiveRangePreset('CUSTOM');
+    const parsed = parseFloat(val.replace(/[^0-9.]/g, ''));
+    if (!isNaN(parsed) && parsed > 0) {
+      setMaxAmount(parsed);
+    } else if (val.trim() === '') {
+      setMaxAmount(null);
+    }
+  };
+
+  // Reset Amount Filters
+  const handleResetAmountFilter = () => {
+    setActiveRangePreset('ALL');
+    setMinAmount(0);
+    setMaxAmount(null);
+    setMinAmountInput('');
+    setMaxAmountInput('');
   };
 
   // Copy VPA to clipboard
@@ -64,11 +114,18 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
     setTimeout(() => setCopiedVpa(null), 2000);
   };
 
-  // Filter clusters based on category, search query, and minimum transaction amount
+  // Check if a single transaction amount satisfies the min & max range
+  const matchesAmountRange = (amount: number): boolean => {
+    if (amount < minAmount) return false;
+    if (maxAmount !== null && amount > maxAmount) return false;
+    return true;
+  };
+
+  // Filter clusters based on category, search query, and range filters
   const filteredClusters = useMemo(() => {
     let list = summary.clusters;
 
-    // Filter by category or posture
+    // 1. Filter by category or posture
     if (filterCategory === 'NET_CREDITOR') {
       list = list.filter((c) => c.posture === 'NET_CREDITOR');
     } else if (filterCategory === 'NET_DEBTOR') {
@@ -77,12 +134,17 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
       list = list.filter((c) => c.category === filterCategory);
     }
 
-    // Filter by minimum amount threshold (cluster must have at least one transaction >= minAmount or gross volume >= minAmount)
-    if (minAmount > 0) {
-      list = list.filter((c) => c.largestTxn >= minAmount || c.grossVolume >= minAmount);
+    // 2. Filter by amount range (cluster has at least one transaction in range or gross volume in range)
+    if (minAmount > 0 || maxAmount !== null) {
+      list = list.filter((c) => {
+        return c.transactions.some((t) => {
+          const amt = t.amount || (t.direction === 'CREDIT' ? t.credit || 0 : t.debit || 0);
+          return matchesAmountRange(amt);
+        });
+      });
     }
 
-    // Search query filter (search by name, VPA, category label, narration, or numeric amount)
+    // 3. Search query filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       const numQ = parseFloat(q);
@@ -106,7 +168,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
       });
     }
 
-    // Sort clusters
+    // 4. Sort clusters
     return [...list].sort((a, b) => {
       let comp = 0;
       switch (sortField) {
@@ -136,7 +198,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
       }
       return sortOrder === 'DESC' ? -comp : comp;
     });
-  }, [summary.clusters, filterCategory, searchQuery, minAmount, sortField, sortOrder]);
+  }, [summary.clusters, filterCategory, searchQuery, minAmount, maxAmount, sortField, sortOrder]);
 
   // Flat individual transactions across all P2P / UPI entities
   const flatTransactions = useMemo(() => {
@@ -164,8 +226,8 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
         continue;
       }
 
-      // Filter by minimum amount threshold
-      if (minAmount > 0 && amt < minAmount) {
+      // Filter by amount range (Greater than AND Less than)
+      if (!matchesAmountRange(amt)) {
         continue;
       }
 
@@ -217,7 +279,45 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
       }
       return sortOrder === 'DESC' ? -comp : comp;
     });
-  }, [transactions, filterCategory, minAmount, searchQuery, sortField, sortOrder]);
+  }, [transactions, filterCategory, minAmount, maxAmount, searchQuery, sortField, sortOrder]);
+
+  // ── REAL-TIME DYNAMIC SUMMARY METRICS FOR CURRENTLY FILTERED TRANSACTIONS ───
+  const filteredSummary = useMemo(() => {
+    let sentSum = 0;
+    let sentCount = 0;
+    let receivedSum = 0;
+    let receivedCount = 0;
+
+    for (const item of flatTransactions) {
+      const isCredit = item.txn.direction === 'CREDIT' || (item.txn.credit !== null && (item.txn.credit ?? 0) > 0);
+      const amt = item.txn.amount || (isCredit ? item.txn.credit || 0 : item.txn.debit || 0);
+
+      if (isCredit) {
+        receivedSum += amt;
+        receivedCount++;
+      } else {
+        sentSum += amt;
+        sentCount++;
+      }
+    }
+
+    const totalTxnCount = sentCount + receivedCount;
+    const grossVolumeSum = sentSum + receivedSum;
+    const netBalance = receivedSum - sentSum;
+    const avgTxn = totalTxnCount > 0 ? Math.round(grossVolumeSum / totalTxnCount) : 0;
+
+    return {
+      matchingTxnCount: totalTxnCount,
+      matchingClusterCount: filteredClusters.length,
+      grossVolumeSum: Math.round(grossVolumeSum),
+      sentSum: Math.round(sentSum),
+      sentCount,
+      receivedSum: Math.round(receivedSum),
+      receivedCount,
+      netBalance: Math.round(netBalance),
+      avgTxn,
+    };
+  }, [flatTransactions, filteredClusters.length]);
 
   // Toggle sort direction or change sort column
   const handleSort = (field: SortField) => {
@@ -267,7 +367,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `bytfloww_p2p_counterparties_min_${minAmount}_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', `bytfloww_p2p_counterparties_${minAmount}_to_${maxAmount || 'max'}_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -304,7 +404,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `bytfloww_p2p_transactions_min_${minAmount}_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', `bytfloww_p2p_transactions_${minAmount}_to_${maxAmount || 'max'}_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -382,7 +482,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
         </div>
       </div>
 
-      {/* ── 2. FILTER, SEARCH & AMOUNT COMMAND BAR ────────────────────────── */}
+      {/* ── 2. FILTER, SEARCH & AMOUNT RANGE COMMAND BAR ─────────────────── */}
       <div className={`p-5 sm:p-6 ${cardCls} space-y-4`}>
         {/* Header & View Mode Switcher */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
@@ -435,58 +535,152 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
           </div>
         </div>
 
-        {/* ── ADVANCED AMOUNT THRESHOLD BAR ───────────────────────────────── */}
-        <div className="p-4 rounded-2xl bg-abyss-well border border-abyss-border space-y-2.5">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm">⚡</span>
-              <span className="text-xs font-bold text-abyss-textPrimary">Filter by Minimum Amount (₹ Threshold):</span>
-              {minAmount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-jade-500/20 text-jade-500 border border-jade-500/30">
-                  Showing ≥ ₹{minAmount.toLocaleString('en-IN')}
-                </span>
-              )}
+        {/* ── ADVANCED AMOUNT RANGE FILTER BAR (GREATER THAN & LESS THAN) ───── */}
+        <div className="p-4 rounded-2xl bg-abyss-well border border-abyss-border space-y-3">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm">⚖️</span>
+              <span className="text-xs font-bold text-abyss-textPrimary">Amount Range Filter:</span>
+              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-jade-500">
+                <span>[ &gt;= ₹{minAmount.toLocaleString('en-IN')}</span>
+                <span>and</span>
+                <span>&lt;= {maxAmount !== null ? `₹${maxAmount.toLocaleString('en-IN')}` : '∞'} ]</span>
+              </div>
             </div>
 
-            {/* Custom Amount Input Box */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-abyss-textMuted font-medium">Type custom amount:</span>
-              <div className="relative w-36">
-                <span className="absolute left-2.5 top-1.5 text-xs font-mono font-bold text-jade-500">₹</span>
-                <input
-                  type="number"
-                  placeholder="e.g. 2000"
-                  value={minAmountInput}
-                  onChange={(e) => handleMinAmountInputChange(e.target.value)}
-                  className="w-full text-xs font-mono font-bold px-2 py-1.5 pl-6 rounded-lg bg-abyss-card border border-abyss-border text-abyss-textPrimary outline-none focus:border-jade-500 transition placeholder:text-abyss-textMuted"
-                />
-                {minAmountInput && (
-                  <button
-                    onClick={() => handleSelectPresetAmount(0)}
-                    className="absolute right-2 top-1.5 text-xs text-abyss-textMuted hover:text-abyss-textPrimary"
-                  >
-                    ✕
-                  </button>
-                )}
+            {/* Min Amount & Max Amount Input Controls */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Greater than (Min) */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-abyss-textMuted font-medium whitespace-nowrap">Min ₹ (&gt;=):</span>
+                <div className="relative w-28">
+                  <span className="absolute left-2 top-1.5 text-xs font-mono font-bold text-jade-500">₹</span>
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={minAmountInput}
+                    onChange={(e) => handleMinAmountChange(e.target.value)}
+                    className="w-full text-xs font-mono font-bold px-2 py-1.5 pl-5 rounded-lg bg-abyss-card border border-abyss-border text-abyss-textPrimary outline-none focus:border-jade-500 transition placeholder:text-abyss-textMuted"
+                  />
+                </div>
               </div>
+
+              {/* Less than (Max) */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-abyss-textMuted font-medium whitespace-nowrap">Max ₹ (&lt;=):</span>
+                <div className="relative w-28">
+                  <span className="absolute left-2 top-1.5 text-xs font-mono font-bold text-pulse-500">₹</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={maxAmountInput}
+                    onChange={(e) => handleMaxAmountChange(e.target.value)}
+                    className="w-full text-xs font-mono font-bold px-2 py-1.5 pl-5 rounded-lg bg-abyss-card border border-abyss-border text-abyss-textPrimary outline-none focus:border-pulse-500 transition placeholder:text-abyss-textMuted"
+                  />
+                </div>
+              </div>
+
+              {/* Clear Range Button */}
+              {(minAmount > 0 || maxAmount !== null || minAmountInput || maxAmountInput) && (
+                <button
+                  onClick={handleResetAmountFilter}
+                  className="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-abyss-card border border-abyss-border hover:border-pulse-500 text-pulse-500 transition"
+                  title="Reset Amount Filter"
+                >
+                  Reset Range
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Quick Preset Amount Chips */}
+          {/* Quick Preset Range Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar flex-wrap">
-            {PRESET_AMOUNTS.map((amt) => (
+            {AMOUNT_RANGE_PRESETS.map((preset) => (
               <button
-                key={amt}
-                onClick={() => handleSelectPresetAmount(amt)}
+                key={preset.id}
+                onClick={() => handleSelectPreset(preset)}
                 className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1 ${
-                  minAmount === amt
+                  activeRangePreset === preset.id
                     ? 'bg-jade-500 text-black shadow-solid-sm font-black'
                     : 'bg-abyss-card border border-abyss-border text-abyss-textSecondary hover:text-abyss-textPrimary hover:border-jade-500/50'
                 }`}
               >
-                <span>{amt === 0 ? 'All Amounts' : `≥ ₹${amt.toLocaleString('en-IN')}`}</span>
+                <span>{preset.label}</span>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* ── 3. DYNAMIC REAL-TIME FILTERED TRANSACTIONS SUMMARY RIBBON ─────── */}
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-synapse-950/40 via-abyss-well to-jade-950/30 border border-synapse-500/30 space-y-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📊</span>
+              <h3 className="text-xs font-black uppercase text-synapse-400 tracking-wider">
+                Filtered Transactions Financial Summary (Real-time Sum)
+              </h3>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-synapse-500/20 text-synapse-400 border border-synapse-500/30">
+              {filteredSummary.matchingTxnCount.toLocaleString('en-IN')} Transactions across {filteredSummary.matchingClusterCount} Entities
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
+            {/* Filtered Gross Sum */}
+            <div className="p-2.5 rounded-xl bg-abyss-card border border-abyss-border">
+              <div className="text-[9px] font-bold uppercase text-synapse-400">Total Filtered Sum</div>
+              <div className="text-sm sm:text-base font-black font-mono mt-0.5 text-synapse-400">
+                ₹{filteredSummary.grossVolumeSum.toLocaleString('en-IN')}
+              </div>
+              <div className="text-[8px] text-abyss-textMuted">Debits + Credits</div>
+            </div>
+
+            {/* Filtered Sent Sum (Debits) */}
+            <div className="p-2.5 rounded-xl bg-abyss-card border border-abyss-border">
+              <div className="text-[9px] font-bold uppercase text-pulse-500">Filtered Outflow (Sent)</div>
+              <div className="text-sm sm:text-base font-black font-mono mt-0.5 text-pulse-500">
+                ₹{filteredSummary.sentSum.toLocaleString('en-IN')}
+              </div>
+              <div className="text-[8px] text-abyss-textMuted">{filteredSummary.sentCount} debit transactions</div>
+            </div>
+
+            {/* Filtered Received Sum (Credits) */}
+            <div className="p-2.5 rounded-xl bg-abyss-card border border-abyss-border">
+              <div className="text-[9px] font-bold uppercase text-jade-500">Filtered Inflow (Received)</div>
+              <div className="text-sm sm:text-base font-black font-mono mt-0.5 text-jade-500">
+                ₹{filteredSummary.receivedSum.toLocaleString('en-IN')}
+              </div>
+              <div className="text-[8px] text-abyss-textMuted">{filteredSummary.receivedCount} credit deposits</div>
+            </div>
+
+            {/* Filtered Net Balance */}
+            <div className="p-2.5 rounded-xl bg-abyss-card border border-abyss-border">
+              <div className="text-[9px] font-bold uppercase text-abyss-textMuted">Filtered Net Delta</div>
+              <div className={`text-sm sm:text-base font-black font-mono mt-0.5 ${
+                filteredSummary.netBalance > 0 ? 'text-jade-500' : filteredSummary.netBalance < 0 ? 'text-pulse-500' : 'text-abyss-textPrimary'
+              }`}>
+                {filteredSummary.netBalance > 0 ? '+' : ''}₹{filteredSummary.netBalance.toLocaleString('en-IN')}
+              </div>
+              <div className="text-[8px] text-abyss-textMuted">{filteredSummary.netBalance >= 0 ? 'Net Inflow Surplus' : 'Net Outflow Deficit'}</div>
+            </div>
+
+            {/* Filtered Avg Txn */}
+            <div className="p-2.5 rounded-xl bg-abyss-card border border-abyss-border">
+              <div className="text-[9px] font-bold uppercase text-abyss-textMuted">Average Txn Size</div>
+              <div className="text-sm sm:text-base font-black font-mono mt-0.5 text-abyss-textPrimary">
+                ₹{filteredSummary.avgTxn.toLocaleString('en-IN')}
+              </div>
+              <div className="text-[8px] text-abyss-textMuted">Per matching transaction</div>
+            </div>
+
+            {/* Active Range */}
+            <div className="p-2.5 rounded-xl bg-abyss-card border border-abyss-border">
+              <div className="text-[9px] font-bold uppercase text-abyss-textMuted">Applied Threshold</div>
+              <div className="text-xs font-black font-mono mt-1 text-jade-500 truncate">
+                ≥ ₹{minAmount.toLocaleString('en-IN')} {maxAmount !== null ? `to ≤ ₹${maxAmount.toLocaleString('en-IN')}` : ''}
+              </div>
+              <div className="text-[8px] text-abyss-textMuted">Active amount filter</div>
+            </div>
           </div>
         </div>
 
@@ -539,7 +733,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
           </div>
         </div>
 
-        {/* ── 3A. VIEW MODE 1: CLUSTERED COUNTERPARTIES TABLE ──────────────── */}
+        {/* ── 4A. VIEW MODE 1: CLUSTERED COUNTERPARTIES TABLE ──────────────── */}
         {viewMode === 'CLUSTERED_ENTITIES' && (
           <div className="bg-abyss-well border border-abyss-border rounded-[18px] overflow-hidden">
             <div className="overflow-x-auto">
@@ -627,7 +821,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
                   {filteredClusters.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="p-8 text-center text-abyss-textMuted">
-                        No counterparties match your current filter, amount threshold (≥ ₹{minAmount.toLocaleString('en-IN')}), or search criteria.
+                        No counterparties match your current filter, amount range (≥ ₹{minAmount.toLocaleString('en-IN')} {maxAmount !== null ? `to ≤ ₹${maxAmount.toLocaleString('en-IN')}` : ''}), or search criteria.
                       </td>
                     </tr>
                   ) : (
@@ -764,7 +958,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
           </div>
         )}
 
-        {/* ── 3B. VIEW MODE 2: FLAT INDIVIDUAL TRANSACTIONS LEDGER ─────────── */}
+        {/* ── 4B. VIEW MODE 2: FLAT INDIVIDUAL TRANSACTIONS LEDGER ─────────── */}
         {viewMode === 'FLAT_TRANSACTIONS' && (
           <div className="bg-abyss-well border border-abyss-border rounded-[18px] overflow-hidden">
             <div className="overflow-x-auto">
@@ -822,7 +1016,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
                   {flatTransactions.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="p-8 text-center text-abyss-textMuted">
-                        No transactions found matching amount ≥ ₹{minAmount.toLocaleString('en-IN')} or search criteria.
+                        No transactions found matching amount range [≥ ₹{minAmount.toLocaleString('en-IN')} {maxAmount !== null ? `to ≤ ₹${maxAmount.toLocaleString('en-IN')}` : ''}] or search criteria.
                       </td>
                     </tr>
                   ) : (
@@ -892,7 +1086,7 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
         )}
       </div>
 
-      {/* ── 4. DRILLDOWN MODAL: COMPLETE COUNTERPARTY LEDGER ──────────────── */}
+      {/* ── 5. DRILLDOWN MODAL: COMPLETE COUNTERPARTY LEDGER ──────────────── */}
       {selectedCluster && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-emergence">
           <div className={`w-full max-w-4xl max-h-[90vh] flex flex-col ${cardCls} overflow-hidden shadow-solid-lg border-synapse-500/40`}>
@@ -971,30 +1165,53 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
               </div>
             </div>
 
-            {/* In-Modal Amount Filter Bar */}
+            {/* In-Modal Range Filter Bar */}
             <div className="p-3 px-5 bg-abyss-well border-b border-abyss-border flex items-center justify-between flex-wrap gap-2 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-abyss-textMuted">Filter this contact by Min Amount:</span>
-                <div className="flex items-center gap-1">
-                  {[0, 1000, 2000, 3000, 5000, 10000].map((amt) => (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-abyss-textMuted">Filter this contact by Amount:</span>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {[
+                    { label: 'All', min: 0, max: null },
+                    { label: '≥ ₹1k', min: 1000, max: null },
+                    { label: '≥ ₹2k', min: 2000, max: null },
+                    { label: '≥ ₹3k', min: 3000, max: null },
+                    { label: '≥ ₹5k', min: 5000, max: null },
+                    { label: '≥ ₹10k', min: 10000, max: null },
+                  ].map((preset, pIdx) => (
                     <button
-                      key={amt}
-                      onClick={() => setModalMinAmount(amt)}
+                      key={pIdx}
+                      onClick={() => {
+                        setModalMinAmount(preset.min);
+                        setModalMaxAmount(preset.max);
+                      }}
                       className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold transition ${
-                        modalMinAmount === amt
+                        modalMinAmount === preset.min && modalMaxAmount === preset.max
                           ? 'bg-jade-500 text-black font-black'
                           : 'bg-abyss-card border border-abyss-border text-abyss-textSecondary hover:text-abyss-textPrimary'
                       }`}
                     >
-                      {amt === 0 ? 'All' : `≥₹${amt}`}
+                      {preset.label}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <span className="text-xs font-mono text-abyss-textMuted">
-                Showing {selectedCluster.transactions.filter(t => (t.amount || 0) >= modalMinAmount).length} of {selectedCluster.transactions.length} txns
-              </span>
+              {/* In-Modal Filtered Sum Metric */}
+              {(() => {
+                const modalMatching = selectedCluster.transactions.filter((t) => {
+                  const amt = t.amount || (t.direction === 'CREDIT' ? t.credit || 0 : t.debit || 0);
+                  if (amt < modalMinAmount) return false;
+                  if (modalMaxAmount !== null && amt > modalMaxAmount) return false;
+                  return true;
+                });
+                const modalSum = modalMatching.reduce((acc, t) => acc + (t.amount || (t.direction === 'CREDIT' ? t.credit || 0 : t.debit || 0)), 0);
+
+                return (
+                  <span className="text-xs font-mono font-bold text-jade-500">
+                    Filtered Sum: ₹{modalSum.toLocaleString('en-IN')} ({modalMatching.length} of {selectedCluster.transactions.length} txns)
+                  </span>
+                );
+              })()}
             </div>
 
             {/* Individual Transaction Timeline Ledger */}
@@ -1012,7 +1229,12 @@ export const P2PSocialGraphView: React.FC<P2PSocialGraphViewProps> = ({
                   </thead>
                   <tbody className="divide-y divide-abyss-border">
                     {selectedCluster.transactions
-                      .filter((t) => (t.amount || 0) >= modalMinAmount)
+                      .filter((t) => {
+                        const amt = t.amount || (t.direction === 'CREDIT' ? t.credit || 0 : t.debit || 0);
+                        if (amt < modalMinAmount) return false;
+                        if (modalMaxAmount !== null && amt > modalMaxAmount) return false;
+                        return true;
+                      })
                       .map((t, idx) => {
                         const isCredit = t.direction === 'CREDIT' || (t.credit !== null && (t.credit ?? 0) > 0);
                         const amt = t.amount || (isCredit ? t.credit || 0 : t.debit || 0);
