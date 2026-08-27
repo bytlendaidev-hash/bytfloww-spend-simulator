@@ -583,7 +583,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                   onClick={() => setActiveTabCategory(cg.id)}
                   className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
                     activeTabCategory === cg.id
-                      ? 'btn-neon-action shadow-neon-cyan text-white'
+                      ? 'btn-emerald-capsule text-white shadow-sm'
                       : 'bg-abyss-well text-abyss-textSecondary hover:text-abyss-textPrimary border border-abyss-border'
                   }`}
                 >
@@ -596,7 +596,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
               <button
                 onClick={() => setShowReportModal(true)}
-                className="spatial-btn px-3 py-1.5 text-xs font-bold text-abyss-textPrimary flex items-center gap-1.5 border-cyan-500/30 text-cyan-400"
+                className="spatial-btn px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 border-amber-500/30 text-amber-600 dark:text-[#E0A83F]"
                 title="Open Boardroom PDF Dossier & Export CSV"
               >
                 <span>📄</span>
@@ -648,13 +648,13 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
                   onClick={() => setActiveSection(tab.id as StatementSection)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
                     activeSection === tab.id
-                      ? 'btn-neon-action shadow-neon-cyan text-white'
+                      ? 'tab-pill-active'
                       : 'bg-abyss-well/70 text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well border border-abyss-border/80'
                   }`}
                 >
                   <span>{tab.label}</span>
                   {tab.badge && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold uppercase bg-cyan-500/20 text-cyan-400">
+                    <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold uppercase bg-amber-500/15 text-amber-600 dark:text-[#E0A83F]">
                       {tab.badge}
                     </span>
                   )}

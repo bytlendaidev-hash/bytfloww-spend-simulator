@@ -52,22 +52,22 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 rounded-[22px] bg-abyss-card border border-abyss-border relative overflow-hidden shadow-lg">
         {/* Left Section: Brand Title & Reconciled Badge */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-[16px] bg-jade-500/15 border border-jade-500/35 flex items-center justify-center text-jade-500 text-lg sm:text-xl font-bold shrink-0 shadow-sm">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[14px] sm:rounded-[16px] bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-[#1AE893] text-lg sm:text-xl font-bold shrink-0 shadow-sm">
             ⚡
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-abyss-textPrimary">
-                Capital <span className="text-jade-500 font-black">Intelligence</span>
+              <h1 className="text-lg sm:text-2xl font-black tracking-tight text-abyss-textPrimary font-fraunces">
+                Capital <span className="text-[#00884E] dark:text-[#1AE893]">Intelligence</span>
               </h1>
-              <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-jade-500/10 text-jade-500 border border-jade-500/30 uppercase tracking-wider">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-[#1AE893] border border-emerald-500/30 uppercase tracking-wider">
                 ● LIVE
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-abyss-textMuted font-medium flex items-center gap-1.5 sm:gap-2 mt-0.5">
               <span>{totalParsedCount.toLocaleString('en-IN')} Reconciled</span>
               <span>•</span>
-              <span className="text-jade-500 font-semibold">{snapshot.periodLabel}</span>
+              <span className="text-emerald-600 dark:text-[#1AE893] font-semibold">{snapshot.periodLabel}</span>
             </p>
           </div>
         </div>
@@ -77,7 +77,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Net Flow Ticker */}
           <div className="px-3 py-1.5 rounded-xl bg-abyss-well border border-abyss-border flex items-center gap-1.5 text-xs">
             <span className="text-[10px] text-abyss-textMuted uppercase font-bold">Net Flow</span>
-            <span className={`font-mono font-bold ${isSurplus ? 'text-jade-500' : 'text-pulse-500'}`}>
+            <span className={`font-mono font-bold ${isSurplus ? 'text-[#00884E] dark:text-[#1AE893]' : 'text-rose-500'}`}>
               {isSurplus ? '+' : '-'}₹{Math.abs(snapshot.netCashflow).toLocaleString('en-IN')}
             </span>
           </div>
@@ -85,7 +85,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* AI Copilot Button */}
           <button
             onClick={onOpenCopilot}
-            className="spatial-btn px-3 py-1.5 text-xs flex items-center gap-1.5 border-synapse-500/40 text-synapse-400 bg-synapse-500/10 hover:bg-synapse-500/20"
+            className="spatial-btn px-3 py-1.5 text-xs flex items-center gap-1.5 border-amber-500/30 text-amber-600 dark:text-[#E0A83F] bg-amber-500/10 hover:bg-amber-500/20"
             title="Ask AI Copilot"
           >
             <span>✨</span>
@@ -95,7 +95,7 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
           {/* Filter Modal Trigger */}
           <button
             onClick={onOpenFilter}
-            className="spatial-btn px-3 py-1.5 text-xs flex items-center gap-1.5 text-telemetry-500 border-telemetry-500/30 bg-telemetry-500/10"
+            className="spatial-btn px-3 py-1.5 text-xs flex items-center gap-1.5 border-amber-500/30 text-amber-600 dark:text-[#E0A83F] bg-amber-500/10 hover:bg-amber-500/20"
             title="Filter Transactions"
           >
             <span>⚡</span>
@@ -121,10 +121,10 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
             <button
               key={range.key}
               onClick={() => onSelectPeriod(range.key)}
-              className={`px-3.5 sm:px-4 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${
+              className={`px-3.5 sm:px-4 py-1.5 text-xs font-bold whitespace-nowrap transition-all duration-200 shrink-0 rounded-full ${
                 isSelected
-                  ? 'spatial-btn-selected rounded-full'
-                  : 'spatial-btn'
+                  ? 'btn-emerald-capsule shadow-sm'
+                  : 'spatial-btn hover:border-emerald-500/30'
               }`}
             >
               {range.label}
@@ -134,17 +134,17 @@ export const SpendHeader: React.FC<SpendHeaderProps> = ({
       </div>
 
       {/* ── 3. SECONDARY HORIZONTAL TAB STRIP (DESKTOP / QUICK TAB SWITCH) */}
-      <div className="hidden md:flex items-center gap-1.5 p-1.5 spatial-ornament overflow-x-auto no-scrollbar max-w-full">
+      <div className="hidden md:flex items-center gap-1.5 p-1.5 rounded-2xl bg-abyss-well/60 border border-abyss-border/60 overflow-x-auto no-scrollbar max-w-full">
         {mainTabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => onSelectTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap shrink-0 transition-all duration-200 ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all duration-200 ${
                 isActive
-                  ? 'spatial-btn-selected'
-                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well/60'
+                  ? 'tab-pill-active'
+                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-card'
               }`}
             >
               <span>{tab.icon}</span>

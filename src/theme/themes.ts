@@ -2,13 +2,13 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * BYTFLOWW / BYTLEND MASTER THEME TEMPLATES
  * ─────────────────────────────────────────────────────────────────────────────
- * Matches the exact design language of BytLend Design System V9
- * and Aurora Cyber-Glassmorphic Design from cloud-sign-in-hub-main.
+ * Matches the exact design language of HomeScreen.tsx & SpendIntelligenceScreen.tsx
+ * from cloud-sign-in-hub-main (Absinthe Noir Emerald, Champagne Gold, VisionOS 3D cards).
  */
 
 export type ThemeTemplateId = 
-  | 'aurora_cyber'       // 👑 Flagship: BytLend Aurora Cyber-Glassmorphic (Cyan, Purple & Deep Obsidian-Teal)
-  | 'bytlend_gold'       // BytLend Centurion: Champagne Warm Gold & Obsidian
+  | 'bytlend_vision'     // 👑 Flagship: BytLend VisionOS (Absinthe Noir Emerald & Champagne Gold)
+  | 'bytlend_gold'       // BytLend Centurion: Pure Champagne Warm Gold & Obsidian
   | 'royal_indigo'       // Stripe / Revolut Ultra: Velvet Midnight & Royal Indigo
   | 'titanium_monolith'  // Apple Vision Pro / Raycast: Azure Ice & Titanium
   | 'terminal_matrix';   // Bloomberg / Palantir: Phosphor Amber & Matrix Green
@@ -66,21 +66,21 @@ export interface ThemeTemplate {
 }
 
 export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
-  // ── 1. AURORA CYBER-GLASSMORPHISM (👑 Flagship - cloud-sign-in-hub-main) ──
-  aurora_cyber: {
-    id: 'aurora_cyber',
-    name: 'Aurora Cyber-Glass',
-    tagline: 'Deep Obsidian-Teal, Electric Cyan & Neon Violet',
-    inspiration: 'BytLend Official • Aurora Cyber-Glass V9',
+  // ── 1. BYTLEND VISION (👑 Flagship - HomeScreen.tsx & VisionOS 3D) ─────────
+  bytlend_vision: {
+    id: 'bytlend_vision',
+    name: 'BytLend VisionOS',
+    tagline: 'Absinthe Noir Emerald & Champagne Gold',
+    inspiration: 'BytLend HomeScreen • VisionOS 3D Design',
     badge: 'FLAGSHIP',
     icon: '💎',
     swatches: {
-      primary: '#06B6D4',
-      ai: '#8B5CF6',
-      spend: '#EF4444',
-      vault: '#EDC184',
+      primary: '#1AE893', // Jewel Emerald
+      ai: '#E0A83F',      // Copper Gold
+      spend: '#EF4444',   // Crimson Red
+      vault: '#EDC184',   // Champagne Gold
       telemetry: '#38BDF8',
-      bgDark: '#061118',
+      bgDark: '#050506',
       bgLight: '#FFFFFF',
     },
     dark: {
@@ -89,33 +89,33 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
       cardElevated: '#10222D',
       well: '#0D1E27',
       border: 'rgba(255, 255, 255, 0.08)',
-      borderStrong: 'rgba(6, 182, 212, 0.28)',
-      textPrimary: '#FFFFFF',
-      textSecondary: '#94A3B8',
-      textMuted: '#64748B',
-      primaryHero: '#06B6D4',
-      aiHero: '#8B5CF6',
+      borderStrong: 'rgba(26, 232, 147, 0.30)',
+      textPrimary: '#F1F1EF',
+      textSecondary: '#9698A2',
+      textMuted: '#6D7280',
+      primaryHero: '#1AE893',
+      aiHero: '#E0A83F',
       spendHero: '#EF4444',
       vaultHero: '#EDC184',
       telemetryHero: '#38BDF8',
-      ambientGlow: 'radial-gradient(circle at 50% 25%, rgba(6, 182, 212, 0.18) 0%, rgba(139, 92, 246, 0.12) 45%, transparent 75%)',
+      ambientGlow: 'radial-gradient(circle at 50% 25%, rgba(26, 232, 147, 0.15) 0%, rgba(224, 168, 63, 0.12) 45%, transparent 75%)',
     },
     light: {
       canvas: '#FFFFFF',
       card: '#FFFFFF',
       cardElevated: '#FFFFFF',
       well: '#F8FAFC',
-      border: 'rgba(46, 52, 69, 0.08)',
-      borderStrong: 'rgba(200, 138, 69, 0.35)',
-      textPrimary: '#2E3445',
+      border: 'rgba(226, 232, 240, 0.8)',
+      borderStrong: 'rgba(0, 136, 78, 0.30)',
+      textPrimary: '#131418',
       textSecondary: '#5E667A',
       textMuted: '#8B95A5',
-      primaryHero: '#C88A45',
-      aiHero: '#3D5AFE',
+      primaryHero: '#00884E',
+      aiHero: '#B4791F',
       spendHero: '#EF4444',
-      vaultHero: '#EDC184',
+      vaultHero: '#C88A45',
       telemetryHero: '#00884E',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(200, 138, 69, 0.10) 0%, rgba(61, 90, 254, 0.06) 50%, transparent 75%)',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 136, 78, 0.08) 0%, rgba(180, 121, 31, 0.06) 50%, transparent 75%)',
     },
   },
 
@@ -332,7 +332,7 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
   },
 };
 
-export const DEFAULT_THEME_ID: ThemeTemplateId = 'aurora_cyber';
+export const DEFAULT_THEME_ID: ThemeTemplateId = 'bytlend_vision';
 
 export function getActiveThemeId(): ThemeTemplateId {
   try {
@@ -357,7 +357,7 @@ export function setActiveThemeId(themeId: ThemeTemplateId): void {
 
 export function applyThemeVariables(isDark: boolean, themeId?: ThemeTemplateId) {
   const selectedId = themeId || getActiveThemeId();
-  const template = THEME_TEMPLATES[selectedId] || THEME_TEMPLATES.aurora_cyber;
+  const template = THEME_TEMPLATES[selectedId] || THEME_TEMPLATES.bytlend_vision;
   const t = isDark ? template.dark : template.light;
   const root = document.documentElement;
 

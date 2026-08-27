@@ -45,7 +45,7 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
     };
   }, []);
 
-  const currentTemplate = THEME_TEMPLATES[activeTheme] || THEME_TEMPLATES.aurora_cyber;
+  const currentTemplate = THEME_TEMPLATES[activeTheme] || THEME_TEMPLATES.bytlend_vision;
   const t = isDark ? currentTemplate.dark : currentTemplate.light;
 
   return (
@@ -68,62 +68,54 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
         }}
       />
 
-      {/* ── 2. CELESTIAL ORBITAL GLOWS (Aurora Cyan & Violet/Magenta) ────── */}
+      {/* ── 2. CELESTIAL ORBITAL GLOWS (HomeScreen Emerald & Copper Gold) ── */}
       {isDark ? (
         <>
-          {/* Vibrant Cyan Aura (Top-Left) */}
+          {/* Absinthe Noir Emerald Aura (Top-Right) */}
           <div 
-            className="absolute -top-32 -left-32 w-[650px] h-[650px] rounded-full blur-[120px] pointer-events-none opacity-40 animate-pulse"
+            className="absolute -top-32 -right-32 w-[550px] h-[550px] rounded-full blur-[120px] pointer-events-none opacity-40 animate-pulse"
             style={{ 
-              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(56, 189, 248, 0.12) 40%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(26, 232, 147, 0.20) 0%, rgba(0, 136, 78, 0.08) 40%, transparent 70%)',
               animationDuration: '8s'
             }}
           />
 
-          {/* Electric Violet/Purple Radiance (Center Depth) */}
+          {/* Copper Gold Depth Glow (Bottom-Left) */}
           <div 
-            className="absolute top-1/4 -right-32 w-[700px] h-[700px] rounded-full blur-[130px] pointer-events-none opacity-30 animate-pulse"
+            className="absolute -bottom-32 -left-32 w-[600px] h-[600px] rounded-full blur-[130px] pointer-events-none opacity-30 animate-pulse"
             style={{ 
-              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.30) 0%, rgba(217, 70, 239, 0.10) 45%, transparent 75%)',
+              background: 'radial-gradient(circle, rgba(224, 168, 63, 0.20) 0%, rgba(180, 121, 31, 0.06) 45%, transparent 75%)',
               animationDuration: '10s'
-            }}
-          />
-
-          {/* Soft Amber / Champagne Depth Glow (Bottom-Left) */}
-          <div 
-            className="absolute -bottom-32 left-1/4 w-[500px] h-[500px] rounded-full blur-[110px] pointer-events-none opacity-20"
-            style={{ 
-              background: 'radial-gradient(circle, rgba(237, 193, 132, 0.20) 0%, transparent 70%)'
             }}
           />
         </>
       ) : (
         <>
-          {/* Light Mode Champagne & Royal Indigo Glows */}
+          {/* Light Mode Jewel Emerald & Gold Glows */}
           <div 
-            className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full blur-[100px] pointer-events-none opacity-25"
+            className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none opacity-20"
             style={{ 
-              background: 'radial-gradient(circle, rgba(200, 138, 69, 0.18) 0%, transparent 70%)'
+              background: 'radial-gradient(circle, rgba(0, 136, 78, 0.12) 0%, transparent 70%)'
             }}
           />
           <div 
-            className="absolute -bottom-32 -left-32 w-[600px] h-[600px] rounded-full blur-[100px] pointer-events-none opacity-15"
+            className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full blur-[100px] pointer-events-none opacity-15"
             style={{ 
-              background: 'radial-gradient(circle, rgba(61, 90, 254, 0.15) 0%, transparent 70%)'
+              background: 'radial-gradient(circle, rgba(180, 121, 31, 0.10) 0%, transparent 70%)'
             }}
           />
         </>
       )}
 
-      {/* ── 3. CYBER PRECISION GRID TEXTURE ──────────────────────────────── */}
+      {/* ── 3. PRECISION GRID TEXTURE ────────────────────────────────────── */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: isDark
-            ? 'radial-gradient(circle, rgba(6, 182, 212, 0.10) 1px, transparent 1px), linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px)'
-            : 'radial-gradient(circle, rgba(30, 41, 59, 0.08) 1.5px, transparent 1.5px), linear-gradient(to right, rgba(200, 138, 69, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(200, 138, 69, 0.05) 1px, transparent 1px)',
-          backgroundSize: isDark ? '24px 24px, 48px 48px, 48px 48px' : '28px 28px, 56px 56px, 56px 56px',
-          opacity: isDark ? 0.75 : 0.90,
+            ? 'radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px)'
+            : 'radial-gradient(circle, rgba(30, 41, 59, 0.06) 1.5px, transparent 1.5px)',
+          backgroundSize: isDark ? '28px 28px' : '28px 28px',
+          opacity: isDark ? 0.70 : 0.85,
         }}
       />
 
@@ -132,8 +124,8 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
         className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
         style={{
           background: isDark
-            ? 'linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.35) 30%, rgba(255, 255, 255, 0.6) 50%, rgba(139, 92, 246, 0.35) 70%, transparent 100%)'
-            : 'linear-gradient(90deg, transparent 0%, rgba(200, 138, 69, 0.25) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(200, 138, 69, 0.25) 70%, transparent 100%)',
+            ? 'linear-gradient(90deg, transparent 0%, rgba(26, 232, 147, 0.35) 30%, rgba(255, 255, 255, 0.5) 50%, rgba(224, 168, 63, 0.35) 70%, transparent 100%)'
+            : 'linear-gradient(90deg, transparent 0%, rgba(0, 136, 78, 0.25) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(180, 121, 31, 0.25) 70%, transparent 100%)',
         }}
       />
     </div>

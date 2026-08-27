@@ -58,13 +58,13 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 onClick={() => onSelectTab(tab.id)}
                 className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all duration-200 min-h-[50px] relative ${
                   isActive
-                    ? 'text-cyan-400 font-bold'
+                    ? 'text-[#00884E] dark:text-[#1AE893] font-bold'
                     : 'text-abyss-textMuted hover:text-abyss-textPrimary'
                 }`}
               >
                 {/* Active Indicator Top Pill */}
                 {isActive && (
-                  <span className="absolute -top-1.5 w-6 h-1 rounded-full bg-cyan-400 shadow-neon-cyan animate-emergence" />
+                  <span className="absolute -top-1.5 w-6 h-1 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 animate-emergence" />
                 )}
                 <span className={`text-lg leading-none transition-transform duration-200 ${isActive ? 'scale-110' : ''}`}>
                   {tab.icon}
@@ -81,12 +81,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             onClick={() => setShowMoreDrawer(true)}
             className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all duration-200 min-h-[50px] relative ${
               isSecondaryActive || showMoreDrawer
-                ? 'text-purple-400 font-bold'
+                ? 'text-amber-600 dark:text-[#E0A83F] font-bold'
                 : 'text-abyss-textMuted hover:text-abyss-textPrimary'
             }`}
           >
             {isSecondaryActive && (
-              <span className="absolute -top-1.5 w-6 h-1 rounded-full bg-purple-500 shadow-neon-purple" />
+              <span className="absolute -top-1.5 w-6 h-1 rounded-full bg-amber-500 shadow-sm" />
             )}
             <span className={`text-lg leading-none transition-transform duration-200 ${isSecondaryActive ? 'scale-110' : ''}`}>
               ✨
@@ -134,7 +134,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   }}
                   className={`p-2 rounded-xl text-xs font-bold text-center transition ${
                     activeModule === 'BANK_STATEMENTS'
-                      ? 'btn-neon-action shadow-neon-cyan'
+                      ? 'btn-emerald-capsule text-white shadow-sm'
                       : 'text-abyss-textSecondary'
                   }`}
                 >
@@ -147,7 +147,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   }}
                   className={`p-2 rounded-xl text-xs font-bold text-center transition ${
                     activeModule === 'SMS_INTELLIGENCE'
-                      ? 'btn-neon-action shadow-neon-cyan'
+                      ? 'btn-emerald-capsule text-white shadow-sm'
                       : 'text-abyss-textSecondary'
                   }`}
                 >
@@ -173,7 +173,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                       }}
                       className={`p-3 rounded-2xl border text-left transition flex items-center justify-between ${
                         isActive
-                          ? 'bg-cyan-500/15 border-cyan-500/40 text-white'
+                          ? 'tab-pill-active'
                           : 'bg-abyss-well border-abyss-border text-abyss-textSecondary hover:bg-abyss-elevated'
                       }`}
                     >
@@ -184,7 +184,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                           <div className="text-[10px] text-abyss-textMuted">{tab.desc}</div>
                         </div>
                       </div>
-                      {isActive && <span className="text-cyan-400 font-bold text-xs">Active</span>}
+                      {isActive && <span className="text-[#00884E] dark:text-[#1AE893] font-bold text-xs">Active</span>}
                     </button>
                   );
                 })}
@@ -199,7 +199,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     setShowMoreDrawer(false);
                     onOpenThemeStudio();
                   }}
-                  className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold flex items-center justify-center gap-1.5"
+                  className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-[#E0A83F] text-xs font-bold flex items-center justify-center gap-1.5"
                 >
                   <span>🎨</span> Theme Studio
                 </button>
@@ -209,7 +209,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                       setShowMoreDrawer(false);
                       onOpenDiagnostics();
                     }}
-                    className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold flex items-center justify-center gap-1.5"
+                    className="p-2.5 rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary text-xs font-bold flex items-center justify-center gap-1.5"
                   >
                     <span>🩺</span> Diagnostics
                   </button>

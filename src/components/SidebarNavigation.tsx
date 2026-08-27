@@ -35,7 +35,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const activeThemeId = getActiveThemeId();
-  const theme = THEME_TEMPLATES[activeThemeId] || THEME_TEMPLATES.aurora_cyber;
+  const theme = THEME_TEMPLATES[activeThemeId] || THEME_TEMPLATES.bytlend_vision;
 
   // Navigation Items when inside BANK_STATEMENTS Module
   const bankNavGroups: Array<{
@@ -118,13 +118,13 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         <div className={`flex items-center ${isExpanded ? 'justify-between' : 'justify-center'} shrink-0`}>
           {isExpanded ? (
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-black uppercase text-cyan-400 tracking-wider">
+              <span className="text-xs font-mono font-black uppercase text-emerald-600 dark:text-[#1AE893] tracking-wider">
                 {activeModule === 'BANK_STATEMENTS' ? 'Bank Forensics' : 'SMS Intelligence'}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </div>
           ) : (
-            <BytLendLogo size="sm" />
+            <BytLendLogo size="sm" isDark={isDark} />
           )}
 
           <button
@@ -160,7 +160,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                         : 'p-2.5 justify-center'
                     } ${
                       isActive
-                        ? 'btn-neon-action text-white font-black shadow-neon-cyan'
+                        ? 'btn-emerald-capsule text-white font-bold shadow-sm'
                         : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well'
                     }`}
                     title={!isExpanded ? `${tab.label}` : undefined}
@@ -206,7 +206,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         {/* Theme Studio Trigger */}
         <button
           onClick={onOpenThemeStudio}
-          className={`w-full flex items-center rounded-xl p-2 transition border border-cyan-500/30 text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 group relative ${
+          className={`w-full flex items-center rounded-xl p-2 transition border border-amber-500/30 text-amber-600 dark:text-[#E0A83F] bg-amber-500/10 hover:bg-amber-500/20 group relative ${
             isExpanded ? 'px-3 gap-2.5' : 'justify-center'
           }`}
           title={!isExpanded ? 'Theme Studio (5 Themes)' : undefined}
@@ -215,7 +215,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           {isExpanded && (
             <div className="text-left leading-none truncate">
               <span className="text-xs font-bold block">Theme Studio</span>
-              <span className="text-[9px] text-cyan-400/80 font-mono mt-0.5">{theme.name}</span>
+              <span className="text-[9px] text-amber-600/80 dark:text-[#E0A83F]/80 font-mono mt-0.5">{theme.name}</span>
             </div>
           )}
         </button>
@@ -231,7 +231,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           <span className="text-base shrink-0">{isDark ? '☀️' : '🌙'}</span>
           {isExpanded && (
             <span className="text-xs font-semibold truncate">
-              {isDark ? 'Light Silk' : 'Dark Obsidian-Teal'}
+              {isDark ? 'Light Mode' : 'Dark Obsidian'}
             </span>
           )}
         </button>

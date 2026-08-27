@@ -9,6 +9,7 @@ interface LoginScreenProps {
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({
+  isDark = true,
   onLoginSuccess,
 }) => {
   const [authMode, setAuthMode] = useState<'EMAIL' | 'PHONE'>('EMAIL');
@@ -110,30 +111,30 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     <div className="min-h-[82vh] flex flex-col items-center justify-center px-4 py-8 sm:py-12 animate-emergence">
       <div className="spatial-card w-full max-w-md p-8 sm:p-10 text-center space-y-6 shadow-2xl relative overflow-hidden">
         {/* Top ambient glow */}
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-cyan-500/20 blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
 
         {/* Brand Icon Badge */}
         <div className="flex justify-center relative z-10">
-          <BytLendLogo size="lg" />
+          <BytLendLogo size="lg" isDark={isDark} />
         </div>
 
         <div className="space-y-1 relative z-10">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-abyss-textPrimary flex items-center justify-center">
-            Byt<span className="text-cyan-400 font-black ml-0.5">Floww</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-abyss-textPrimary flex items-center justify-center font-fraunces">
+            Byt<span className="text-[#00884E] dark:text-[#1AE893] ml-0.5">Floww</span>
           </h1>
-          <p className="text-xs text-cyan-400 font-bold uppercase tracking-widest">
+          <p className="text-xs text-[#00884E] dark:text-[#1AE893] font-bold uppercase tracking-widest">
             Autonomous AI Capital Forensics
           </p>
           <p className="text-[11px] text-abyss-textMuted pt-0.5">
-            BytLend Aurora Cyber-Glass Design System V9
+            BytLend VisionOS Design System
           </p>
         </div>
 
         {/* Theme Quick Selector Swatches */}
         <div className="p-3 rounded-2xl bg-abyss-well border border-abyss-border space-y-2">
           <div className="flex items-center justify-between text-[10px] uppercase font-bold text-abyss-textMuted px-1">
-            <span>Choose Startup Theme</span>
-            <span className="text-cyan-400">{THEME_TEMPLATES[activeTheme]?.name}</span>
+            <span>Choose Theme</span>
+            <span className="text-[#00884E] dark:text-[#1AE893]">{THEME_TEMPLATES[activeTheme]?.name}</span>
           </div>
           <div className="flex items-center justify-center gap-2">
             {Object.values(THEME_TEMPLATES).map((t) => (
@@ -143,7 +144,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 onClick={() => handleSelectTheme(t.id)}
                 className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm transition-all duration-200 border ${
                   activeTheme === t.id
-                    ? 'border-cyan-400 bg-cyan-500/25 scale-110 shadow-neon-cyan'
+                    ? 'border-emerald-500 bg-emerald-500/20 scale-110 shadow-sm'
                     : 'border-abyss-border bg-abyss-card hover:scale-105'
                 }`}
                 title={t.name}
@@ -161,7 +162,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             onClick={() => { setAuthMode('EMAIL'); setErrorMessage(''); setStep('INPUT'); }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
               authMode === 'EMAIL'
-                ? 'btn-neon-action shadow-neon-cyan'
+                ? 'btn-emerald-capsule text-white shadow-sm'
                 : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
             }`}
           >
@@ -172,7 +173,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             onClick={() => { setAuthMode('PHONE'); setErrorMessage(''); setStep('INPUT'); }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
               authMode === 'PHONE'
-                ? 'btn-neon-action shadow-neon-cyan'
+                ? 'btn-emerald-capsule text-white shadow-sm'
                 : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
             }`}
           >
@@ -192,7 +193,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-cyan-400"
+                className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -205,7 +206,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-cyan-400"
+                className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -216,7 +217,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-2xl btn-neon-action shadow-neon-cyan text-xs font-bold transition flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl btn-emerald-capsule text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm"
             >
               {loading ? 'Authenticating...' : 'Sign In Securely →'}
             </button>
@@ -241,7 +242,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       placeholder="84008 69600"
-                      className="flex-1 px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-cyan-400 font-mono"
+                      className="flex-1 px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-sm text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-emerald-500 font-mono"
                     />
                   </div>
                 </div>
@@ -253,7 +254,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-2xl btn-neon-action shadow-neon-cyan text-xs font-bold transition flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl btn-emerald-capsule text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm"
                 >
                   {loading ? 'Sending OTP...' : 'Send Verification OTP →'}
                 </button>
@@ -269,7 +270,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="123456"
-                    className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-center text-lg font-mono tracking-widest text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-cyan-400"
+                    className="w-full px-4 py-3 rounded-xl bg-abyss-well border border-abyss-border text-center text-lg font-mono tracking-widest text-abyss-textPrimary placeholder-abyss-textMuted outline-none focus:border-emerald-500"
                   />
                 </div>
 
@@ -280,7 +281,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-2xl btn-neon-action shadow-neon-cyan text-xs font-bold transition flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-2xl btn-emerald-capsule text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm"
                 >
                   {loading ? 'Verifying...' : 'Verify & Enter Workspace →'}
                 </button>

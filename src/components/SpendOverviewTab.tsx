@@ -51,23 +51,23 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       <div className="spatial-card-hero p-4 sm:p-7 space-y-4 sm:space-y-6 relative overflow-hidden">
         {/* Top period header with Status Badges */}
         <div className="flex items-center justify-between gap-2 sm:gap-3 relative z-10 flex-wrap">
-          <span className="spatial-btn px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs flex items-center gap-1.5 sm:gap-2 border-jade-500/40 bg-jade-500/10">
-            <span className="w-2 h-2 rounded-full bg-jade-500 animate-pulse" />
-            <span className="text-jade-500 font-bold tracking-wider">{snapshot.periodLabel.toUpperCase()}</span>
+          <span className="spatial-btn px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs flex items-center gap-1.5 sm:gap-2 border-emerald-500/30 bg-emerald-500/10">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[#00884E] dark:text-[#1AE893] font-bold tracking-wider">{snapshot.periodLabel.toUpperCase()}</span>
           </span>
 
-          <span className="px-2.5 sm:px-3.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold tracking-wider border bg-synapse-500/20 text-synapse-400 border-synapse-500/40 shadow-sm flex items-center gap-1">
+          <span className="px-2.5 sm:px-3.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold tracking-wider border bg-amber-500/10 text-amber-600 dark:text-[#E0A83F] border-amber-500/30 shadow-sm flex items-center gap-1">
             <span>✨</span> {snapshot.healthScoreTier} HEALTH TIER
           </span>
         </div>
 
         {/* Main spend number with Billion-Dollar Startup Typography */}
         <div className="relative z-10 pt-1 sm:pt-2">
-          <span className="text-[10px] sm:text-xs uppercase tracking-widest text-pulse-500 font-bold block">
+          <span className="text-[10px] sm:text-xs uppercase tracking-widest text-abyss-textMuted font-bold block">
             Capital Reconciled This Period (Outflow)
           </span>
-          <div className="text-4xl xs:text-5xl sm:text-7xl font-black tracking-tight font-mono mt-1 flex items-baseline gap-1 text-pulse-500">
-            <span className="text-2xl xs:text-3xl sm:text-5xl font-normal opacity-80">₹</span>
+          <div className="text-4xl xs:text-5xl sm:text-7xl font-black tracking-tight font-ibm-mono mt-1 flex items-baseline gap-1 text-abyss-textPrimary">
+            <span className="text-2xl xs:text-3xl sm:text-5xl font-normal text-abyss-textMuted">₹</span>
             <span>
               {snapshot.totalSpend.toLocaleString('en-IN')}
             </span>
@@ -75,12 +75,12 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
         </div>
 
         {/* Budget Status line & Velocity Progress bar */}
-        <div className="space-y-2.5 sm:space-y-3 pt-2 relative z-10 border-t border-pulse-500/20">
+        <div className="space-y-2.5 sm:space-y-3 pt-2 relative z-10 border-t border-abyss-border">
           <div className="flex items-center justify-between text-[11px] sm:text-xs font-semibold gap-2">
             <span className="px-2.5 py-0.5 sm:py-1 rounded-full bg-abyss-well text-abyss-textSecondary border border-abyss-border truncate">
               ⚡ {snapshot.transactionCount} transactions
             </span>
-            <span className={`truncate text-right ${isOverBudget ? 'text-pulse-500 font-bold' : 'text-jade-500 font-bold'}`}>
+            <span className={`truncate text-right ${isOverBudget ? 'text-rose-500 font-bold' : 'text-[#00884E] dark:text-[#1AE893] font-bold'}`}>
               {isOverBudget 
                 ? `Over by ₹${varianceAmount.toLocaleString('en-IN')} (${budgetPct}%)` 
                 : `Within budget (${budgetPct}% utilized)`}
@@ -92,7 +92,7 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
             <div 
               style={{ width: `${Math.min(100, Math.max(3, budgetPct))}%` }}
               className={`h-full rounded-full transition-all duration-500 ${
-                isOverBudget ? 'bg-pulse-500 shadow-md shadow-pulse-500/50' : 'bg-jade-500 shadow-md shadow-jade-500/50'
+                isOverBudget ? 'bg-rose-500 shadow-sm' : 'bg-emerald-500 shadow-sm'
               }`}
             />
           </div>
@@ -100,13 +100,13 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
       </div>
 
       {/* ── 2. TRI-METRIC CASHFLOW STRIP (3-COLUMN LIQUIDITY CARD) ───────── */}
-      <div className="spatial-card p-3.5 sm:p-6 grid grid-cols-3 gap-1.5 sm:gap-4 text-left border-jade-500/25 shadow-lg">
+      <div className="spatial-card p-3.5 sm:p-6 grid grid-cols-3 gap-1.5 sm:gap-4 text-left border-emerald-500/20 shadow-lg">
         {/* Income (Cyber Emerald) */}
         <div className="space-y-0.5 sm:space-y-1">
-          <div className="flex items-center gap-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-jade-500">
+          <div className="flex items-center gap-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#00884E] dark:text-[#1AE893]">
             <span>↓</span> Income
           </div>
-          <div className="text-xs xs:text-sm sm:text-2xl font-bold font-mono text-jade-500 truncate">
+          <div className="text-xs xs:text-sm sm:text-2xl font-bold font-mono text-[#00884E] dark:text-[#1AE893] truncate">
             ₹{snapshot.totalIncome.toLocaleString('en-IN')}
           </div>
           <div className="text-[9px] sm:text-[10px] text-abyss-textMuted hidden xs:block truncate">
@@ -114,12 +114,12 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
           </div>
         </div>
 
-        {/* Expenses (Plasma Vermillion) */}
+        {/* Expenses (Crimson Vermillion) */}
         <div className="space-y-0.5 sm:space-y-1 border-x border-abyss-border px-1.5 sm:px-4">
-          <div className="flex items-center gap-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-pulse-500">
+          <div className="flex items-center gap-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-rose-500">
             <span>↑</span> Expenses
           </div>
-          <div className="text-xs xs:text-sm sm:text-2xl font-bold font-mono text-pulse-500 truncate">
+          <div className="text-xs xs:text-sm sm:text-2xl font-bold font-mono text-rose-500 truncate">
             ₹{snapshot.totalSpend.toLocaleString('en-IN')}
           </div>
           <div className="text-[9px] sm:text-[10px] text-abyss-textMuted hidden xs:block truncate">
@@ -130,12 +130,12 @@ export const SpendOverviewTab: React.FC<SpendOverviewTabProps> = ({
         {/* Net Surplus / Deficit */}
         <div className="space-y-0.5 sm:space-y-1 text-right">
           <div className={`flex items-center justify-end gap-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider ${
-            snapshot.netCashflow >= 0 ? 'text-jade-500' : 'text-pulse-500'
+            snapshot.netCashflow >= 0 ? 'text-[#00884E] dark:text-[#1AE893]' : 'text-rose-500'
           }`}>
             <span>{snapshot.netCashflow >= 0 ? '● Surplus' : '● Deficit'}</span>
           </div>
           <div className={`text-xs xs:text-sm sm:text-2xl font-bold font-mono truncate ${
-            snapshot.netCashflow >= 0 ? 'text-jade-500' : 'text-pulse-500'
+            snapshot.netCashflow >= 0 ? 'text-[#00884E] dark:text-[#1AE893]' : 'text-rose-500'
           }`}>
             {snapshot.netCashflow >= 0 ? '+' : '-'}₹{Math.abs(snapshot.netCashflow).toLocaleString('en-IN')}
           </div>
