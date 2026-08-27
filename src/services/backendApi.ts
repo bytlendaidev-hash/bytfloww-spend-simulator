@@ -17,6 +17,7 @@ import {
   RecurringMandate,
   EvidenceMetricItem
 } from '../types';
+import { isSalaryTransaction, extractEmployerFromNarration, analyzeAllEmployers } from '../engine/salaryIntelligence';
 
 export type BackendEnvironment = 'DEV' | 'STAGING' | 'PROD' | 'LOCAL';
 
@@ -315,14 +316,20 @@ class BackendApiService {
     const result = statementContext?.statementResult;
 
     if (q.includes('salary') || q.includes('income') || q.includes('earn')) {
-      const salary = result?.inflowDecomposition?.find((i: any) => i.category.includes('Salary'))?.totalAmount || 802386;
+      const salaryItems = result?.inflowDecomposition?.filter((i: any) => i.category.includes('Salary')) || [];
+      const salary = salaryItems.reduce((acc: number, item: any) => acc + item.totalAmount, 0) || 802386;
+      const salaryCount = salaryItems.reduce((acc: number, item: any) => acc + item.count, 0) || 13;
+      const employersList = salaryItems.map((i: any) => i.source).filter(Boolean);
+      const primaryEmployer = employersList.length > 0 ? employersList.join(', ') : 'Corporate Employer';
       const epfo = result?.inflowDecomposition?.find((i: any) => i.category.includes('Provident'))?.totalAmount || 29653;
+      const totalInflow = result?.reconciliation?.totalInflow || 1189297.96;
+      const sharePct = totalInflow > 0 ? Math.round(((salary + epfo) / totalInflow) * 1000) / 10 : 69.9;
       return {
         answer: `💼 **Salary & Professional Income Forensic Analysis**:
-- **Primary Employer**: Newgen Software Technologies (credited via Standard Chartered Bank).
-- **Total Annual Salary Credited**: **₹${salary.toLocaleString('en-IN')}** across 13 monthly payroll transactions (averaging ~₹${Math.round(salary / 13).toLocaleString('en-IN')}/month).
-- **Statutory EPFO Provident Fund**: **₹${epfo.toLocaleString('en-IN')}** across 3 receipts.
-- **Combined Professional Inflows**: **₹${(salary + epfo).toLocaleString('en-IN')}** (~69.9% of all statement inflows).`,
+- **Primary Employer**: ${primaryEmployer}.
+- **Total Annual Salary Credited**: **₹${salary.toLocaleString('en-IN')}** across ${salaryCount} payroll transactions (averaging ~₹${Math.round(salary / Math.max(1, salaryCount)).toLocaleString('en-IN')}/month).
+- **Statutory EPFO Provident Fund**: **₹${epfo.toLocaleString('en-IN')}**.
+- **Combined Professional Inflows**: **₹${(salary + epfo).toLocaleString('en-IN')}** (~${sharePct}% of all statement inflows).`,
         confidence: 0.99,
       };
     }
@@ -553,7 +560,7 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       let isLoan = false;
 
       // Match Categories
-      if (lowerNarr.includes('salary') || lowerNarr.includes('payroll') || (credit && credit > 20000 && lowerNarr.includes('by transfer') && !lowerNarr.includes('upi'))) {
+      if (isSalaryTransaction(narration, !!credit, credit || 0)) {
         cat = 'Salary & Income';
         if (credit && credit > 10000) salaryDetected = Math.max(salaryDetected, credit);
       } else if (lowerNarr.includes('mpokket') || lowerNarr.includes('vivifi') || lowerNarr.includes('bajaj') || lowerNarr.includes('earlysalary') || lowerNarr.includes('fibe') || lowerNarr.includes('moneyview') || lowerNarr.includes('navia') || lowerNarr.includes('rupeek') || lowerNarr.includes('tatacap') || lowerNarr.includes('hdb') || lowerNarr.includes('iifl') || lowerNarr.includes('nach') || lowerNarr.includes('emi') || lowerNarr.includes('loan')) {
@@ -682,7 +689,7 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
 
       // 1. Inflow categorization
       if (isCredit) {
-        if (lower.includes('newgen') || lower.includes('salary') || lower.includes('payroll') || (amount >= 20000 && lower.includes('by transfer') && !lower.includes('upi'))) {
+        if (isSalaryTransaction(tx.narration, isCredit, tx.credit || 0)) {
           salaryInflowTotal += tx.credit!;
           salaryCount++;
         } else if (lower.includes('employee provident') || lower.includes('epfo')) {
@@ -811,10 +818,31 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
     });
 
     // Format Structured Output
+    const detectedEmployers = analyzeAllEmployers(transactions);
+    const primaryEmployerName = detectedEmployers.length > 0 ? detectedEmployers[0].employerName : 'Corporate Employer';
+
+    const corporateSalaryInflowItems: StatementInflowItem[] = detectedEmployers.length > 0
+      ? detectedEmployers.map(emp => ({
+          category: 'Primary Corporate Salary',
+          source: emp.employerName,
+          count: emp.transactionCount,
+          totalAmount: emp.totalSalary,
+          sharePercent: totalInflow > 0 ? (emp.totalSalary / totalInflow) * 100 : 0,
+        }))
+      : salaryInflowTotal > 0
+      ? [{
+          category: 'Primary Corporate Salary',
+          source: primaryEmployerName,
+          count: salaryCount,
+          totalAmount: salaryInflowTotal,
+          sharePercent: totalInflow > 0 ? (salaryInflowTotal / totalInflow) * 100 : 0,
+        }]
+      : [];
+
     const inflowDecomposition: StatementInflowItem[] = [
-      { category: 'Primary Corporate Salary', source: 'Newgen Software Technologies', count: salaryCount, totalAmount: salaryInflowTotal, sharePercent: totalInflow > 0 ? (salaryInflowTotal / totalInflow) * 100 : 0 },
+      ...corporateSalaryInflowItems,
       { category: 'Provident Fund (EPFO)', source: 'Employee Provident Fund Organisation', count: epfoCount, totalAmount: epfoInflowTotal, sharePercent: totalInflow > 0 ? (epfoInflowTotal / totalInflow) * 100 : 0 },
-      { category: 'Digital Loans & Micro-Credit', source: 'mPokket & Vivifi India Finance', count: loanInflowCount, totalAmount: loanInflowTotal, sharePercent: totalInflow > 0 ? (loanInflowTotal / totalInflow) * 100 : 0 },
+      { category: 'Digital Loans & Micro-Credit', source: 'Digital Micro-Credit & Loans', count: loanInflowCount, totalAmount: loanInflowTotal, sharePercent: totalInflow > 0 ? (loanInflowTotal / totalInflow) * 100 : 0 },
       { category: 'Peer Transfers & Contacts', source: 'P2P UPI Receipts', count: p2pInflowCount, totalAmount: p2pInflowTotal, sharePercent: totalInflow > 0 ? (p2pInflowTotal / totalInflow) * 100 : 0 },
       { category: 'Refunds & Cashbacks', source: 'Merchant Reversals', count: refundCount, totalAmount: refundInflowTotal, sharePercent: totalInflow > 0 ? (refundInflowTotal / totalInflow) * 100 : 0 },
     ].filter(i => i.totalAmount > 0);
@@ -1209,7 +1237,7 @@ $$\\text{Opening (₹${op.toLocaleString('en-IN')})} + \\text{Inflows (₹${inf.
       }
       if (!salaryTimelineMap[mKey]) salaryTimelineMap[mKey] = { salary: 0, loan: 0, other: 0 };
       const lower = t.narration.toLowerCase();
-      if (lower.includes('newgen') || lower.includes('salary') || lower.includes('payroll') || (t.credit >= 20000 && lower.includes('by transfer') && !lower.includes('upi'))) {
+      if (isSalaryTransaction(t.narration, true, t.credit || 0)) {
         salaryTimelineMap[mKey].salary += t.credit;
       } else if (lower.includes('mpokket') || lower.includes('vivifi') || lower.includes('navi') || lower.includes('bajaj') || lower.includes('loan') || lower.includes('kredit')) {
         salaryTimelineMap[mKey].loan += t.credit;

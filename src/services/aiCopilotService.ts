@@ -15,6 +15,7 @@ import {
   Where100WentItem 
 } from '../engine/statementForensicsData';
 import { CanonicalTransaction } from '../types';
+import { analyzeAllEmployers } from '../engine/salaryIntelligence';
 
 export const DEFAULT_GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
 
@@ -274,9 +275,19 @@ ${activeLenders.map((l: ForensicLenderItem) => `• **${l.name}**: ₹${l.totalB
   // Salary query
   if (q.includes('salary') || q.includes('income')) {
     const avgSalary = Math.round(dataset.salaryTotal / Math.max(1, dataset.monthlyCashFlow.length));
+    const detected = analyzeAllEmployers(transactions.map(t => ({
+      date: t.transactionDate || '',
+      narration: t.rawNarration || t.narration || '',
+      credit: t.direction === 'CREDIT' ? t.amount : 0,
+      debit: t.direction === 'DEBIT' ? t.amount : 0,
+    })));
+    const employerName = detected.length > 0
+      ? detected.map(e => e.employerName).join(', ')
+      : 'Corporate Employer';
+
     return `💼 **Corporate Earned Salary Breakdown**:
 
-• **Total Corporate Salary**: **₹${dataset.salaryTotal.toLocaleString('en-IN')}** (Strictly employment payroll from Newgen Software Technologies Limited).
+• **Total Corporate Salary**: **₹${dataset.salaryTotal.toLocaleString('en-IN')}** (Employment payroll from ${employerName}).
 • **Average Monthly Salary**: **₹${avgSalary.toLocaleString('en-IN')}/mo**.
 • **Excluded Disbursals**: Segregated ₹${dataset.loanCreditsTotal.toLocaleString('en-IN')} borrowed loan credits and ₹${dataset.epfoCreditsTotal.toLocaleString('en-IN')} EPFO capital withdrawals.`;
   }
