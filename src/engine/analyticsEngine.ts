@@ -29,6 +29,9 @@ import {
   extractEmployerFromNarration, 
   analyzeAllEmployers 
 } from './salaryIntelligence';
+import { 
+  analyzeCounterparties 
+} from './p2pIntelligence';
 
 // ── MULTI-STATEMENT SESSION & DEDUPLICATION TYPES ─────────────────────────────
 export type DuplicateStatus =
@@ -1406,53 +1409,32 @@ export function detectLenders(txns: CanonicalTransaction[]): LiveLenderItem[] {
 // ══════════════════════════════════════════════════════════════════════════════
 
 export function detectRecipients(txns: CanonicalTransaction[]): LiveRecipientItem[] {
-  const recipMap = new Map<string, {
-    name: string; handle: string | null;
-    sent: number; received: number;
-    amounts: number[]; dates: string[];
-    count: number;
-  }>();
+  const summary = analyzeCounterparties(txns);
+  const p2pClusters = summary.clusters.filter(c => c.category === 'P2P_CONTACT');
 
-  for (const t of txns) {
-    if (t.category !== 'UPI_TRANSFER_UNKNOWN' && t.category !== 'PERSONAL_TRANSFER' && t.category !== 'FAMILY_TRANSFER') continue;
-    const key = t.upiHandle || t.entityNormalized;
-    if (!key || key.length < 2) continue;
-
-    const existing = recipMap.get(key) || { name: t.entityName, handle: t.upiHandle, sent: 0, received: 0, amounts: [], dates: [], count: 0 };
-    if (t.direction === 'DEBIT' && t.debit) { existing.sent += t.debit; existing.amounts.push(t.debit); }
-    if (t.direction === 'CREDIT' && t.credit) { existing.received += t.credit; }
-    existing.dates.push(t.transactionDate);
-    existing.count++;
-    recipMap.set(key, existing);
-  }
-
-  return Array.from(recipMap.values())
-    .filter(r => r.sent > 0 || r.received > 0)
-    .sort((a, b) => b.sent - a.sent)
-    .slice(0, 50)
-    .map((r, idx) => {
-      const sortedDates = r.dates.sort();
-      const avgTxn = r.amounts.length > 0 ? r.amounts.reduce((a, b) => a + b, 0) / r.amounts.length : 0;
-      const monthSpan = Math.max(1, sortedDates.length > 0 ?
-        (new Date(sortedDates[sortedDates.length - 1]).getTime() - new Date(sortedDates[0]).getTime()) / (30 * 24 * 3600 * 1000) : 1);
+  return p2pClusters
+    .slice(0, 100)
+    .map((c, idx) => {
+      const monthSpan = Math.max(1, c.firstDate && c.latestDate ?
+        (new Date(c.latestDate).getTime() - new Date(c.firstDate).getTime()) / (30 * 24 * 3600 * 1000) : 1);
 
       return {
         id: `recip_${idx + 1}`,
-        name: r.name || r.handle || 'Unknown',
-        normalizedName: (r.name || '').toUpperCase(),
-        upiHandle: r.handle,
-        totalSent: r.sent,
-        totalReceived: r.received,
-        netOutflow: r.sent - r.received,
-        txnCount: r.count,
-        largestTxn: Math.max(...r.amounts, 0),
-        smallestTxn: Math.min(...r.amounts.filter(a => a > 0), 0),
-        averageTxn: avgTxn,
-        monthlyAverage: r.sent / monthSpan,
-        firstDate: sortedDates[0] || '',
-        lastDate: sortedDates[sortedDates.length - 1] || '',
+        name: c.displayName,
+        normalizedName: c.displayName.toUpperCase(),
+        upiHandle: c.primaryVpa,
+        totalSent: c.totalSent,
+        totalReceived: c.totalReceived,
+        netOutflow: c.totalSent - c.totalReceived,
+        txnCount: c.txnCount,
+        largestTxn: c.largestTxn,
+        smallestTxn: c.smallestTxn,
+        averageTxn: c.averageTxn,
+        monthlyAverage: Math.round(c.totalSent / monthSpan),
+        firstDate: c.firstDate,
+        lastDate: c.latestDate,
         relationshipTag: 'PERSON',
-        flagPriority: r.sent > 50000 ? 'HIGH' : 'NORMAL',
+        flagPriority: c.totalSent > 50000 ? 'HIGH' : 'NORMAL',
       } as LiveRecipientItem;
     });
 }
