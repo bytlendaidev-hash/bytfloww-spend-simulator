@@ -275,7 +275,7 @@ export const App: React.FC = () => {
       ) : (
         /* ── 4. IF SMS XML LOADED: SHOW SPEND INTELLIGENCE DASHBOARD ─── */
         <>
-          <div className="flex items-center justify-between mb-3 px-1 text-xs">
+          <div className="hidden sm:flex items-center justify-between mb-3 px-1 text-xs">
             <span className="font-semibold text-abyss-textMuted">
               Session: <strong className="text-abyss-textPrimary">{currentUser.name}</strong> ({currentUser.phone})
             </span>
