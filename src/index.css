@@ -7,13 +7,25 @@
 @layer base {
   :root {
     /* ══════════════════════════════════════════════════════════════════════
-       BYTFLOWW BILLION-DOLLAR FINTECH OS — CSS VARIABLES & DEFAULTS
-       Zero compromise. Five signature theme architectures.
+       BYTFLOWW ROYAL INDIGO SOVEREIGN FINTECH OS — CSS VARIABLES & DEFAULTS
+       Pure Velvet Midnight Canvas (#050814) with Royal Indigo & Electric Emerald
     ══════════════════════════════════════════════════════════════════════ */
 
-    --spatial-bg: #07090E;
+    --spatial-bg: #050814;
 
-    /* ── PILLAR 1: CYBER EMERALD (Inflow, Salary, Surplus) ── */
+    /* ── PILLAR 1: ROYAL INDIGO & SAPPHIRE (AI Forensics, Synapse Intelligence) ── */
+    --color-synapse-50:  #EEF2FF;
+    --color-synapse-100: #E0E7FF;
+    --color-synapse-200: #C7D2FE;
+    --color-synapse-300: #A5B4FC;
+    --color-synapse-400: #818CF8;
+    --color-synapse-500: #6366F1;  /* ROYAL INDIGO HERO */
+    --color-synapse-600: #4F46E5;
+    --color-synapse-700: #4338CA;
+    --color-synapse-800: #3730A3;
+    --color-synapse-900: #1E1B4B;
+
+    /* ── PILLAR 2: CYBER EMERALD MINT (Inflow, Salary, Surplus) ── */
     --color-jade-50:  #E6FAF2;
     --color-jade-100: #C2F4DF;
     --color-jade-200: #8DE7C2;
@@ -24,18 +36,6 @@
     --color-jade-700: #00875A;   /* LIGHT HERO — Sovereign Forest Jade */
     --color-jade-800: #004D3B;
     --color-jade-900: #002D22;
-
-    /* ── PILLAR 2: HYPER VIOLET (AI Forensics, Synapse Intelligence) ── */
-    --color-synapse-50:  #F4F0FF;
-    --color-synapse-100: #E8DDFF;
-    --color-synapse-200: #D4BBFF;
-    --color-synapse-300: #B990FF;
-    --color-synapse-400: #A070FF;
-    --color-synapse-500: #8B5CF6;  /* DARK HERO — Hyper Violet */
-    --color-synapse-600: #7340E8;
-    --color-synapse-700: #5B2EE0;  /* LIGHT HERO — Deep Ultraviolet */
-    --color-synapse-800: #3D1AAA;
-    --color-synapse-900: #220D6B;
 
     /* ── PILLAR 3: PLASMA VERMILLION (Outflow, Expenses, Debits) ── */
     --color-pulse-50:  #FFF4EE;
@@ -73,34 +73,34 @@
     --color-telemetry-800: #004460;
     --color-telemetry-900: #001E2E;
 
-    /* ── PILLAR 6: LUXURY SURFACES (Apex Noir Obsidian) ── */
-    --obsidian-canvas:       #07090E;
-    --obsidian-card:         #0D111A;
-    --obsidian-elevated:     #141A26;
-    --obsidian-well:         #182030;
-    --obsidian-border:       #1E2840;
-    --obsidian-border-strong:#2E3D60;
-    --text-primary:          #F1F5F9;
+    /* ── PILLAR 6: LUXURY ROYAL SURFACES (Midnight Velvet Obsidian) ── */
+    --obsidian-canvas:       #050814;
+    --obsidian-card:         #0A0F26;
+    --obsidian-elevated:     #101738;
+    --obsidian-well:         #141C42;
+    --obsidian-border:       #1E2B5C;
+    --obsidian-border-strong:#2E3F80;
+    --text-primary:          #F8FAFC;
     --text-secondary:        #94A3B8;
     --text-muted:            #64748B;
-    --text-subtle:           #38465C;
+    --text-subtle:           #3B4E75;
 
     /* Legacy mapping */
-    --titanium-chrome:         #F1F5F9;
-    --cyber-iris:              #8B5CF6;
-    --cyber-iris-dark:         #5B2EE0;
+    --titanium-chrome:         #F8FAFC;
+    --cyber-iris:              #6366F1;
+    --cyber-iris-dark:         #4338CA;
     --photon-cyan:             #00F5A0;
     --magma-pulse:             #FF4757;
-    --aerospace-slate:         #07090E;
-    --deep-vacuum:             #07090E;
-    --spatial-accent:          #00F5A0;
-    --spatial-accent-purple:   #8B5CF6;
-    --spatial-accent-indigo:   #5B2EE0;
+    --aerospace-slate:         #050814;
+    --deep-vacuum:             #050814;
+    --spatial-accent:          #6366F1;
+    --spatial-accent-purple:   #818CF8;
+    --spatial-accent-indigo:   #4F46E5;
   }
 
   body {
-    background-color: var(--obsidian-canvas, #07090E);
-    color: var(--text-primary, #F1F5F9);
+    background-color: var(--obsidian-canvas, #050814);
+    color: var(--text-primary, #F8FAFC);
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -116,7 +116,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--text-primary, #F1F5F9);
+    color: var(--text-primary, #F8FAFC);
     letter-spacing: -0.025em;
     font-weight: 700;
     font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
@@ -124,37 +124,37 @@
 }
 
 @layer components {
-  /* ── 1. BILLION-DOLLAR STARTUP WINDOW & CARDS ──────────────────────── */
+  /* ── 1. ROYAL FINTECH WINDOW & SPATIAL CARDS ──────────────────────── */
   .spatial-window {
-    background-color: var(--obsidian-card, #0D111A);
-    border: 1px solid var(--obsidian-border, #1E2840);
-    box-shadow: 0 32px 80px -16px rgba(0, 0, 0, 0.85);
+    background-color: var(--obsidian-card, #0A0F26);
+    border: 1px solid var(--obsidian-border, #1E2B5C);
+    box-shadow: 0 32px 80px -16px rgba(5, 8, 20, 0.95), 0 0 40px -10px rgba(99, 102, 241, 0.15);
     border-radius: 28px;
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
   }
 
   .spatial-card {
-    background-color: var(--obsidian-card, #0D111A);
-    border: 1px solid var(--obsidian-border, #1E2840);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    background-color: var(--obsidian-card, #0A0F26);
+    border: 1px solid var(--obsidian-border, #1E2B5C);
+    box-shadow: 0 4px 20px -2px rgba(5, 8, 20, 0.6);
     border-radius: 20px;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
   }
 
   .spatial-card:hover {
-    background-color: var(--obsidian-elevated, #141A26);
-    border-color: var(--obsidian-border-strong, #2E3D60);
+    background-color: var(--obsidian-elevated, #101738);
+    border-color: var(--obsidian-border-strong, #2E3F80);
     transform: translateY(-2px);
-    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 16px 40px -8px rgba(5, 8, 20, 0.8), 0 0 24px -6px rgba(99, 102, 241, 0.2);
   }
 
   .spatial-card-hero {
-    background: linear-gradient(180deg, var(--obsidian-card, #0D111A) 0%, var(--obsidian-elevated, #141A26) 100%);
-    border: 1px solid var(--obsidian-border-strong, #2E3D60);
+    background: linear-gradient(180deg, var(--obsidian-card, #0A0F26) 0%, var(--obsidian-elevated, #101738) 100%);
+    border: 1px solid var(--obsidian-border-strong, #2E3F80);
     border-radius: 24px;
-    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 50px -12px rgba(5, 8, 20, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
   }
@@ -165,17 +165,17 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-jade-500, #00F5A0), transparent);
-    opacity: 0.8;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--color-synapse-500, #6366F1), var(--color-jade-500, #00F5A0), transparent);
+    opacity: 0.9;
   }
 
-  /* ── 2. INTERACTIVE BUTTONS & PILLS ────────────────────────────────── */
+  /* ── 2. INTERACTIVE ROYAL BUTTONS & PILLS ──────────────────────────── */
   .spatial-btn {
-    background-color: var(--obsidian-elevated, #141A26);
-    border: 1px solid var(--obsidian-border, #1E2840);
+    background-color: var(--obsidian-elevated, #101738);
+    border: 1px solid var(--obsidian-border, #1E2B5C);
     border-radius: 9999px;
-    color: var(--text-primary, #F1F5F9);
+    color: var(--text-primary, #F8FAFC);
     font-weight: 600;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     display: inline-flex;
@@ -185,32 +185,32 @@
   }
 
   .spatial-btn:hover {
-    background-color: var(--obsidian-well, #182030);
-    border-color: var(--color-jade-500, #00F5A0);
-    color: var(--color-jade-500, #00F5A0);
+    background-color: var(--obsidian-well, #141C42);
+    border-color: var(--color-synapse-500, #6366F1);
+    color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 20px -2px rgba(0, 245, 160, 0.2);
+    box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.35);
   }
 
   .spatial-btn:active {
     transform: scale(0.97);
   }
 
-  /* Selected State: Radiant Solid Glow */
+  /* Selected State: Radiant Royal Indigo Glow */
   .spatial-btn-selected {
-    background-color: var(--color-jade-500, #00F5A0) !important;
-    border-color: var(--color-jade-500, #00F5A0) !important;
-    color: #07090E !important;
+    background-color: var(--color-synapse-500, #6366F1) !important;
+    border-color: var(--color-synapse-400, #818CF8) !important;
+    color: #FFFFFF !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 16px 0 rgba(0, 245, 160, 0.35) !important;
+    box-shadow: 0 4px 20px 0 rgba(99, 102, 241, 0.45) !important;
   }
 
   /* ── 3. FLOATING SEGMENTED ORNAMENT ────────────────────────────────── */
   .spatial-ornament {
-    background-color: var(--obsidian-well, #182030);
-    border: 1px solid var(--obsidian-border, #1E2840);
+    background-color: var(--obsidian-well, #141C42);
+    border: 1px solid var(--obsidian-border, #1E2B5C);
     border-radius: 9999px;
-    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
   }
 
   /* ── 4. TELEMETRY BADGES & GLOW ────────────────────────────────────── */
@@ -224,16 +224,16 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    background-color: rgba(0, 245, 160, 0.1);
-    color: var(--color-jade-500, #00F5A0);
-    border: 1px solid rgba(0, 245, 160, 0.3);
+    background-color: rgba(99, 102, 241, 0.15);
+    color: var(--color-synapse-400, #818CF8);
+    border: 1px solid rgba(99, 102, 241, 0.35);
   }
 
   .glass-card {
-    background: rgba(13, 17, 26, 0.75);
+    background: rgba(10, 15, 38, 0.75);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(30, 43, 92, 0.8);
     border-radius: 20px;
   }
 
@@ -247,12 +247,12 @@
     inset: -1px;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, var(--color-jade-500, #00F5A0), var(--color-synapse-500, #8B5CF6), transparent);
+    background: linear-gradient(135deg, var(--color-synapse-500, #6366F1), var(--color-jade-500, #00F5A0), transparent);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.6;
     transition: opacity 0.3s ease;
   }
 
@@ -303,12 +303,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--obsidian-border, #1E2840);
+  background: var(--obsidian-border, #1E2B5C);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--obsidian-border-strong, #2E3D60);
+  background: var(--obsidian-border-strong, #2E3F80);
 }
 
 .no-scrollbar::-webkit-scrollbar {

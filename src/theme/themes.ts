@@ -7,11 +7,11 @@
  */
 
 export type ThemeTemplateId = 
+  | 'royal_indigo'       // Stripe / Revolut Ultra — Royal Indigo Sovereign & Electric Emerald
   | 'apex_obsidian'      // Linear / Ramp — Cyber Emerald & Hyper Iris
   | 'titanium_monolith'  // Apple Vision Pro / Raycast — Azure Ice & Gold
   | 'solstice_champagne' // Mercury / Arc — Luxe Light Alabaster & Royal Emerald
-  | 'terminal_matrix'    // Bloomberg / Palantir — Phosphor Amber & Matrix Green
-  | 'midnight_nebula';   // Stripe / Vercel — Velvet Cosmic Violet & Cyan
+  | 'terminal_matrix';   // Bloomberg / Palantir — Phosphor Amber & Matrix Green
 
 export interface ThemeTemplate {
   id: ThemeTemplateId;
@@ -66,13 +66,66 @@ export interface ThemeTemplate {
 }
 
 export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
-  // ── 1. APEX OBSIDIAN (Linear / Ramp) ───────────────────────────────────────
+  // ── 1. ROYAL INDIGO SOVEREIGN (Stripe Atlas / Revolut Ultra) ───────────────
+  royal_indigo: {
+    id: 'royal_indigo',
+    name: 'Royal Indigo Sovereign',
+    tagline: 'Deep Velvet Midnight & Royal Indigo Blue',
+    inspiration: 'Stripe Atlas • Revolut Ultra • Linear Dark',
+    badge: 'ROYAL PRO',
+    icon: '👑',
+    swatches: {
+      primary: '#6366F1',
+      ai: '#818CF8',
+      spend: '#FF4757',
+      vault: '#FFB800',
+      telemetry: '#00E5FF',
+      bgDark: '#050814',
+      bgLight: '#F4F6FF',
+    },
+    dark: {
+      canvas: '#050814',
+      card: '#0A0F26',
+      cardElevated: '#101738',
+      well: '#141C42',
+      border: '#1E2B5C',
+      borderStrong: '#2E3F80',
+      textPrimary: '#F8FAFC',
+      textSecondary: '#94A3B8',
+      textMuted: '#64748B',
+      primaryHero: '#6366F1',
+      aiHero: '#818CF8',
+      spendHero: '#FF4757',
+      vaultHero: '#FFB800',
+      telemetryHero: '#00E5FF',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.22), transparent 70%)',
+    },
+    light: {
+      canvas: '#F4F6FF',
+      card: '#FFFFFF',
+      cardElevated: '#FFFFFF',
+      well: '#EAEFFE',
+      border: '#D4DCFA',
+      borderStrong: '#A8BAF4',
+      textPrimary: '#0A0F26',
+      textSecondary: '#475569',
+      textMuted: '#64748B',
+      primaryHero: '#4338CA',
+      aiHero: '#4F46E5',
+      spendHero: '#E11D48',
+      vaultHero: '#D97706',
+      telemetryHero: '#0284C7',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(79, 70, 229, 0.08), transparent 70%)',
+    },
+  },
+
+  // ── 2. APEX OBSIDIAN (Linear / Ramp) ───────────────────────────────────────
   apex_obsidian: {
     id: 'apex_obsidian',
     name: 'Apex Obsidian',
     tagline: 'Cyber Emerald & Hyper Iris',
     inspiration: 'Linear • Ramp • Raycast Pro',
-    badge: 'DEFAULT PRO',
+    badge: 'CYBER PRO',
     icon: '⚡',
     swatches: {
       primary: '#00F5A0',
@@ -119,7 +172,7 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
     },
   },
 
-  // ── 2. TITANIUM MONOLITH (Apple Vision Pro / Spatial UI) ───────────────────
+  // ── 3. TITANIUM MONOLITH (Apple Vision Pro / Spatial UI) ───────────────────
   titanium_monolith: {
     id: 'titanium_monolith',
     name: 'Titanium Monolith',
@@ -172,7 +225,7 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
     },
   },
 
-  // ── 3. SOLSTICE CHAMPAGNE (Mercury / Arc Minimalist) ───────────────────────
+  // ── 4. SOLSTICE CHAMPAGNE (Mercury / Arc Minimalist) ───────────────────────
   solstice_champagne: {
     id: 'solstice_champagne',
     name: 'Solstice Champagne',
@@ -225,7 +278,7 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
     },
   },
 
-  // ── 4. HIGH-FREQUENCY TERMINAL (Bloomberg / Palantir) ──────────────────────
+  // ── 5. HIGH-FREQUENCY TERMINAL (Bloomberg / Palantir) ──────────────────────
   terminal_matrix: {
     id: 'terminal_matrix',
     name: 'High-Frequency Terminal',
@@ -248,10 +301,10 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
       cardElevated: '#111822',
       well: '#17212E',
       border: '#202E40',
-      borderStrong: '#324763',
-      textPrimary: '#FAFAFA',
-      textSecondary: '#A1A1AA',
-      textMuted: '#71717A',
+      borderStrong: '#324762',
+      textPrimary: '#E8F0F8',
+      textSecondary: '#8CA0B8',
+      textMuted: '#526880',
       primaryHero: '#FFB800',
       aiHero: '#00FF88',
       spendHero: '#FF3344',
@@ -263,76 +316,23 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
       canvas: '#F4F5F7',
       card: '#FFFFFF',
       cardElevated: '#FFFFFF',
-      well: '#E9ECEF',
-      border: '#D8DEE4',
-      borderStrong: '#B8C2CC',
-      textPrimary: '#0F172A',
-      textSecondary: '#475569',
-      textMuted: '#64748B',
-      primaryHero: '#D97706',
-      aiHero: '#059669',
-      spendHero: '#DC2626',
-      vaultHero: '#B45309',
-      telemetryHero: '#0284C7',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(217, 119, 6, 0.08), transparent 70%)',
-    },
-  },
-
-  // ── 5. MIDNIGHT NEBULA (Stripe / Vercel Galactic) ──────────────────────────
-  midnight_nebula: {
-    id: 'midnight_nebula',
-    name: 'Midnight Nebula',
-    tagline: 'Velvet Cosmic Violet & Cyan',
-    inspiration: 'Stripe Press • Vercel Ship',
-    badge: 'COSMIC',
-    icon: '🌌',
-    swatches: {
-      primary: '#A855F7',
-      ai: '#38BDF8',
-      spend: '#F43F5E',
-      vault: '#FBBF24',
-      telemetry: '#818CF8',
-      bgDark: '#080914',
-      bgLight: '#F7F6FB',
-    },
-    dark: {
-      canvas: '#080914',
-      card: '#0F1123',
-      cardElevated: '#171B35',
-      well: '#20254A',
-      border: '#2A3160',
-      borderStrong: '#414D94',
-      textPrimary: '#FAF5FF',
-      textSecondary: '#A8A29E',
-      textMuted: '#78716C',
-      primaryHero: '#A855F7',
-      aiHero: '#38BDF8',
-      spendHero: '#F43F5E',
-      vaultHero: '#FBBF24',
-      telemetryHero: '#818CF8',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.16), transparent 70%)',
-    },
-    light: {
-      canvas: '#F7F6FB',
-      card: '#FFFFFF',
-      cardElevated: '#FFFFFF',
-      well: '#EFEBF8',
-      border: '#DFD8F0',
-      borderStrong: '#BFB0E0',
-      textPrimary: '#1E1B4B',
-      textSecondary: '#475569',
-      textMuted: '#64748B',
-      primaryHero: '#7E22CE',
-      aiHero: '#0284C7',
-      spendHero: '#E11D48',
-      vaultHero: '#D97706',
-      telemetryHero: '#4F46E5',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(126, 34, 206, 0.08), transparent 70%)',
+      well: '#E6E9EE',
+      border: '#CCD3DD',
+      borderStrong: '#A0B0C4',
+      textPrimary: '#0C141E',
+      textSecondary: '#445468',
+      textMuted: '#68788C',
+      primaryHero: '#B88000',
+      aiHero: '#009944',
+      spendHero: '#D01020',
+      vaultHero: '#C07000',
+      telemetryHero: '#008899',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(184, 128, 0, 0.08), transparent 70%)',
     },
   },
 };
 
-export const DEFAULT_THEME_ID: ThemeTemplateId = 'apex_obsidian';
+export const DEFAULT_THEME_ID: ThemeTemplateId = 'royal_indigo';
 
 export function getActiveThemeId(): ThemeTemplateId {
   const saved = localStorage.getItem('bytfloww_theme_template');

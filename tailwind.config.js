@@ -84,18 +84,18 @@ export default {
           DEFAULT: 'var(--color-telemetry-500, #00B4E0)',
         },
 
-        // ── 6. VOID SURFACES (Apex Noir Backgrounds) ──────────────────
+        // ── 6. ROYAL INDIGO MIDNIGHT SURFACES ────────────────────────
         abyss: {
-          canvas:       'var(--obsidian-canvas,       #07080E)',
-          card:         'var(--obsidian-card,         #0D1018)',
-          elevated:     'var(--obsidian-elevated,     #131926)',
-          well:         'var(--obsidian-well,         #1A2030)',
-          border:       'var(--obsidian-border,       #1E2840)',
-          borderStrong: 'var(--obsidian-border-strong,#28364E)',
-          textPrimary:  'var(--text-primary,          #EEF2FF)',
-          textSecondary:'var(--text-secondary,        #8892B0)',
-          textMuted:    'var(--text-muted,            #50607A)',
-          DEFAULT:      'var(--obsidian-canvas,       #07080E)',
+          canvas:       'var(--obsidian-canvas,       #050814)',
+          card:         'var(--obsidian-card,         #0A0F26)',
+          elevated:     'var(--obsidian-elevated,     #101738)',
+          well:         'var(--obsidian-well,         #141C42)',
+          border:       'var(--obsidian-border,       #1E2B5C)',
+          borderStrong: 'var(--obsidian-border-strong,#2E3F80)',
+          textPrimary:  'var(--text-primary,          #F8FAFC)',
+          textSecondary:'var(--text-secondary,        #94A3B8)',
+          textMuted:    'var(--text-muted,            #64748B)',
+          DEFAULT:      'var(--obsidian-canvas,       #050814)',
         },
 
         // ── 7. APEX ICE LIGHT SURFACES ─────────────────────────────────
