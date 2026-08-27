@@ -1,6 +1,7 @@
 /**
- * TransactionExplorer — Full Master Transaction Ledger with Search, Filters, and Spend Calendar Analytical Workspace.
- * 100% Solid zero-gradient theme tokens.
+ * TransactionExplorer — Streamlined Master Transaction Ledger with Fast Search,
+ * Amount Range Filtering, Multi-Category Chips, Sortable Columns, and Calendar View.
+ * Zero-redundancy, high-impact SaaS design.
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -8,13 +9,12 @@ import { ClassificationTaxonomy, LiveAnalyticsResult } from '../../engine/analyt
 import { CanonicalTransaction } from '../../types';
 import { MasterLedgerCalendar } from './MasterLedgerCalendar';
 import { BrandLogoBadge } from './BrandLogoBadge';
-import { Calendar as CalendarIcon, Filter, Search, ArrowUpRight, ArrowDownRight, X, Sparkles, AlertTriangle } from 'lucide-react';
+import { Calendar as CalendarIcon, Filter, Search, ArrowUpRight, ArrowDownRight, X, ArrowUpDown, ChevronDown } from 'lucide-react';
 
 interface TransactionExplorerProps {
   liveResult: LiveAnalyticsResult | null;
   isDark: boolean;
   initialDate?: string | null;
-  initialTab?: 'ALL' | 'CALENDAR' | 'TRANSFERS' | 'LOANS' | 'RECURRING' | 'REVIEW';
   onDateChange?: (date: string | null) => void;
 }
 
@@ -46,20 +46,16 @@ const TAXONOMY_LABELS: Partial<Record<ClassificationTaxonomy, string>> = {
   UNKNOWN: '❓ Unknown',
 };
 
-const CONFIDENCE_COLORS = {
-  HIGH: 'text-jade-500',
-  MEDIUM: 'text-ochre-500',
-  LOW: 'text-pulse-500',
-};
+type SortField = 'date' | 'amount' | 'entity' | 'category' | 'balance';
+type SortOrder = 'asc' | 'desc';
 
 export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({ 
   liveResult, 
   isDark,
   initialDate = null,
-  initialTab = 'ALL',
   onDateChange
 }) => {
-  const [activeTab, setActiveTab] = useState<'ALL' | 'CALENDAR' | 'TRANSFERS' | 'LOANS' | 'RECURRING' | 'REVIEW'>(initialTab);
+  const [viewMode, setViewMode] = useState<'TABLE' | 'CALENDAR'>('TABLE');
   const [search, setSearch] = useState('');
   const [dirFilter, setDirFilter] = useState<'ALL' | 'CREDIT' | 'DEBIT'>('ALL');
   const [taxFilter, setTaxFilter] = useState<string>('ALL');
@@ -68,6 +64,8 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
   const [selectedTx, setSelectedTx] = useState<CanonicalTransaction | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate);
   const [visibleCount, setVisibleCount] = useState(50);
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   // Sync initialDate prop if changed externally
   useEffect(() => {
@@ -83,19 +81,18 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
 
   const txns = liveResult?.transactions || [];
 
-  const filtered = useMemo(() => {
-    return txns.filter(t => {
-      // Tab filter
-      if (activeTab === 'TRANSFERS') {
-        if (t.category !== 'PERSONAL_TRANSFER' && t.category !== 'UPI_TRANSFER_UNKNOWN' && t.financialType !== 'TRANSFER' && t.category !== 'SELF_TRANSFER') return false;
-      } else if (activeTab === 'LOANS') {
-        if (t.category !== 'LOAN_REPAYMENT' && t.category !== 'LOAN_CREDIT' && t.financialType !== 'DEBT_REPAYMENT' && t.financialType !== 'DEBT_DISBURSEMENT') return false;
-      } else if (activeTab === 'RECURRING') {
-        if (t.category !== 'SUBSCRIPTION' && t.category !== 'BILL_UTILITY' && !t.isRecurring) return false;
-      } else if (activeTab === 'REVIEW') {
-        if (t.amount < 15000 && t.categoryConfidence >= 0.7 && !t.isAnomaly) return false;
-      }
+  // Compute available category counts dynamically
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const t of txns) {
+      counts[t.category] = (counts[t.category] || 0) + 1;
+    }
+    return counts;
+  }, [txns]);
 
+  // Filtered & Sorted Transactions
+  const filtered = useMemo(() => {
+    const list = txns.filter(t => {
       const matchSearch = !search || 
         (t.rawNarration || t.narration || '').toLowerCase().includes(search.toLowerCase()) || 
         (t.entityName || '').toLowerCase().includes(search.toLowerCase()) || 
@@ -109,15 +106,32 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
       const matchDate = !selectedDate || t.transactionDate === selectedDate;
       return matchSearch && matchDir && matchTax && matchMin && matchMax && matchDate;
     });
-  }, [txns, search, dirFilter, taxFilter, minAmt, maxAmt, activeTab, selectedDate]);
 
-  // Dynamic Live Summary Metrics of Filtered Ledger
+    list.sort((a, b) => {
+      let comp = 0;
+      if (sortField === 'date') {
+        comp = a.transactionDate.localeCompare(b.transactionDate);
+      } else if (sortField === 'amount') {
+        comp = a.amount - b.amount;
+      } else if (sortField === 'entity') {
+        comp = (a.entityName || '').localeCompare(b.entityName || '');
+      } else if (sortField === 'category') {
+        comp = (a.category || '').localeCompare(b.category || '');
+      } else if (sortField === 'balance') {
+        comp = (a.balanceAfter || 0) - (b.balanceAfter || 0);
+      }
+      return sortOrder === 'desc' ? -comp : comp;
+    });
+
+    return list;
+  }, [txns, search, dirFilter, taxFilter, minAmt, maxAmt, selectedDate, sortField, sortOrder]);
+
+  // Live Summary of Filtered Transactions
   const summary = useMemo(() => {
     let creditSum = 0;
     let debitSum = 0;
     let creditCount = 0;
     let debitCount = 0;
-    let maxAmount = 0;
 
     for (const t of filtered) {
       if (t.credit && t.credit > 0) {
@@ -128,14 +142,9 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
         debitSum += t.debit;
         debitCount++;
       }
-      if (t.amount > maxAmount) {
-        maxAmount = t.amount;
-      }
     }
 
     const netFlow = creditSum - debitSum;
-    const avgTxn = filtered.length > 0 ? (creditSum + debitSum) / filtered.length : 0;
-
     return {
       creditSum,
       debitSum,
@@ -143,10 +152,17 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
       creditCount,
       debitCount,
       totalCount: filtered.length,
-      maxAmount,
-      avgTxn,
     };
   }, [filtered]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
 
   const visible = filtered.slice(0, visibleCount);
 
@@ -164,41 +180,186 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
 
   return (
     <div className="space-y-4 font-sans animate-fade-in">
-      {/* Master Ledger Sub-Navigation Tabs Ornament */}
-      <div className="spatial-card p-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-        {[
-          { id: 'ALL', label: '📋 All Transactions', count: txns.length },
-          { id: 'CALENDAR', label: '📅 Spend Calendar', count: undefined, highlight: true },
-          { id: 'TRANSFERS', label: '👥 Transfers', count: txns.filter(t => t.category === 'PERSONAL_TRANSFER' || t.category === 'UPI_TRANSFER_UNKNOWN' || t.financialType === 'TRANSFER').length },
-          { id: 'LOANS', label: '🏦 Loans & EMIs', count: txns.filter(t => t.category === 'LOAN_REPAYMENT' || t.category === 'LOAN_CREDIT').length },
-          { id: 'RECURRING', label: '🔄 Recurring & Bills', count: txns.filter(t => t.category === 'SUBSCRIPTION' || t.category === 'BILL_UTILITY' || t.isRecurring).length },
-          { id: 'REVIEW', label: '🚨 Review & Anomalies', count: txns.filter(t => t.amount >= 15000 || t.categoryConfidence < 0.7 || t.isAnomaly).length },
-        ].map((tab) => (
+      {/* ── 1. UNIFIED COMMAND & VIEW CONTROLLER ────────────────────────── */}
+      <div className="spatial-card p-4 space-y-4 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
+              <span>📑</span>
+              <span>Master Transaction Ledger</span>
+              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-[#00884E] dark:text-[#1AE893] border border-emerald-500/20">
+                {filtered.length.toLocaleString('en-IN')} / {txns.length.toLocaleString('en-IN')} Txns
+              </span>
+            </h2>
+            <p className="text-xs text-abyss-textMuted mt-0.5">
+              Deterministic search, direction, and amount range filtering across all reconciled statements.
+            </p>
+          </div>
+
+          {/* View Mode Toggle: Table vs Calendar */}
+          <div className="flex items-center p-1 rounded-xl bg-abyss-well border border-abyss-border gap-1 shrink-0 self-start md:self-auto">
+            <button
+              onClick={() => setViewMode('TABLE')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                viewMode === 'TABLE'
+                  ? 'btn-emerald-capsule text-white shadow-sm'
+                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
+              }`}
+            >
+              <span>📋</span>
+              <span>Table View</span>
+            </button>
+            <button
+              onClick={() => setViewMode('CALENDAR')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                viewMode === 'CALENDAR'
+                  ? 'btn-emerald-capsule text-white shadow-sm'
+                  : 'text-abyss-textSecondary hover:text-abyss-textPrimary'
+              }`}
+            >
+              <span>📅</span>
+              <span>Calendar View</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ── 2. SEARCH & FILTER CONTROLS ──────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 pt-2 border-t border-abyss-border">
+          {/* Narration & Entity Search (Col 6) */}
+          <div className="md:col-span-5 relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-abyss-textMuted pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search narration, entity, UTR, UPI handle..."
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted/60 outline-none focus:border-emerald-500 transition"
+            />
+            {search && (
+              <button 
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-abyss-textMuted hover:text-abyss-textPrimary text-xs"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Direction Toggle (Col 3) */}
+          <div className="md:col-span-3 flex items-center p-0.5 rounded-xl bg-abyss-well border border-abyss-border">
+            {(['ALL', 'CREDIT', 'DEBIT'] as const).map(dir => (
+              <button
+                key={dir}
+                onClick={() => setDirFilter(dir)}
+                className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold transition ${
+                  dirFilter === dir
+                    ? dir === 'CREDIT' 
+                      ? 'bg-emerald-500 text-white shadow-xs'
+                      : dir === 'DEBIT'
+                      ? 'bg-rose-500 text-white shadow-xs'
+                      : 'btn-emerald-capsule text-white shadow-xs'
+                    : 'text-abyss-textMuted hover:text-abyss-textPrimary'
+                }`}
+              >
+                {dir === 'ALL' ? 'All' : dir === 'CREDIT' ? 'Credits ↓' : 'Debits ↑'}
+              </button>
+            ))}
+          </div>
+
+          {/* Amount Range Filter (Col 4) */}
+          <div className="md:col-span-4 flex items-center gap-1.5">
+            <input
+              type="number"
+              value={minAmt}
+              onChange={(e) => setMinAmt(e.target.value)}
+              placeholder="Min ₹"
+              className="w-1/2 px-3 py-2 text-xs rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted/60 outline-none focus:border-emerald-500 font-mono transition"
+            />
+            <span className="text-abyss-textMuted text-xs font-bold">–</span>
+            <input
+              type="number"
+              value={maxAmt}
+              onChange={(e) => setMaxAmt(e.target.value)}
+              placeholder="Max ₹"
+              className="w-1/2 px-3 py-2 text-xs rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted/60 outline-none focus:border-emerald-500 font-mono transition"
+            />
+            {(minAmt || maxAmt) && (
+              <button
+                onClick={() => { setMinAmt(''); setMaxAmt(''); }}
+                className="p-2 rounded-xl bg-abyss-well border border-abyss-border text-abyss-textMuted hover:text-rose-500 text-xs"
+                title="Clear Amount Filter"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── 3. HORIZONTAL CATEGORY FILTER CHIPS ───────────────────────── */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-abyss-border/60">
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'spatial-btn-selected'
-                : 'spatial-btn text-abyss-textSecondary'
+            onClick={() => setTaxFilter('ALL')}
+            className={`px-3 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
+              taxFilter === 'ALL'
+                ? 'btn-emerald-capsule text-white shadow-xs'
+                : 'bg-abyss-well text-abyss-textSecondary hover:text-abyss-textPrimary border border-abyss-border'
             }`}
           >
-            <span>{tab.label}</span>
-            {tab.count !== undefined && (
-              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
-                activeTab === tab.id 
-                  ? 'bg-black/15 text-black' 
-                  : 'bg-abyss-well text-abyss-textMuted'
-              }`}>
-                {tab.count.toLocaleString('en-IN')}
-              </span>
-            )}
+            <span>All Categories</span>
+            <span className="text-[10px] font-mono opacity-80">({txns.length})</span>
           </button>
-        ))}
+
+          {Object.entries(categoryCounts).map(([catKey, count]) => {
+            const label = TAXONOMY_LABELS[catKey as ClassificationTaxonomy] || catKey;
+            const isSelected = taxFilter === catKey;
+            return (
+              <button
+                key={catKey}
+                onClick={() => setTaxFilter(isSelected ? 'ALL' : catKey)}
+                className={`px-3 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'btn-emerald-capsule text-white shadow-xs'
+                    : 'bg-abyss-well text-abyss-textSecondary hover:text-abyss-textPrimary border border-abyss-border'
+                }`}
+              >
+                <span>{label}</span>
+                <span className="text-[10px] font-mono opacity-75">({count})</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── 4. FILTERED SUMMARY METRIC BAR ───────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-abyss-border text-center">
+          <div className="p-2 rounded-xl bg-abyss-well/70 border border-abyss-border">
+            <div className="text-[10px] uppercase font-bold text-abyss-textMuted">Filtered Inflow</div>
+            <div className="text-sm font-bold font-mono text-[#00884E] dark:text-[#1AE893]">
+              ₹{summary.creditSum.toLocaleString('en-IN')} <span className="text-[10px] text-abyss-textMuted font-normal">({summary.creditCount})</span>
+            </div>
+          </div>
+          <div className="p-2 rounded-xl bg-abyss-well/70 border border-abyss-border">
+            <div className="text-[10px] uppercase font-bold text-abyss-textMuted">Filtered Outflow</div>
+            <div className="text-sm font-bold font-mono text-rose-500">
+              ₹{summary.debitSum.toLocaleString('en-IN')} <span className="text-[10px] text-abyss-textMuted font-normal">({summary.debitCount})</span>
+            </div>
+          </div>
+          <div className="p-2 rounded-xl bg-abyss-well/70 border border-abyss-border">
+            <div className="text-[10px] uppercase font-bold text-abyss-textMuted">Net Cash Flow</div>
+            <div className={`text-sm font-bold font-mono ${summary.netFlow >= 0 ? 'text-[#00884E] dark:text-[#1AE893]' : 'text-rose-500'}`}>
+              {summary.netFlow >= 0 ? '+' : '-'}₹{Math.abs(summary.netFlow).toLocaleString('en-IN')}
+            </div>
+          </div>
+          <div className="p-2 rounded-xl bg-abyss-well/70 border border-abyss-border">
+            <div className="text-[10px] uppercase font-bold text-abyss-textMuted">Active Filter Span</div>
+            <div className="text-xs font-bold text-abyss-textPrimary font-mono mt-0.5">
+              {filtered.length} of {txns.length} ({((filtered.length / Math.max(1, txns.length)) * 100).toFixed(0)}%)
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Spend Calendar Analytical Workspace Tab */}
-      {activeTab === 'CALENDAR' && (
+      {/* ── 5. SPEND CALENDAR VIEW MODE ────────────────────────────────── */}
+      {viewMode === 'CALENDAR' && (
         <MasterLedgerCalendar
           transactions={txns}
           selectedDate={selectedDate}
@@ -206,7 +367,7 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
           isDark={isDark}
           onFilterLedgerToDate={(date) => {
             handleSelectDate(date);
-            setActiveTab('ALL');
+            setViewMode('TABLE');
           }}
           onCategoryFilterChange={(cat) => {
             if (cat === 'ALL') setTaxFilter('ALL');
@@ -216,327 +377,255 @@ export const TransactionExplorer: React.FC<TransactionExplorerProps> = ({
         />
       )}
 
-      {/* Main Ledger Table View */}
-      {activeTab !== 'CALENDAR' && (
-        <div className="space-y-4">
-          {/* Active Date Filter Banner if filtered from calendar */}
+      {/* ── 6. VIRTUALIZED / SORTABLE TRANSACTION TABLE VIEW ──────────── */}
+      {viewMode === 'TABLE' && (
+        <div className="spatial-card overflow-hidden">
+          {/* Active Date Banner */}
           {selectedDate && (
-            <div className="p-4 rounded-[16px] bg-jade-500/15 border border-jade-500/30 flex items-center justify-between gap-3 text-abyss-textPrimary">
-              <div className="flex items-center gap-2">
-                <span className="text-base">📅</span>
-                <div>
-                  <span className="text-xs font-bold font-mono text-jade-500">Filtered to Date: {selectedDate}</span>
-                  <span className="text-xs text-abyss-textMuted ml-2">({filtered.length} transactions found)</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setActiveTab('CALENDAR')}
-                  className="spatial-btn px-3 py-1 text-xs font-semibold text-abyss-textPrimary"
-                >
-                  View in Calendar
-                </button>
-                <button
-                  onClick={() => handleSelectDate(null)}
-                  className="spatial-btn px-3 py-1 text-xs font-semibold text-pulse-500 flex items-center gap-1"
-                >
-                  <X className="w-3.5 h-3.5" />
-                  <span>Clear Filter</span>
-                </button>
-              </div>
+            <div className="p-3 bg-emerald-500/10 border-b border-emerald-500/20 flex items-center justify-between text-xs">
+              <span className="font-bold text-[#00884E] dark:text-[#1AE893]">
+                📅 Filtered to Date: {selectedDate} ({filtered.length} txns)
+              </span>
+              <button
+                onClick={() => handleSelectDate(null)}
+                className="text-xs font-bold text-rose-500 hover:underline flex items-center gap-1"
+              >
+                <X className="w-3 h-3" /> Clear Date Filter
+              </button>
             </div>
           )}
 
-          {/* Header & Main Controls */}
-          <div className="spatial-card p-6 space-y-4">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div>
-                <h2 className="text-base font-bold flex items-center gap-2 text-abyss-textPrimary">
-                  <span>📑</span>
-                  <span>Master Transaction Ledger</span>
-                </h2>
-                <p className="text-xs text-abyss-textMuted mt-0.5">
-                  {txns.length.toLocaleString('en-IN')} total transactions • Showing {Math.min(visibleCount, filtered.length)} of {filtered.length.toLocaleString('en-IN')} filtered
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {(['ALL', 'CREDIT', 'DEBIT'] as const).map(d => (
-                  <button
-                    key={d}
-                    onClick={() => setDirFilter(d)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
-                      dirFilter === d
-                        ? d === 'CREDIT' 
-                          ? 'bg-jade-500/20 text-jade-500 border border-jade-500/30 font-bold'
-                          : d === 'DEBIT' 
-                          ? 'bg-pulse-500/20 text-pulse-500 border border-pulse-500/30 font-bold'
-                          : 'spatial-btn-selected'
-                        : 'spatial-btn text-abyss-textMuted'
-                    }`}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-abyss-border bg-abyss-well/80 text-[10px] font-bold uppercase tracking-wider text-abyss-textMuted select-none">
+                  <th 
+                    onClick={() => handleSort('date')}
+                    className="py-3 px-4 cursor-pointer hover:text-abyss-textPrimary"
                   >
-                    {d}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Dynamic Summary Metric Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
-                <div className="text-[10px] font-bold uppercase text-jade-500 flex items-center justify-between">
-                  <span>Total Inflow</span>
-                  <span className="text-[9px] font-mono text-abyss-textMuted">{summary.creditCount} txns</span>
-                </div>
-                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-jade-500">
-                  ₹{summary.creditSum.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                </div>
-                <div className="text-[10px] text-abyss-textMuted mt-0.5">
-                  {summary.totalCount > 0 ? `${((summary.creditCount / summary.totalCount) * 100).toFixed(1)}% of volume` : '0%'}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
-                <div className="text-[10px] font-bold uppercase text-pulse-500 flex items-center justify-between">
-                  <span>Total Outflow</span>
-                  <span className="text-[9px] font-mono text-abyss-textMuted">{summary.debitCount} txns</span>
-                </div>
-                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-pulse-500">
-                  ₹{summary.debitSum.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                </div>
-                <div className="text-[10px] text-abyss-textMuted mt-0.5">
-                  {summary.totalCount > 0 ? `${((summary.debitCount / summary.totalCount) * 100).toFixed(1)}% of volume` : '0%'}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
-                <div className="text-[10px] font-bold uppercase text-abyss-textMuted flex items-center justify-between">
-                  <span>Net Cash Flow</span>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full ${summary.netFlow >= 0 ? 'bg-jade-500/20 text-jade-500' : 'bg-pulse-500/20 text-pulse-500'}`}>
-                    {summary.netFlow >= 0 ? 'SURPLUS' : 'DEFICIT'}
-                  </span>
-                </div>
-                <div className={`text-base sm:text-lg font-bold font-mono mt-1 ${summary.netFlow >= 0 ? 'text-jade-500' : 'text-pulse-500'}`}>
-                  {summary.netFlow >= 0 ? '+' : ''}₹{summary.netFlow.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                </div>
-                <div className="text-[10px] text-abyss-textMuted mt-0.5">Inflow minus Outflow</div>
-              </div>
-
-              <div className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border">
-                <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Filtered Ledger</div>
-                <div className="text-base sm:text-lg font-bold font-mono mt-1 text-telemetry-500">
-                  {summary.totalCount.toLocaleString('en-IN')} <span className="text-xs font-normal text-abyss-textMuted">/ {txns.length}</span>
-                </div>
-                <div className="text-[10px] text-abyss-textMuted mt-0.5">
-                  Avg: ₹{Math.round(summary.avgTxn).toLocaleString('en-IN')}
-                </div>
-              </div>
-            </div>
-
-            {/* Search + Amount Filters */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <div className="col-span-2">
-                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Search narration / entity / ref no</div>
-                <input
-                  className="px-4 py-2.5 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none w-full focus:border-jade-500 transition"
-                  placeholder="Search EPFO, Swiggy, Salary, UTR, Ref No..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Min Amount (₹)</div>
-                <input
-                  className="px-4 py-2.5 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none w-full focus:border-jade-500 transition"
-                  placeholder="0"
-                  value={minAmt}
-                  onChange={e => setMinAmt(e.target.value)}
-                  type="number"
-                />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Max Amount (₹)</div>
-                <input
-                  className="px-4 py-2.5 rounded-full text-xs bg-abyss-well border border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted outline-none w-full focus:border-jade-500 transition"
-                  placeholder="Any"
-                  value={maxAmt}
-                  onChange={e => setMaxAmt(e.target.value)}
-                  type="number"
-                />
-              </div>
-            </div>
-
-            {/* Category Filter Pills */}
-            <div className="flex gap-1.5 flex-wrap pt-1">
-              <button
-                onClick={() => setTaxFilter('ALL')}
-                className={`px-3 py-1 rounded-full text-[10px] font-semibold transition border ${
-                  taxFilter === 'ALL'
-                    ? 'spatial-btn-selected'
-                    : 'spatial-btn text-abyss-textMuted'
-                }`}
-              >
-                All Categories ({txns.length})
-              </button>
-              {Object.entries(TAXONOMY_LABELS).map(([tax, label]) => {
-                const count = txns.filter(t => t.category === tax).length;
-                if (count === 0 && taxFilter !== tax) return null;
-                return (
-                  <button
-                    key={tax}
-                    onClick={() => setTaxFilter(tax === taxFilter ? 'ALL' : tax)}
-                    className={`px-3 py-1 rounded-full text-[10px] font-semibold transition border ${
-                      taxFilter === tax
-                        ? 'spatial-btn-selected'
-                        : 'spatial-btn text-abyss-textMuted'
-                    }`}
+                    <div className="flex items-center gap-1">
+                      <span>Date</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('entity')}
+                    className="py-3 px-4 cursor-pointer hover:text-abyss-textPrimary"
                   >
-                    {label} ({count})
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                    <div className="flex items-center gap-1">
+                      <span>Narration & Counterparty</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('category')}
+                    className="py-3 px-4 cursor-pointer hover:text-abyss-textPrimary"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>Category</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('amount')}
+                    className="py-3 px-4 text-right cursor-pointer hover:text-abyss-textPrimary"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Debit</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('amount')}
+                    className="py-3 px-4 text-right cursor-pointer hover:text-abyss-textPrimary"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Credit</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('balance')}
+                    className="py-3 px-4 text-right cursor-pointer hover:text-abyss-textPrimary"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Running Bal</span>
+                      <ArrowUpDown className="w-3 h-3 opacity-60" />
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-abyss-border">
+                {visible.map((tx) => {
+                  const isDebit = tx.direction === 'DEBIT';
+                  const catLabel = TAXONOMY_LABELS[tx.category as ClassificationTaxonomy] || tx.category;
 
-          {/* Transaction Table */}
-          <div className="bg-abyss-well border border-abyss-border rounded-[16px] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[700px] text-left text-xs border-collapse">
-                <thead className="bg-abyss-card text-abyss-textMuted text-[10px] font-bold uppercase tracking-wider">
-                  <tr className="border-b border-abyss-border">
-                    <th className="p-3.5">Date</th>
-                    <th className="p-3.5">Narration & Entity</th>
-                    <th className="p-3.5">Category</th>
-                    <th className="p-3.5 text-right">Debit</th>
-                    <th className="p-3.5 text-right">Credit</th>
-                    <th className="p-3.5 text-right">Balance</th>
-                    <th className="p-3.5 text-center">Confidence</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-abyss-border">
-                  {visible.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="p-8 text-center">
-                        <div className="text-xs text-abyss-textMuted">No transactions match your filters.</div>
+                  return (
+                    <tr 
+                      key={tx.id}
+                      onClick={() => setSelectedTx(tx)}
+                      className="hover:bg-abyss-well/60 transition-colors cursor-pointer group"
+                    >
+                      {/* Date */}
+                      <td className="py-3 px-4 font-mono whitespace-nowrap text-abyss-textSecondary text-[11px]">
+                        {tx.transactionDate}
                       </td>
-                    </tr>
-                  ) : (
-                    visible.map((tx) => (
-                      <tr
-                        key={tx.id}
-                        onClick={() => setSelectedTx(selectedTx?.id === tx.id ? null : tx)}
-                        className={`text-xs cursor-pointer transition-colors hover:bg-abyss-elevated ${
-                          selectedTx?.id === tx.id ? 'bg-abyss-elevated' : ''
-                        }`}
-                      >
-                        <td className="p-3.5 font-mono text-[10px] whitespace-nowrap text-abyss-textMuted">
-                          {tx.transactionDate}
-                        </td>
-                        <td className="p-3.5 max-w-[280px]">
-                          <div className="flex items-center gap-2.5">
-                            <BrandLogoBadge entityName={tx.entityName || tx.rawNarration} size="sm" />
-                            <div className="min-w-0">
-                              <div className="font-semibold text-abyss-textPrimary truncate">{tx.entityName}</div>
-                              <div className="text-[10px] text-abyss-textMuted truncate">{tx.rawNarration.substring(0, 60)}</div>
+
+                      {/* Narration & Entity */}
+                      <td className="py-3 px-4 max-w-sm">
+                        <div className="flex items-center gap-2">
+                          <BrandLogoBadge 
+                            entityName={tx.entityName || tx.narration || tx.rawNarration} 
+                            size="sm" 
+                          />
+                          <div className="min-w-0">
+                            <div className="font-bold text-abyss-textPrimary truncate group-hover:text-[#00884E] dark:group-hover:text-[#1AE893] transition">
+                              {tx.entityName || tx.narration}
+                            </div>
+                            <div className="text-[10px] text-abyss-textMuted font-mono truncate max-w-xs">
+                              {tx.referenceNumber ? `Ref: ${tx.referenceNumber}` : tx.rawNarration}
                             </div>
                           </div>
-                        </td>
-                        <td className="p-3.5">
-                          <span className="text-[10px] font-bold text-abyss-textSecondary">
-                            {TAXONOMY_LABELS[tx.category as ClassificationTaxonomy] || tx.category}
-                          </span>
-                        </td>
-                        <td className="p-3.5 text-right font-mono">
-                          {tx.debit ? (
-                            <span className="text-pulse-500 font-bold">₹{tx.debit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                          ) : <span className="text-abyss-textMuted/40">—</span>}
-                        </td>
-                        <td className="p-3.5 text-right font-mono">
-                          {tx.credit ? (
-                            <span className="text-jade-500 font-bold">₹{tx.credit.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
-                          ) : <span className="text-abyss-textMuted/40">—</span>}
-                        </td>
-                        <td className="p-3.5 text-right font-mono text-[10px] text-abyss-textMuted">
-                          {tx.balanceAfter != null ? `₹${tx.balanceAfter.toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
-                        </td>
-                        <td className="p-3.5 text-center">
-                          <span className={`text-[9px] font-bold ${CONFIDENCE_COLORS[(tx.categoryConfidence > 0.8 ? 'HIGH' : tx.categoryConfidence > 0.4 ? 'MEDIUM' : 'LOW')]}`}>
-                            {(tx.categoryConfidence > 0.8 ? 'HIGH' : tx.categoryConfidence > 0.4 ? 'MEDIUM' : 'LOW')}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </td>
 
-            {/* Load More */}
-            {visible.length < filtered.length && (
-              <div className="p-4 text-center border-t border-abyss-border">
-                <button
-                  onClick={() => setVisibleCount(v => v + 50)}
-                  className="spatial-btn px-6 py-2 rounded-full text-xs font-semibold text-abyss-textSecondary hover:text-abyss-textPrimary"
-                >
-                  Load 50 more ({filtered.length - visible.length} remaining)
-                </button>
-              </div>
-            )}
+                      {/* Category Badge */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-abyss-well border border-abyss-border text-abyss-textSecondary">
+                          {catLabel}
+                        </span>
+                      </td>
+
+                      {/* Debit */}
+                      <td className="py-3 px-4 text-right font-mono font-bold whitespace-nowrap">
+                        {isDebit ? (
+                          <span className="text-rose-500">
+                            -₹{tx.amount.toLocaleString('en-IN')}
+                          </span>
+                        ) : (
+                          <span className="text-abyss-textMuted/40">–</span>
+                        )}
+                      </td>
+
+                      {/* Credit */}
+                      <td className="py-3 px-4 text-right font-mono font-bold whitespace-nowrap">
+                        {!isDebit ? (
+                          <span className="text-[#00884E] dark:text-[#1AE893]">
+                            +₹{tx.amount.toLocaleString('en-IN')}
+                          </span>
+                        ) : (
+                          <span className="text-abyss-textMuted/40">–</span>
+                        )}
+                      </td>
+
+                      {/* Running Balance */}
+                      <td className="py-3 px-4 text-right font-mono text-abyss-textSecondary whitespace-nowrap">
+                        {tx.balanceAfter !== null && tx.balanceAfter !== undefined ? (
+                          `₹${tx.balanceAfter.toLocaleString('en-IN')}`
+                        ) : (
+                          <span className="text-abyss-textMuted/40">–</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {visible.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-abyss-textMuted">
+                      <div className="text-2xl mb-2">🔍</div>
+                      <div className="text-xs font-bold text-abyss-textPrimary">No transactions match your filter criteria</div>
+                      <div className="text-[11px] mt-1">Try broadening your search term or adjusting amount filters.</div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
 
-          {/* Detail Drawer */}
-          {selectedTx && (
-            <div className="spatial-card p-6 space-y-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <BrandLogoBadge entityName={selectedTx.entityName || selectedTx.rawNarration} size="md" />
-                  <div>
-                    <div className="text-sm font-bold text-abyss-textPrimary">{selectedTx.entityName}</div>
-                    <div className="text-[10px] mt-0.5 font-mono text-abyss-textMuted">{selectedTx.transactionDate} • {selectedTx.channel}</div>
-                  </div>
-                </div>
-                <div className={`text-xl font-bold font-mono ${selectedTx.direction === 'CREDIT' ? 'text-jade-500' : 'text-pulse-500'}`}>
-                  {selectedTx.direction === 'CREDIT' ? '+' : '-'}₹{selectedTx.amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {[
-                  { label: 'Classification', value: TAXONOMY_LABELS[selectedTx.category as ClassificationTaxonomy] || selectedTx.category },
-                  { label: 'Confidence', value: `${Math.round(selectedTx.categoryConfidence * 100)}%` },
-                  { label: 'Reason', value: selectedTx.subcategory },
-                  { label: 'Channel', value: selectedTx.channel },
-                  { label: 'Reference', value: selectedTx.referenceNumber || 'N/A' },
-                  { label: 'Balance After', value: selectedTx.balanceAfter != null ? `₹${selectedTx.balanceAfter.toLocaleString('en-IN')}` : 'N/A' },
-                ].map(({ label, value }) => (
-                  <div key={label} className="p-3 rounded-[12px] bg-abyss-well border border-abyss-border">
-                    <div className="text-[10px] font-bold uppercase text-abyss-textMuted">{label}</div>
-                    <div className="text-xs font-semibold mt-0.5 text-abyss-textPrimary">{value}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <div className="text-[10px] font-bold uppercase text-abyss-textMuted mb-1">Full Narration</div>
-                <div className="text-[11px] font-mono p-3 rounded-[12px] bg-abyss-canvas border border-abyss-border text-abyss-textSecondary">
-                  {selectedTx.rawNarration || selectedTx.narration}
-                </div>
-              </div>
-
-              {/* Semantic Flags */}
-              <div className="flex flex-wrap gap-1.5">
-                {(selectedTx.financialType === 'INCOME') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-jade-500/20 text-jade-500 border border-jade-500/30">INCOME</span>}
-                {(selectedTx.category === 'EPFO_PF') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-telemetry-500/20 text-telemetry-500 border border-telemetry-500/30">EPFO / PF WITHDRAWAL</span>}
-                {(selectedTx.financialType === 'DEBT_DISBURSEMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-ochre-500/20 text-ochre-500 border border-ochre-500/30">LOAN CREDIT (NOT INCOME)</span>}
-                {(selectedTx.financialType === 'DEBT_REPAYMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-pulse-500/20 text-pulse-500 border border-pulse-500/30">LOAN REPAYMENT</span>}
-                {(selectedTx.category === 'CREDIT_CARD_PAYMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">CC PAYMENT</span>}
-                {(selectedTx.category === 'WALLET_MOVEMENT') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">WALLET MOVEMENT</span>}
-                {(selectedTx.financialType === 'CASH_WITHDRAWAL') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">ATM CASH</span>}
-                {selectedTx.isEconomicExpense && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">LIFESTYLE SPEND</span>}
-                {(selectedTx.category === 'PERSONAL_TRANSFER') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-synapse-500/20 text-synapse-400 light:text-synapse-700 border border-synapse-500/30">PERSONAL TRANSFER</span>}
-                {(selectedTx.category === 'SELF_TRANSFER') && <span className="px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-abyss-well text-abyss-textPrimary border border-abyss-border">SELF TRANSFER</span>}
-              </div>
+          {/* Load More Pagination Footer */}
+          {visibleCount < filtered.length && (
+            <div className="p-4 border-t border-abyss-border flex items-center justify-between text-xs bg-abyss-well/40">
+              <span className="text-abyss-textMuted">
+                Showing {visibleCount} of {filtered.length.toLocaleString('en-IN')} transactions
+              </span>
+              <button
+                onClick={() => setVisibleCount(prev => prev + 50)}
+                className="btn-emerald-capsule px-4 py-1.5 rounded-xl font-bold shadow-sm"
+              >
+                Load Next 50 Transactions ↓
+              </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── TRANSACTION DETAIL POPUP MODAL ────────────────────────────── */}
+      {selectedTx && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-emergence"
+          onClick={() => setSelectedTx(null)}
+        >
+          <div 
+            className="vision-card w-full max-w-lg p-6 space-y-4 text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-abyss-border pb-3">
+              <div className="flex items-center gap-2.5">
+                <BrandLogoBadge entityName={selectedTx.entityName || selectedTx.narration || selectedTx.rawNarration} size="md" />
+                <div>
+                  <h3 className="text-sm font-bold text-abyss-textPrimary">{selectedTx.entityName || selectedTx.narration}</h3>
+                  <p className="text-[10px] font-mono text-abyss-textMuted">{selectedTx.transactionDate}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedTx(null)}
+                className="w-7 h-7 rounded-full bg-abyss-well text-abyss-textMuted flex items-center justify-center text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-abyss-well border border-abyss-border text-center space-y-1">
+              <span className="text-[10px] uppercase font-bold text-abyss-textMuted">Transaction Amount</span>
+              <div className={`text-2xl font-black font-mono ${selectedTx.direction === 'CREDIT' ? 'text-[#00884E] dark:text-[#1AE893]' : 'text-rose-500'}`}>
+                {selectedTx.direction === 'CREDIT' ? '+' : '-'}₹{selectedTx.amount.toLocaleString('en-IN')}
+              </div>
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-abyss-card border border-abyss-border text-abyss-textSecondary">
+                {TAXONOMY_LABELS[selectedTx.category as ClassificationTaxonomy] || selectedTx.category}
+              </span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between py-1.5 border-b border-abyss-border">
+                <span className="text-abyss-textMuted">Reference / UTR</span>
+                <span className="font-mono font-bold text-abyss-textPrimary">{selectedTx.referenceNumber || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-abyss-border">
+                <span className="text-abyss-textMuted">UPI Handle</span>
+                <span className="font-mono text-abyss-textPrimary">{selectedTx.upiHandle || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between py-1.5 border-b border-abyss-border">
+                <span className="text-abyss-textMuted">Running Balance</span>
+                <span className="font-mono font-bold text-abyss-textPrimary">
+                  {selectedTx.balanceAfter !== null && selectedTx.balanceAfter !== undefined ? `₹${selectedTx.balanceAfter.toLocaleString('en-IN')}` : 'N/A'}
+                </span>
+              </div>
+              <div className="pt-2">
+                <span className="text-abyss-textMuted block text-[10px] uppercase font-bold mb-1">Raw Bank Narration</span>
+                <p className="p-2.5 rounded-xl bg-abyss-well border border-abyss-border font-mono text-[11px] text-abyss-textSecondary break-words">
+                  {selectedTx.rawNarration}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedTx(null)}
+              className="w-full py-2.5 rounded-xl btn-emerald-capsule font-bold text-xs"
+            >
+              Close Details
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -514,184 +514,101 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         )}
       </div>
 
-      {/* ── UPLOADED FILES WORKSPACE & COVERAGE STATUS (WHEN DATA LOADED) ── */}
+      {/* ── UNIFIED EXECUTIVE FORENSICS COMMAND HEADER ─────────────────── */}
       {hasData && (
-        <div className="spatial-card p-6 space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-base text-telemetry-500">📑</span>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-abyss-textPrimary">Statement Source Files ({session.files.length})</h2>
-            </div>
-            <div className="flex items-center gap-2 text-xs flex-wrap">
-              <span className="px-3 py-1 rounded-full font-semibold border bg-abyss-well border-abyss-border text-abyss-textPrimary">
-                Coverage: {session.coverage.status.replace(/_/g, ' ')} ({session.coverage.continuityScore}% Quality)
-              </span>
-              <span className="px-3 py-1 rounded-full font-semibold border bg-jade-500/10 text-jade-500 border-jade-500/30">
-                {session.coverage.balanceContinuityStatus.replace(/_/g, ' ')}
-              </span>
-            </div>
-          </div>
-
-          {/* Files Badges Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {session.files.map((file, idx) => (
-              <div 
-                key={file.fileId || idx}
-                className="p-4 rounded-[14px] bg-abyss-well border border-abyss-border flex items-center justify-between gap-3"
-              >
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs">📄</span>
-                    <span className="text-xs font-bold text-abyss-textPrimary truncate max-w-[180px]">{file.fileName}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] text-abyss-textMuted">
-                    <span className="font-semibold text-abyss-textSecondary">{file.detectedBank}</span>
-                    <span>•</span>
-                    <span>{file.transactionCount} rows</span>
-                    {file.duplicateTransactionCount > 0 && (
-                      <span className="text-ochre-500 font-semibold">({file.duplicateTransactionCount} dupes)</span>
-                    )}
-                  </div>
-                  {file.statementStartDate && file.statementEndDate && (
-                    <div className="text-[9px] font-mono text-abyss-textMuted">
-                      {file.statementStartDate} → {file.statementEndDate}
-                    </div>
-                  )}
-                  {file.duplicateStatus === 'EXACT_FILE_DUPLICATE' && (
-                    <div className="text-[10px] font-bold text-ochre-500">⚠️ Exact Duplicate (Skipped)</div>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => handleRemoveFile(idx)}
-                  className="p-1.5 rounded-full border border-abyss-border hover:bg-abyss-elevated text-abyss-textMuted hover:text-abyss-textPrimary transition"
-                  title="Remove this statement"
-                >
-                  ✕
-                </button>
+        <div className="spatial-card p-3.5 sm:p-4 sticky top-0 z-30 shadow-md bg-abyss-card/95 backdrop-blur-xl border border-abyss-border flex flex-col md:flex-row md:items-center justify-between gap-3 animate-fade-in">
+          {/* Active Section Identity & Quick File Status Chip */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0">
+                {activeSection === 'OVERVIEW' ? '⚡' :
+                 activeSection === 'PEOPLE' ? '👥' :
+                 activeSection === 'INFLOW' ? '💼' :
+                 activeSection === 'TRANSACTIONS' || activeSection === 'LEDGER' ? '📋' :
+                 activeSection === 'LOANS' ? '🏦' :
+                 activeSection === 'DEBT_SIMULATOR' ? '🧮' :
+                 activeSection === 'SUBSCRIPTIONS_AUTOPSY' ? '🔄' :
+                 activeSection === 'RATIOS' ? '⚖️' :
+                 activeSection === 'MERCHANT_DNA' ? '🛍️' :
+                 activeSection === 'SPEND_CALENDAR' ? '📅' :
+                 activeSection === 'ANOMALY_RADAR' ? '🚨' :
+                 activeSection === 'AUDIT' ? '🛡️' : '🤖'}
               </div>
-            ))}
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-base sm:text-lg font-bold text-abyss-textPrimary font-fraunces leading-tight">
+                    {activeSection === 'OVERVIEW' ? 'Executive Summary' :
+                     activeSection === 'PEOPLE' ? 'P2P & UPI Transfers' :
+                     activeSection === 'INFLOW' ? 'Salary & Inflow Intelligence' :
+                     activeSection === 'TRANSACTIONS' || activeSection === 'LEDGER' ? 'Master Transaction Ledger' :
+                     activeSection === 'LOANS' ? 'Loans & NBFC Radar' :
+                     activeSection === 'DEBT_SIMULATOR' ? 'Debt Freedom Simulator' :
+                     activeSection === 'SUBSCRIPTIONS_AUTOPSY' ? 'Subscriptions Autopsy' :
+                     activeSection === 'RATIOS' ? '7 Financial Health Ratios' :
+                     activeSection === 'MERCHANT_DNA' ? 'Spend DNA & Brands' :
+                     activeSection === 'SPEND_CALENDAR' ? 'Ledger Calendar' :
+                     activeSection === 'ANOMALY_RADAR' ? 'Anomaly & Risk Radar' :
+                     activeSection === 'AUDIT' ? 'Reconciliation Audit Notes' : 'AI Forensic Copilot'}
+                  </h1>
+                  <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-[#1AE893] border border-emerald-500/20 uppercase tracking-wider">
+                    ● Reconciled
+                  </span>
+                </div>
+                <p className="text-[11px] text-abyss-textMuted font-medium truncate max-w-sm sm:max-w-md">
+                  {session.coverage.earliestDate} → {session.coverage.latestDate} ({session.coverage.totalMonths} months analyzed)
+                </p>
+              </div>
+            </div>
+
+            {/* Quick File Manager Modal Trigger Button */}
+            <button
+              onClick={() => setShowCoverageModal(true)}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-abyss-well hover:bg-abyss-elevated border border-abyss-border text-xs text-abyss-textSecondary hover:text-abyss-textPrimary transition"
+              title="Manage uploaded statement files"
+            >
+              <span>📁</span>
+              <span className="font-bold text-abyss-textPrimary truncate max-w-[130px]">
+                {session.files[0]?.detectedBank || 'Statement'} ({session.files.length} {session.files.length === 1 ? 'file' : 'files'})
+              </span>
+              <span className="text-abyss-textMuted">•</span>
+              <span className="font-mono text-[#00884E] dark:text-[#1AE893] font-bold">
+                {session.uniqueTransactions.length.toLocaleString('en-IN')} txns
+              </span>
+            </button>
           </div>
 
-          {/* Session Overview Stats Banner */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
-              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Unique Valid Txns</div>
-              <div className="text-lg font-bold font-mono mt-0.5 text-abyss-textPrimary">{session.uniqueTransactions.length.toLocaleString('en-IN')}</div>
-            </div>
-            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
-              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Dupes Excluded</div>
-              <div className="text-lg font-bold font-mono mt-0.5 text-ochre-500">{session.duplicateTransactionsRemoved}</div>
-            </div>
-            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
-              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Months Covered</div>
-              <div className="text-lg font-bold font-mono mt-0.5 text-telemetry-500">{session.coverage.totalMonths} mos</div>
-            </div>
-            <div className="p-3.5 rounded-[14px] bg-abyss-well border border-abyss-border text-center">
-              <div className="text-[10px] font-bold uppercase text-abyss-textMuted">Date Span</div>
-              <div className="text-xs font-bold font-mono mt-1 text-abyss-textPrimary truncate">{session.coverage.earliestDate} → {session.coverage.latestDate}</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── FILTER & TAB BAR ORNAMENT (STICKY) ────────────────────────────── */}
-      {hasData && (
-        <div className="spatial-card p-3 sm:p-4 space-y-3 sticky top-2 z-30 shadow-solid-md bg-abyss-card/95 backdrop-blur-xl">
-          {/* Top Bar: Category Group Pills + Period Selector & Export */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-            {/* Category Groups */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-              {[
-                { id: 'ALL', label: '✨ All Sections' },
-                { id: 'OVERVIEW', label: '⚡ Overview' },
-                { id: 'CASHFLOW', label: '👥 P2P & Cashflow' },
-                { id: 'DEBT', label: '🏦 Loans & Debt' },
-                { id: 'MERCHANTS', label: '🛍️ Merchants' },
-                { id: 'AUDITS', label: '🚨 Audits & AI' },
-              ].map((cg) => (
-                <button
-                  key={cg.id}
-                  onClick={() => setActiveTabCategory(cg.id)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
-                    activeTabCategory === cg.id
-                      ? 'btn-emerald-capsule text-white shadow-sm'
-                      : 'bg-abyss-well text-abyss-textSecondary hover:text-abyss-textPrimary border border-abyss-border'
-                  }`}
-                >
-                  {cg.label}
-                </button>
+          {/* Right Action Controls: Period Filter & Export Dossier */}
+          <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+            <span className="text-xs font-semibold text-abyss-textMuted hidden lg:inline">Period:</span>
+            <select
+              value={periodFilter}
+              onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
+              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary outline-none cursor-pointer"
+            >
+              <option value="ALL_TIME">All Data ({session.coverage.totalMonths} Mos)</option>
+              <option value="CURRENT_FY">Current FY</option>
+              {availableFYs.map(fy => (
+                <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`}>{fy}</option>
               ))}
-            </div>
+            </select>
 
-            {/* Dynamic Period Selector & Export Dossier Action Button */}
-            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-              <button
-                onClick={() => setShowReportModal(true)}
-                className="spatial-btn px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 border-amber-500/30 text-amber-600 dark:text-[#E0A83F]"
-                title="Open Boardroom PDF Dossier & Export CSV"
-              >
-                <span>📄</span>
-                <span>Export Dossier</span>
-              </button>
-              <span className="text-xs font-semibold text-abyss-textMuted hidden md:inline">Period:</span>
-              <select
-                value={periodFilter}
-                onChange={(e) => setPeriodFilter(e.target.value as StatementPeriodFilter)}
-                className="text-xs font-bold px-3 py-1.5 rounded-xl bg-abyss-well border border-abyss-border text-abyss-textPrimary outline-none cursor-pointer"
-              >
-                <option value="ALL_TIME" className="bg-abyss-card text-abyss-textPrimary">All Data ({session.coverage.totalMonths} Mos)</option>
-                <option value="CURRENT_FY" className="bg-abyss-card text-abyss-textPrimary">Current FY</option>
-                {availableFYs.map(fy => (
-                  <option key={fy} value={`FY_${fy.replace(/[^0-9]/g, '_')}`} className="bg-abyss-card text-abyss-textPrimary">{fy}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+            <button
+              onClick={() => setShowReportModal(true)}
+              className="spatial-btn px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 border-amber-500/30 text-amber-600 dark:text-[#E0A83F] hover:border-amber-400"
+              title="Open Boardroom PDF Dossier & Export CSV"
+            >
+              <span>📄</span>
+              <span className="hidden xs:inline">Export Dossier</span>
+            </button>
 
-          {/* Sub-Tabs Ribbon */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-abyss-border/60">
-            {[
-              { id: 'OVERVIEW', label: '📊 Overview', group: 'OVERVIEW' },
-              { id: 'PEOPLE', label: '👥 P2P & UPI Transfers', group: 'CASHFLOW' },
-              { id: 'INFLOW', label: '💰 Income & Salary', group: 'CASHFLOW' },
-              { id: 'DEBITS', label: '💳 14-Cat Debits', group: 'CASHFLOW' },
-              { id: 'LEDGER', label: '📋 Master Ledger', group: 'CASHFLOW' },
-              { id: 'WHERE_100_WENT', label: '🎯 Where ₹100 Went', group: 'OVERVIEW' },
-              { id: 'MONEY_FLOW', label: '🕸️ Money Flow', group: 'OVERVIEW' },
-              { id: 'PREDICTIVE_RUNWAY', label: '📉 Cash Runway', group: 'OVERVIEW' },
-              { id: 'FIRE_RUNWAY', label: '🎯 FIRE & Emergency', group: 'OVERVIEW' },
-              { id: 'LOANS', label: '🏦 Loan Forensics', group: 'DEBT' },
-              { id: 'DEBT_SIMULATOR', label: '🧮 Debt Freedom Simulator', group: 'DEBT' },
-              { id: 'SUBSCRIPTIONS_AUTOPSY', label: '🔄 Subscriptions Autopsy', group: 'DEBT' },
-              { id: 'RATIOS', label: '⚖️ 7 Health Ratios', group: 'DEBT' },
-              { id: 'MERCHANT_DNA', label: '🛍️ Merchant DNA', group: 'MERCHANTS' },
-              { id: 'VELOCITY', label: '📈 16-Mo Velocity', group: 'MERCHANTS' },
-              { id: 'VARIANCE_HEATMAP', label: '📊 MoM Variance', group: 'MERCHANTS' },
-              { id: 'SPEND_CALENDAR', label: '📅 Spend Calendar', group: 'MERCHANTS' },
-              { id: 'ANOMALY_RADAR', label: '🚨 Anomaly Radar', group: 'AUDITS' },
-              { id: 'AUDIT', label: '🛡️ Audit Notes', group: 'AUDITS' },
-              { id: 'AI_AGENT', label: '🤖 AI Copilot', group: 'AUDITS', badge: 'Gemini' },
-            ]
-              .filter((tab) => activeTabCategory === 'ALL' || tab.group === activeTabCategory)
-              .map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveSection(tab.id as StatementSection)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 ${
-                    activeSection === tab.id
-                      ? 'tab-pill-active'
-                      : 'bg-abyss-well/70 text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well border border-abyss-border/80'
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[8px] font-mono font-bold uppercase bg-amber-500/15 text-amber-600 dark:text-[#E0A83F]">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="btn-emerald-capsule px-3 py-1.5 text-xs rounded-xl font-bold transition flex items-center gap-1 shadow-sm"
+              title="Add more bank statement files"
+            >
+              <span>+</span>
+              <span>Add File</span>
+            </button>
           </div>
         </div>
       )}
@@ -868,7 +785,25 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         </div>
       )}
 
-            {/* ── 2B. SECTION: INTERACTIVE MONEY FLOW NETWORK ────────────────── */}
+      {/* ── 2A. SECTION: P2P & COUNTERPARTY TRANSFERS ──────────────────── */}
+      {hasData && activeSection === 'PEOPLE' && (
+        <P2PSocialGraphView
+          transactions={session.uniqueTransactions}
+          isDark={isDark}
+        />
+      )}
+
+      {/* ── 2B. SECTION: MASTER TRANSACTION LEDGER & CALENDAR ──────────── */}
+      {hasData && (activeSection === 'TRANSACTIONS' || activeSection === 'LEDGER') && (
+        <TransactionExplorer
+          liveResult={session.analytics}
+          isDark={isDark}
+          initialDate={calendarSelectedDate}
+          onDateChange={setCalendarSelectedDate}
+        />
+      )}
+
+      {/* ── 2C. SECTION: INTERACTIVE MONEY FLOW NETWORK ────────────────── */}
       {hasData && activeSection === 'MONEY_FLOW' && (
         <MoneyFlowGraph dataset={forensicData} isDark={isDark} />
       )}
@@ -1647,6 +1582,97 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
         </div>
       )}
+      {/* Statement Source Files & Coverage Manager Modal */}
+      {showCoverageModal && hasData && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-emergence"
+          onClick={() => setShowCoverageModal(false)}
+        >
+          <div 
+            className="vision-card w-full max-w-2xl p-6 space-y-4 text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-abyss-border pb-3">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">📑</span>
+                <div>
+                  <h3 className="text-sm font-bold text-abyss-textPrimary">Statement Source Files & Quality</h3>
+                  <p className="text-[10px] text-abyss-textMuted">Multi-account deduplicated coverage</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowCoverageModal(false)}
+                className="w-7 h-7 rounded-full bg-abyss-well text-abyss-textMuted flex items-center justify-center text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quality Badges */}
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              <span className="px-3 py-1 rounded-full font-bold bg-abyss-well border border-abyss-border text-abyss-textPrimary">
+                Coverage: {session.coverage.status.replace(/_/g, ' ')} ({session.coverage.continuityScore}% Quality)
+              </span>
+              <span className="px-3 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-700 dark:text-[#1AE893] border border-emerald-500/30">
+                {session.coverage.balanceContinuityStatus.replace(/_/g, ' ')}
+              </span>
+            </div>
+
+            {/* Files List */}
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {session.files.map((file, idx) => (
+                <div 
+                  key={file.fileId || idx}
+                  className="p-3.5 rounded-xl bg-abyss-well border border-abyss-border flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0 space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">📄</span>
+                      <span className="text-xs font-bold text-abyss-textPrimary truncate max-w-xs">{file.fileName}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] text-abyss-textMuted font-mono">
+                      <span className="font-semibold text-abyss-textSecondary">{file.detectedBank}</span>
+                      <span>•</span>
+                      <span>{file.transactionCount} rows</span>
+                      {file.duplicateTransactionCount > 0 && (
+                        <span className="text-amber-500 font-semibold">({file.duplicateTransactionCount} dupes)</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveFile(idx)}
+                    className="p-1.5 rounded-full border border-abyss-border hover:bg-rose-500/10 text-abyss-textMuted hover:text-rose-500 transition"
+                    title="Remove this statement"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-between pt-2 border-t border-abyss-border">
+              <button
+                onClick={handleClearAll}
+                className="spatial-btn px-4 py-2 text-xs font-bold text-rose-500 border-rose-500/30 hover:bg-rose-500/10"
+              >
+                Clear All Files 🗑️
+              </button>
+              <button
+                onClick={() => {
+                  setShowCoverageModal(false);
+                  fileInputRef.current?.click();
+                }}
+                className="btn-emerald-capsule px-4 py-2 rounded-xl text-xs font-bold shadow-sm"
+              >
+                + Add Another Statement File
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Forensic Report Export Modal */}
       {showReportModal && hasData && (
         <ForensicReportModal
