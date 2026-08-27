@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, UploadCloud, FileCode, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, UploadCloud, FileCode, AlertCircle } from 'lucide-react';
 
 interface XmlUploadModalProps {
   isDark: boolean;
@@ -8,7 +8,6 @@ interface XmlUploadModalProps {
 }
 
 export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
-  isDark,
   onClose,
   onXmlParsed,
 }) => {
@@ -52,7 +51,7 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm bg-emerald-500/15 text-[#00884E] dark:text-[#1AE893] border border-emerald-500/30">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm bg-emerald-500/15 text-emerald-600 dark:text-[#1AE893] border border-emerald-500/30">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
@@ -77,7 +76,7 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
         }`}>
           <input
             type="file"
-            accept=".xml,.txt"
+            accept=".xml,.txt,text/xml,application/xml"
             onChange={handleFileUpload}
             className="hidden"
           />
@@ -96,7 +95,7 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
         {/* Text Area for Direct Paste */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-abyss-textMuted">Or paste raw XML snippet:</span>
+            <span className="text-abyss-textMuted font-semibold">Or paste raw XML snippet:</span>
           </div>
           <textarea
             value={xmlContent}
@@ -105,18 +104,25 @@ export const XmlUploadModal: React.FC<XmlUploadModalProps> = ({
               setFileName('pasted_xml_snippet.xml');
             }}
             placeholder="<smses><sms address='AX-HDFCBK' date='...' body='...' /></smses>"
-            className="w-full h-24 p-2.5 rounded-xl border text-[11px] font-mono focus:outline-none focus:border-emerald-500 resize-none bg-abyss-well border-abyss-border text-abyss-textPrimary placeholder:text-abyss-textMuted"
-          ></textarea>
+            className="w-full h-28 p-3 rounded-xl bg-abyss-well border border-abyss-border font-mono text-[11px] text-abyss-textPrimary placeholder:text-abyss-textMuted/50 focus:outline-none focus:border-emerald-500 resize-none"
+          />
         </div>
 
-        {/* Action Button */}
-        <button
-          onClick={handleProcess}
-          className="btn-emerald-capsule w-full py-3 rounded-2xl font-black text-xs transition-all duration-150 active:scale-95 flex items-center justify-center gap-2 shadow-sm"
-        >
-          <CheckCircle2 className="w-4 h-4" />
-          <span>Execute Simulation Pipeline</span>
-        </button>
+        {/* Actions */}
+        <div className="flex items-center gap-2 pt-2">
+          <button
+            onClick={onClose}
+            className="spatial-btn flex-1 py-2.5 text-xs font-bold text-abyss-textSecondary"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleProcess}
+            className="btn-emerald-capsule flex-1 py-2.5 rounded-xl text-xs font-bold transition shadow-sm"
+          >
+            Parse & Reconcile
+          </button>
+        </div>
 
       </div>
     </div>

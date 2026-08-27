@@ -52,6 +52,7 @@ interface BankStatementModuleProps {
   onSwitchToSmsModule?: () => void;
   activeSection?: StatementSection;
   onSelectSection?: (section: StatementSection) => void;
+  onSessionUpdate?: (session: MultiStatementSession | null) => void;
 }
 
 
@@ -126,6 +127,7 @@ export const BankStatementModule: React.FC<BankStatementModuleProps> = ({
   onSwitchToSmsModule,
   activeSection: propActiveSection,
   onSelectSection: propOnSelectSection,
+  onSessionUpdate,
 }) => {
   // Navigation Section (Controlled or Uncontrolled)
   const [internalSection, setInternalSection] = useState<StatementSection>('OVERVIEW');
@@ -232,6 +234,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
       });
 
       setSession(resultSession);
+      onSessionUpdate?.(resultSession);
       setIsProcessing(false);
 
       // Add AI welcome message with actual metrics
@@ -266,6 +269,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
     if (remainingFiles.length === 0) {
       setSession(null);
+      onSessionUpdate?.(null);
       return;
     }
 
@@ -273,6 +277,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
     try {
       const resultSession = await processMultipleStatementFiles(remainingFiles);
       setSession(resultSession);
+      onSessionUpdate?.(resultSession);
     } catch (err: any) {
       setErrorMessage('Error reprocessing remaining statements.');
     } finally {
@@ -283,6 +288,7 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
   const handleClearAll = () => {
     setUploadedFiles([]);
     setSession(null);
+    onSessionUpdate?.(null);
     setPeriodFilter('ALL_TIME');
     setAccountFilter('ALL');
   };
@@ -403,24 +409,24 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         onDragLeave={handleDragLeave}
         className={`p-6 sm:p-8 rounded-[24px] border-2 border-dashed transition-all relative overflow-hidden text-center ${
           isDragging 
-            ? 'border-jade-500 bg-jade-500/10 shadow-solid-md' 
+            ? 'border-[#00884E] dark:border-[#1AE893] bg-emerald-500/10 shadow-lg' 
             : hasData 
             ? 'border-abyss-border bg-abyss-card' 
-            : 'border-abyss-borderStrong bg-abyss-card shadow-solid-md'
+            : 'border-abyss-borderStrong bg-abyss-card shadow-lg'
         }`}
       >
         <input
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".xls,.xlsx,.csv"
+          accept=".xls,.xlsx,.csv,.pdf"
           onChange={handleFileInputChange}
           className="hidden"
         />
 
         <div className="max-w-2xl mx-auto space-y-4">
           <div className="flex items-center justify-center">
-            <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-3xl shadow-solid-md transition-transform duration-200 bg-abyss-well border border-jade-500/40 text-jade-500 ${
+            <div className={`w-16 h-16 rounded-[22px] flex items-center justify-center text-3xl shadow-sm transition-transform duration-200 bg-abyss-well border border-emerald-500/30 text-emerald-600 dark:text-[#1AE893] ${
               isDragging ? 'scale-110' : ''
             }`}>
               📑
@@ -428,11 +434,16 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-abyss-textPrimary flex items-center justify-center gap-2">
-              Byt<span className="text-jade-500 font-black">Lend</span> Multi-Statement Forensics Hub
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00884E] dark:text-[#1AE893]">
+                BANK STATEMENT FORENSICS
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-abyss-textPrimary font-fraunces flex items-center justify-center gap-2">
+              Byt<span className="text-[#00884E] dark:text-[#1AE893]">Floww</span> Multi-Statement Forensics Hub
             </h1>
             <p className="text-xs sm:text-sm mt-1 max-w-lg mx-auto text-abyss-textSecondary font-medium">
-              Drag & drop bank statements (XLS, XLSX, CSV) to unlock AI capital intelligence, loan recycling, salary cycles, and P2P audit trails.
+              Upload bank statements (<code className="font-mono text-emerald-600 dark:text-[#1AE893] font-bold">.xlsx, .xls, .csv, .pdf</code>) to compute mathematical reconciliation, salary verification, P2P social graph, NBFC loan radar, and 7 underwriting health ratios.
             </p>
           </div>
 
@@ -441,16 +452,16 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isProcessing}
-              className="spatial-btn-selected px-6 py-3 rounded-full text-xs font-bold transition flex items-center gap-2"
+              className="btn-emerald-capsule px-6 py-3 rounded-full text-xs font-bold transition flex items-center gap-2 shadow-sm"
             >
               <span>📥</span>
-              <span>{hasData ? 'Add More Statement Files' : 'Select Bank Statements'}</span>
+              <span>{hasData ? 'Add More Statement Files' : 'Select Bank Statements (.xlsx, .xls, .csv)'}</span>
             </button>
 
             {hasData && (
               <button
                 onClick={handleClearAll}
-                className="spatial-btn px-4 py-3 text-xs text-pulse-500 font-semibold border-pulse-500/30"
+                className="spatial-btn px-4 py-3 text-xs text-rose-500 font-semibold border-rose-500/30 hover:bg-rose-500/10"
               >
                 Clear All Files
               </button>
@@ -462,12 +473,12 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
         {isProcessing && (
           <div className="max-w-md mx-auto mt-6 space-y-2 animate-fade-in">
             <div className="flex items-center justify-between text-xs font-bold">
-              <span className="text-jade-500">{processingStage}</span>
+              <span className="text-[#00884E] dark:text-[#1AE893]">{processingStage}</span>
               <span className="font-mono text-abyss-textMuted">{processingProgress}%</span>
             </div>
             <div className="w-full h-2.5 rounded-full bg-abyss-canvas overflow-hidden border border-abyss-border">
               <div 
-                className="h-full bg-jade-500 transition-all duration-300 rounded-full"
+                className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
                 style={{ width: `${processingProgress}%` }}
               />
             </div>
@@ -476,8 +487,29 @@ You can also ask about specific dates, merchants, UTRs, or counterparties.`,
 
         {/* Error Message Alert */}
         {errorMessage && (
-          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-[14px] bg-pulse-500/10 border border-pulse-500/30 text-pulse-500 text-xs font-bold text-center">
+          <div className="max-w-md mx-auto mt-4 p-3.5 rounded-[14px] bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-bold text-center">
             ⚠️ {errorMessage}
+          </div>
+        )}
+
+        {/* Feature Grid shown when no data loaded */}
+        {!hasData && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 max-w-2xl mx-auto border-t border-abyss-border mt-6 text-left">
+            <div className="p-3.5 rounded-xl bg-abyss-well border border-abyss-border space-y-1">
+              <div className="text-base">👥</div>
+              <div className="text-xs font-bold text-abyss-textPrimary">P2P & UPI Forensic Graph</div>
+              <div className="text-[10px] text-abyss-textMuted">Clusters recurring counterparties & net flow balances.</div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-abyss-well border border-abyss-border space-y-1">
+              <div className="text-base">💼</div>
+              <div className="text-xs font-bold text-abyss-textPrimary">Deterministic Salary Intelligence</div>
+              <div className="text-[10px] text-abyss-textMuted">Isolates employer payroll credits from loans & self-transfers.</div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-abyss-well border border-abyss-border space-y-1">
+              <div className="text-base">🏦</div>
+              <div className="text-xs font-bold text-abyss-textPrimary">Loans & Debt Freedom Simulator</div>
+              <div className="text-[10px] text-abyss-textMuted">Detects NBFC lenders, EMI interest costs, & payoff schedules.</div>
+            </div>
           </div>
         )}
       </div>

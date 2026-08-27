@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { parseSmsXml } from './engine/xmlParser';
 import { generateWeeklyDebrief } from './engine/accounting';
 import { FinancialEvent, SpendSnapshot, SpendTab, FilterState, CategoryBreakdownItem, DetectedAccount, ActiveModule, StatementSection } from './types';
+import { MultiStatementSession } from './engine/analyticsEngine';
 import { applyThemeVariables } from './theme/themes';
 
 // Components
@@ -39,7 +40,7 @@ export const App: React.FC = () => {
     const savedTheme = localStorage.getItem('bytfloww_theme_mode') || localStorage.getItem('bytfloww_theme');
     return savedTheme !== 'light';
   });
-  const [activeModule, setActiveModule] = useState<ActiveModule>('BANK_STATEMENTS');
+  const [activeModule, setActiveModule] = useState<ActiveModule>('SMS_INTELLIGENCE');
   const [currentUser, setCurrentUser] = useState<{ name: string; email: string; phone: string } | null>(() => {
     const saved = localStorage.getItem('bytfloww_user');
     if (saved) {
@@ -50,9 +51,9 @@ export const App: React.FC = () => {
       }
     }
     return {
-      name: 'Authorized User',
-      email: 'user@bytlend.local',
-      phone: '+91 ••••• •••••',
+      name: 'Deepankar Gautam',
+      email: 'deepankar.gautam@bytlend.local',
+      phone: '+91 84008 69600',
     };
   });
 
@@ -64,6 +65,7 @@ export const App: React.FC = () => {
   const [currentXml, setCurrentXml] = useState<string | null>(null);
   const [selectedPeriodKey, setSelectedPeriodKey] = useState<string>('2026-08');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [bankSession, setBankSession] = useState<MultiStatementSession | null>(null);
 
   // Filter State
   const [filterState, setFilterState] = useState<FilterState>({
@@ -142,28 +144,34 @@ export const App: React.FC = () => {
   useEffect(() => {
     const mode = isDark ? 'dark' : 'light';
     localStorage.setItem('bytfloww_theme_mode', mode);
+    localStorage.setItem('bytfloww_theme', mode);
     if (isDark) {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
-      document.documentElement.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
     } else {
       document.documentElement.classList.remove('dark');
       document.documentElement.classList.add('light');
-      document.documentElement.setAttribute('data-theme', 'light');
+      document.body.classList.remove('dark');
+      document.body.classList.add('light');
     }
+    const env = isDark ? 'titanium_prism' : 'bytlend_champagne';
+    localStorage.setItem('bytfloww_spatial_env', env);
+    window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: env }));
     applyThemeVariables(isDark);
   }, [isDark]);
 
-  const toggleTheme = () => {
-    setIsDark((prev) => !prev);
+  const handleToggleTheme = () => {
+    setIsDark(prev => !prev);
   };
 
-  // Period filtered events
-  const periodEvents = snapshot ? snapshot.filteredEvents : events;
+  const selectedMerchantData = snapshot?.topMerchants.find(m => m.name.toLowerCase() === selectedMerchantName?.toLowerCase());
 
-  const selectedMerchantData = selectedMerchantName && snapshot
-    ? snapshot.topMerchants.find((m) => m.name.toLowerCase() === selectedMerchantName.toLowerCase()) || undefined
-    : undefined;
+  const periodEvents = React.useMemo(() => {
+    if (!events.length) return [];
+    return events;
+  }, [events]);
 
   return (
     <AppShell
@@ -171,39 +179,48 @@ export const App: React.FC = () => {
       onOpenUpload={() => setShowXmlUpload(true)}
       onOpenDiagnostics={() => setShowDiagnostics(true)}
       activeModule={activeModule}
-      onSwitchModule={(mod) => setActiveModule(mod)}
+      onSwitchModule={setActiveModule}
       currentUser={currentUser}
       onLogout={handleLogout}
       isDark={isDark}
-      onToggleTheme={toggleTheme}
+      onToggleTheme={handleToggleTheme}
       activeTab={activeModule === 'BANK_STATEMENTS' ? activeStatementSection : activeTab}
-      onSelectTab={(tab) => {
+      onSelectTab={(tab: any) => {
         if (activeModule === 'BANK_STATEMENTS') {
           setActiveStatementSection(tab);
         } else {
           setActiveTab(tab);
         }
       }}
-      counts={{
-        transactions: periodEvents.length,
-        categories: snapshot?.categoryDistribution?.length || 0,
-        merchants: snapshot?.topMerchants?.length || 0,
-        commitments: snapshot?.commitments?.length || 0,
-      }}
+      counts={
+        activeModule === 'BANK_STATEMENTS'
+          ? {
+              transactions: bankSession?.uniqueTransactions.length || 0,
+              p2pCount: bankSession?.forensicDataset.recipients.length || 0,
+              lendersCount: bankSession?.forensicDataset.lenders.length || 0,
+            }
+          : {
+              transactions: events.length,
+              categories: snapshot?.categoryDistribution.length || 0,
+              merchants: snapshot?.topMerchants.length || 0,
+              commitments: snapshot?.commitments.length || 0,
+            }
+      }
     >
-      {/* ── 1. AUTH SCREEN (IF NOT LOGGED IN) ─────────────────────────── */}
+      {/* ── 1. IF NOT LOGGED IN: SHOW LOGIN SCREEN ──────────────────────── */}
       {!currentUser ? (
         <LoginScreen
           isDark={isDark}
           onLoginSuccess={handleLoginSuccess}
         />
       ) : activeModule === 'BANK_STATEMENTS' ? (
-        /* ── 2. BANK STATEMENT FORENSICS HUB ───────────────────────────── */
+        /* ── 2. SEPARATE MODULE: BANK STATEMENT FORENSICS HUB ──────────── */
         <div className="space-y-4">
           <BankStatementModule
             isDark={isDark}
             activeSection={activeStatementSection}
             onSelectSection={setActiveStatementSection}
+            onSessionUpdate={setBankSession}
             onMergeTransactions={(newTxs) => {
               setEvents((prev) => [...newTxs, ...prev]);
             }}
@@ -406,11 +423,39 @@ export const App: React.FC = () => {
         />
       )}
 
-      <XmlUploadModal
-        isDark={isDark}
-        onClose={() => setShowXmlUpload(false)}
-        onXmlParsed={handleXmlParsed}
-      />
+      {snapshot && (
+        <SpendFilterModal
+          isOpen={showFilterModal}
+          onClose={() => setShowFilterModal(false)}
+          filterState={filterState}
+          onUpdateFilter={(upd) => setFilterState(prev => ({ ...prev, ...upd }))}
+          categories={snapshot.categoryDistribution}
+          accounts={snapshot.accounts}
+          isDark={isDark}
+        />
+      )}
+
+      {snapshot && (
+        <SpendMonthSelector
+          isOpen={showMonthSelector}
+          onClose={() => setShowMonthSelector(false)}
+          selectedPeriodKey={snapshot.periodKey}
+          onSelectPeriod={handleSelectPeriod}
+          availableMonths={snapshot.monthlyTrends}
+          isDark={isDark}
+        />
+      )}
+
+      {showXmlUpload && (
+        <XmlUploadModal
+          isDark={isDark}
+          onClose={() => setShowXmlUpload(false)}
+          onXmlParsed={(xml: string) => {
+            setShowXmlUpload(false);
+            handleXmlParsed(xml, selectedPeriodKey);
+          }}
+        />
+      )}
 
       {showDiagnostics && snapshot && (
         <DiagnosticsModal
@@ -420,38 +465,13 @@ export const App: React.FC = () => {
         />
       )}
 
-      {showMonthSelector && snapshot && (
-        <SpendMonthSelector
-          isOpen={showMonthSelector}
-          onClose={() => setShowMonthSelector(false)}
-          selectedPeriodKey={selectedPeriodKey}
-          onSelectPeriod={handleSelectPeriod}
-          availableMonths={snapshot.monthlyTrends}
-          isDark={isDark}
-        />
-      )}
-
-      {showFilterModal && snapshot && (
-        <SpendFilterModal
-          isOpen={showFilterModal}
-          onClose={() => setShowFilterModal(false)}
-          filterState={filterState}
-          onUpdateFilter={(update) => setFilterState((prev) => ({ ...prev, ...update }))}
-          categories={snapshot.categoryDistribution}
-          accounts={snapshot.accounts}
-          isDark={isDark}
-        />
-      )}
-
-      {selectedDrilldownCategory && (
-        <CategoryDrilldownModal
-          category={selectedDrilldownCategory}
-          events={periodEvents}
-          isDark={isDark}
-          onClose={() => setSelectedDrilldownCategory(null)}
-          onSelectEvent={(ev) => setSelectedEvent(ev)}
-        />
-      )}
+      <CategoryDrilldownModal
+        category={selectedDrilldownCategory}
+        events={events}
+        isDark={isDark}
+        onClose={() => setSelectedDrilldownCategory(null)}
+        onSelectEvent={(ev) => setSelectedEvent(ev)}
+      />
 
       <AccountDrilldownModal
         account={selectedDrilldownAccount}
