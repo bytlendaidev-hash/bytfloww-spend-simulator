@@ -1,4 +1,5 @@
 import { FinancialEvent, FinancialEventType } from '../types';
+import { isSalaryTransaction } from './salaryIntelligence';
 
 export interface RawSms {
   address: string;
@@ -109,10 +110,10 @@ export function parseSmsToEvent(sms: RawSms): FinancialEvent | null {
       eventType = 'PURCHASE';
       financialSubtype = 'REGULAR_PURCHASE';
     }
-  } else if (lower.includes('credited') || lower.includes('received') || lower.includes('deposited') || lower.includes('salary')) {
+  } else if (lower.includes('credited') || lower.includes('received') || lower.includes('deposited') || isSalaryTransaction(body, true, amount)) {
     direction = 'INFLOW';
     economicType = 'INCOME';
-    if (lower.includes('salary')) {
+    if (isSalaryTransaction(body, true, amount)) {
       eventType = 'SALARY';
       financialSubtype = 'SALARY';
     } else if (lower.includes('upi')) {
