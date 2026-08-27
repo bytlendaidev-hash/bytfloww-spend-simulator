@@ -35,7 +35,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const activeThemeId = getActiveThemeId();
-  const theme = THEME_TEMPLATES[activeThemeId] || THEME_TEMPLATES.royal_indigo;
+  const theme = THEME_TEMPLATES[activeThemeId] || THEME_TEMPLATES.aurora_cyber;
 
   // Navigation Items when inside BANK_STATEMENTS Module
   const bankNavGroups: Array<{
@@ -46,28 +46,28 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
       title: 'CORE FORENSICS',
       items: [
         { id: 'OVERVIEW', label: 'Executive Summary', icon: '⚡' },
-        { id: 'P2P_TRANSFERS', label: 'P2P & UPI Transfers', icon: '👥', badge: counts.p2pCount },
-        { id: 'SALARY_AUDIT', label: 'Salary Intelligence', icon: '💼' },
+        { id: 'PEOPLE', label: 'P2P & UPI Transfers', icon: '👥', badge: counts.p2pCount },
+        { id: 'INFLOW', label: 'Salary Intelligence', icon: '💼' },
         { id: 'TRANSACTIONS', label: 'Master Transactions', icon: '📋', badge: counts.transactions },
       ],
     },
     {
       title: 'CREDIT & DEBT RADAR',
       items: [
-        { id: 'LOANS_NBFC', label: 'Loans & NBFC Radar', icon: '🏦', badge: counts.lendersCount },
-        { id: 'CARDS_EMIS', label: 'Cards & EMIs', icon: '💳' },
-        { id: 'EPFO_TRACKER', label: 'EPFO Passbook', icon: '🏛️' },
-        { id: 'INVESTMENTS', label: 'Investments & Crypto', icon: '📈' },
+        { id: 'LOANS', label: 'Loans & NBFC Radar', icon: '🏦', badge: counts.lendersCount },
+        { id: 'DEBT_SIMULATOR', label: 'Debt Freedom Simulator', icon: '🧮' },
+        { id: 'SUBSCRIPTIONS_AUTOPSY', label: 'Subscriptions Autopsy', icon: '🔄' },
+        { id: 'RATIOS', label: '7 Health Ratios', icon: '⚖️' },
       ],
     },
     {
       title: 'DEEP AUDITS & LEDGER',
       items: [
-        { id: 'RECONCILIATION', label: 'Reconciliation Audit', icon: '⚖️' },
-        { id: 'SPEND_DNA', label: 'Spend DNA & Merchants', icon: '🛍️' },
-        { id: 'HEATMAP', label: 'Ledger Calendar', icon: '📅' },
-        { id: 'RISK_ANOMALIES', label: 'Anomaly Radar', icon: '🚨' },
-        { id: 'RAW_VIEW', label: 'Raw Bank Ledger', icon: '📑' },
+        { id: 'AUDIT', label: 'Reconciliation Audit', icon: '🛡️' },
+        { id: 'MERCHANT_DNA', label: 'Spend DNA & Brands', icon: '🛍️' },
+        { id: 'SPEND_CALENDAR', label: 'Ledger Calendar', icon: '📅' },
+        { id: 'ANOMALY_RADAR', label: 'Anomaly Radar', icon: '🚨' },
+        { id: 'LEDGER', label: 'Raw Bank Ledger', icon: '📑' },
       ],
     },
   ];
@@ -108,7 +108,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 
   return (
     <aside 
-      className={`hidden md:flex flex-col justify-between shrink-0 transition-all duration-300 z-30 border-r border-abyss-border bg-abyss-card/95 backdrop-blur-xl h-full select-none ${
+      className={`hidden md:flex flex-col justify-between shrink-0 transition-all duration-300 z-30 border-r border-abyss-border bg-abyss-card/90 backdrop-blur-xl h-full select-none ${
         isExpanded ? 'w-64 p-4' : 'w-20 p-3'
       }`}
       aria-label="Desktop Navigation"
@@ -118,10 +118,10 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         <div className={`flex items-center ${isExpanded ? 'justify-between' : 'justify-center'} shrink-0`}>
           {isExpanded ? (
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-black uppercase text-synapse-400 tracking-wider">
+              <span className="text-xs font-mono font-black uppercase text-cyan-400 tracking-wider">
                 {activeModule === 'BANK_STATEMENTS' ? 'Bank Forensics' : 'SMS Intelligence'}
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-jade-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
             </div>
           ) : (
             <BytLendLogo size="sm" />
@@ -160,7 +160,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                         : 'p-2.5 justify-center'
                     } ${
                       isActive
-                        ? 'bg-synapse-500 text-white font-black shadow-solid-sm ring-1 ring-synapse-400'
+                        ? 'btn-neon-action text-white font-black shadow-neon-cyan'
                         : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-well'
                     }`}
                     title={!isExpanded ? `${tab.label}` : undefined}
@@ -180,7 +180,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                     {isExpanded && tab.badge !== undefined && tab.badge > 0 && (
                       <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full shrink-0 ${
                         isActive
-                          ? 'bg-white/20 text-white'
+                          ? 'bg-white/25 text-white'
                           : 'bg-abyss-well text-abyss-textMuted border border-abyss-border'
                       }`}>
                         {tab.badge}
@@ -206,7 +206,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
         {/* Theme Studio Trigger */}
         <button
           onClick={onOpenThemeStudio}
-          className={`w-full flex items-center rounded-xl p-2 transition border border-synapse-500/30 text-synapse-400 bg-synapse-500/10 hover:bg-synapse-500/20 group relative ${
+          className={`w-full flex items-center rounded-xl p-2 transition border border-cyan-500/30 text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 group relative ${
             isExpanded ? 'px-3 gap-2.5' : 'justify-center'
           }`}
           title={!isExpanded ? 'Theme Studio (5 Themes)' : undefined}
@@ -215,7 +215,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           {isExpanded && (
             <div className="text-left leading-none truncate">
               <span className="text-xs font-bold block">Theme Studio</span>
-              <span className="text-[9px] text-synapse-400/80 font-mono mt-0.5">{theme.name}</span>
+              <span className="text-[9px] text-cyan-400/80 font-mono mt-0.5">{theme.name}</span>
             </div>
           )}
         </button>
@@ -231,7 +231,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           <span className="text-base shrink-0">{isDark ? '☀️' : '🌙'}</span>
           {isExpanded && (
             <span className="text-xs font-semibold truncate">
-              {isDark ? 'Light Ceramic' : 'Dark Obsidian'}
+              {isDark ? 'Light Silk' : 'Dark Obsidian-Teal'}
             </span>
           )}
         </button>

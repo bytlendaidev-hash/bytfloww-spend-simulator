@@ -173,7 +173,7 @@ export const App: React.FC = () => {
     const env = isDark ? 'titanium_prism' : 'bytlend_champagne';
     localStorage.setItem('bytfloww_spatial_env', env);
     window.dispatchEvent(new CustomEvent('spatial-env-change', { detail: env }));
-    applyThemeVariables();
+    applyThemeVariables(isDark);
   }, [isDark]);
 
   const handleToggleTheme = () => {

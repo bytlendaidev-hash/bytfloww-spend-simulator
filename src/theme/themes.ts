@@ -1,17 +1,17 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- * BYTFLOWW BILLION-DOLLAR STARTUP THEME TEMPLATES
+ * BYTFLOWW / BYTLEND MASTER THEME TEMPLATES
  * ─────────────────────────────────────────────────────────────────────────────
- * Inspired by the design languages of Linear, Stripe, Apple Vision Pro,
- * Mercury, Ramp, and Bloomberg Terminal.
+ * Matches the exact design language of BytLend Design System V9
+ * and Aurora Cyber-Glassmorphic Design from cloud-sign-in-hub-main.
  */
 
 export type ThemeTemplateId = 
-  | 'royal_indigo'       // Stripe / Revolut Ultra — Royal Indigo Sovereign & Electric Emerald
-  | 'apex_obsidian'      // Linear / Ramp — Cyber Emerald & Hyper Iris
-  | 'titanium_monolith'  // Apple Vision Pro / Raycast — Azure Ice & Gold
-  | 'solstice_champagne' // Mercury / Arc — Luxe Light Alabaster & Royal Emerald
-  | 'terminal_matrix';   // Bloomberg / Palantir — Phosphor Amber & Matrix Green
+  | 'aurora_cyber'       // 👑 Flagship: BytLend Aurora Cyber-Glassmorphic (Cyan, Purple & Deep Obsidian-Teal)
+  | 'bytlend_gold'       // BytLend Centurion: Champagne Warm Gold & Obsidian
+  | 'royal_indigo'       // Stripe / Revolut Ultra: Velvet Midnight & Royal Indigo
+  | 'titanium_monolith'  // Apple Vision Pro / Raycast: Azure Ice & Titanium
+  | 'terminal_matrix';   // Bloomberg / Palantir: Phosphor Amber & Matrix Green
 
 export interface ThemeTemplate {
   id: ThemeTemplateId;
@@ -66,7 +66,113 @@ export interface ThemeTemplate {
 }
 
 export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
-  // ── 1. ROYAL INDIGO SOVEREIGN (Stripe Atlas / Revolut Ultra) ───────────────
+  // ── 1. AURORA CYBER-GLASSMORPHISM (👑 Flagship - cloud-sign-in-hub-main) ──
+  aurora_cyber: {
+    id: 'aurora_cyber',
+    name: 'Aurora Cyber-Glass',
+    tagline: 'Deep Obsidian-Teal, Electric Cyan & Neon Violet',
+    inspiration: 'BytLend Official • Aurora Cyber-Glass V9',
+    badge: 'FLAGSHIP',
+    icon: '💎',
+    swatches: {
+      primary: '#06B6D4',
+      ai: '#8B5CF6',
+      spend: '#EF4444',
+      vault: '#EDC184',
+      telemetry: '#38BDF8',
+      bgDark: '#061118',
+      bgLight: '#FFFFFF',
+    },
+    dark: {
+      canvas: '#061118',
+      card: 'rgba(16, 26, 35, 0.72)',
+      cardElevated: '#10222D',
+      well: '#0D1E27',
+      border: 'rgba(255, 255, 255, 0.08)',
+      borderStrong: 'rgba(6, 182, 212, 0.28)',
+      textPrimary: '#FFFFFF',
+      textSecondary: '#94A3B8',
+      textMuted: '#64748B',
+      primaryHero: '#06B6D4',
+      aiHero: '#8B5CF6',
+      spendHero: '#EF4444',
+      vaultHero: '#EDC184',
+      telemetryHero: '#38BDF8',
+      ambientGlow: 'radial-gradient(circle at 50% 25%, rgba(6, 182, 212, 0.18) 0%, rgba(139, 92, 246, 0.12) 45%, transparent 75%)',
+    },
+    light: {
+      canvas: '#FFFFFF',
+      card: '#FFFFFF',
+      cardElevated: '#FFFFFF',
+      well: '#F8FAFC',
+      border: 'rgba(46, 52, 69, 0.08)',
+      borderStrong: 'rgba(200, 138, 69, 0.35)',
+      textPrimary: '#2E3445',
+      textSecondary: '#5E667A',
+      textMuted: '#8B95A5',
+      primaryHero: '#C88A45',
+      aiHero: '#3D5AFE',
+      spendHero: '#EF4444',
+      vaultHero: '#EDC184',
+      telemetryHero: '#00884E',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(200, 138, 69, 0.10) 0%, rgba(61, 90, 254, 0.06) 50%, transparent 75%)',
+    },
+  },
+
+  // ── 2. BYTLEND CENTURION GOLD (Luxury FinTech Warm Gold & Obsidian) ─────────
+  bytlend_gold: {
+    id: 'bytlend_gold',
+    name: 'BytLend Centurion Gold',
+    tagline: 'Champagne Warm Gold & Rich Obsidian',
+    inspiration: 'BytLend Luxury FinTech • American Express Centurion',
+    badge: 'LUXURY GOLD',
+    icon: '✨',
+    swatches: {
+      primary: '#EDC184',
+      ai: '#C88A45',
+      spend: '#EF4444',
+      vault: '#F7D7A4',
+      telemetry: '#38BDF8',
+      bgDark: '#090909',
+      bgLight: '#FFFFFF',
+    },
+    dark: {
+      canvas: '#090909',
+      card: '#171717',
+      cardElevated: '#202124',
+      well: '#151312',
+      border: 'rgba(237, 193, 132, 0.15)',
+      borderStrong: 'rgba(237, 193, 132, 0.35)',
+      textPrimary: '#F5F3F0',
+      textSecondary: '#C7B9A9',
+      textMuted: '#8B7A68',
+      primaryHero: '#EDC184',
+      aiHero: '#C88A45',
+      spendHero: '#EF4444',
+      vaultHero: '#F7D7A4',
+      telemetryHero: '#06B6D4',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(237, 193, 132, 0.14), transparent 70%)',
+    },
+    light: {
+      canvas: '#FFFFFF',
+      card: '#FFFFFF',
+      cardElevated: '#FFFFFF',
+      well: '#F8FAFC',
+      border: 'rgba(46, 52, 69, 0.08)',
+      borderStrong: 'rgba(200, 138, 69, 0.40)',
+      textPrimary: '#2E3445',
+      textSecondary: '#5E667A',
+      textMuted: '#8B95A5',
+      primaryHero: '#C88A45',
+      aiHero: '#8A5A2D',
+      spendHero: '#EF4444',
+      vaultHero: '#EDC184',
+      telemetryHero: '#00884E',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(200, 138, 69, 0.12), transparent 70%)',
+    },
+  },
+
+  // ── 3. ROYAL INDIGO SOVEREIGN (Stripe Atlas / Revolut Ultra) ───────────────
   royal_indigo: {
     id: 'royal_indigo',
     name: 'Royal Indigo Sovereign',
@@ -119,259 +225,162 @@ export const THEME_TEMPLATES: Record<ThemeTemplateId, ThemeTemplate> = {
     },
   },
 
-  // ── 2. APEX OBSIDIAN (Linear / Ramp) ───────────────────────────────────────
-  apex_obsidian: {
-    id: 'apex_obsidian',
-    name: 'Apex Obsidian',
-    tagline: 'Cyber Emerald & Hyper Iris',
-    inspiration: 'Linear • Ramp • Raycast Pro',
-    badge: 'CYBER PRO',
-    icon: '⚡',
-    swatches: {
-      primary: '#00F5A0',
-      ai: '#8B5CF6',
-      spend: '#FF4757',
-      vault: '#FFB800',
-      telemetry: '#00E5FF',
-      bgDark: '#07090E',
-      bgLight: '#F5F7FA',
-    },
-    dark: {
-      canvas: '#07090E',
-      card: '#0D111A',
-      cardElevated: '#141A26',
-      well: '#182030',
-      border: '#1E2840',
-      borderStrong: '#2E3D60',
-      textPrimary: '#F1F5F9',
-      textSecondary: '#94A3B8',
-      textMuted: '#64748B',
-      primaryHero: '#00F5A0',
-      aiHero: '#8B5CF6',
-      spendHero: '#FF4757',
-      vaultHero: '#FFB800',
-      telemetryHero: '#00E5FF',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 245, 160, 0.12), transparent 70%)',
-    },
-    light: {
-      canvas: '#F5F7FA',
-      card: '#FFFFFF',
-      cardElevated: '#FFFFFF',
-      well: '#EDF1F7',
-      border: '#DCE3EE',
-      borderStrong: '#B8C6DC',
-      textPrimary: '#0F172A',
-      textSecondary: '#475569',
-      textMuted: '#64748B',
-      primaryHero: '#009668',
-      aiHero: '#6D28D9',
-      spendHero: '#DC2626',
-      vaultHero: '#D97706',
-      telemetryHero: '#0284C7',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 150, 104, 0.08), transparent 70%)',
-    },
-  },
-
-  // ── 3. TITANIUM MONOLITH (Apple Vision Pro / Spatial UI) ───────────────────
+  // ── 4. TITANIUM MONOLITH (Apple Vision Pro / Raycast Spatial) ──────────────
   titanium_monolith: {
     id: 'titanium_monolith',
     name: 'Titanium Monolith',
     tagline: 'Luminescent Azure & Gold Aurum',
     inspiration: 'Apple Vision Pro • Monolith OS',
-    badge: 'SPATIAL LUXE',
-    icon: '🥽',
+    badge: 'SPATIAL OS',
+    icon: '🔮',
     swatches: {
-      primary: '#00D2FF',
-      ai: '#A855F7',
-      spend: '#F43F5E',
-      vault: '#F59E0B',
-      telemetry: '#38BDF8',
-      bgDark: '#0A0D14',
-      bgLight: '#F3F5F9',
+      primary: '#00C8FF',
+      ai: '#7C4DFF',
+      spend: '#FF5252',
+      vault: '#FFD700',
+      telemetry: '#64FFDA',
+      bgDark: '#080C14',
+      bgLight: '#F0F4F8',
     },
     dark: {
-      canvas: '#0A0D14',
-      card: '#101622',
-      cardElevated: '#182030',
-      well: '#1E283D',
-      border: '#24324D',
-      borderStrong: '#3B4E75',
-      textPrimary: '#F8FAFC',
-      textSecondary: '#94A3B8',
-      textMuted: '#64748B',
-      primaryHero: '#00D2FF',
-      aiHero: '#A855F7',
-      spendHero: '#F43F5E',
-      vaultHero: '#F59E0B',
-      telemetryHero: '#38BDF8',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 210, 255, 0.14), transparent 70%)',
+      canvas: '#080C14',
+      card: '#0E1624',
+      cardElevated: '#142032',
+      well: '#1A2840',
+      border: '#243654',
+      borderStrong: '#36507A',
+      textPrimary: '#F0F6FC',
+      textSecondary: '#8B949E',
+      textMuted: '#586069',
+      primaryHero: '#00C8FF',
+      aiHero: '#7C4DFF',
+      spendHero: '#FF5252',
+      vaultHero: '#FFD700',
+      telemetryHero: '#64FFDA',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 200, 255, 0.15), transparent 70%)',
     },
     light: {
-      canvas: '#F3F5F9',
+      canvas: '#F0F4F8',
       card: '#FFFFFF',
       cardElevated: '#FFFFFF',
-      well: '#E8ECF4',
-      border: '#D3DAE8',
-      borderStrong: '#AFBDD6',
-      textPrimary: '#0B132B',
-      textSecondary: '#475569',
+      well: '#E2E8F0',
+      border: '#CBD5E1',
+      borderStrong: '#94A3B8',
+      textPrimary: '#0F172A',
+      textSecondary: '#334155',
       textMuted: '#64748B',
       primaryHero: '#0284C7',
-      aiHero: '#7E22CE',
-      spendHero: '#E11D48',
+      aiHero: '#6D28D9',
+      spendHero: '#DC2626',
       vaultHero: '#D97706',
-      telemetryHero: '#0369A1',
+      telemetryHero: '#0D9488',
       ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(2, 132, 199, 0.08), transparent 70%)',
     },
   },
 
-  // ── 4. SOLSTICE CHAMPAGNE (Mercury / Arc Minimalist) ───────────────────────
-  solstice_champagne: {
-    id: 'solstice_champagne',
-    name: 'Solstice Champagne',
-    tagline: 'Luxe Ivory & Royal Alpine Emerald',
-    inspiration: 'Mercury Bank • Arc Browser',
-    badge: 'EXECUTIVE',
-    icon: '🍸',
-    swatches: {
-      primary: '#10B981',
-      ai: '#6366F1',
-      spend: '#E11D48',
-      vault: '#D97706',
-      telemetry: '#06B6D4',
-      bgDark: '#0B0F19',
-      bgLight: '#FAF9F6',
-    },
-    dark: {
-      canvas: '#0B0F19',
-      card: '#121827',
-      cardElevated: '#1A2236',
-      well: '#222C44',
-      border: '#2A3756',
-      borderStrong: '#3F527E',
-      textPrimary: '#FDFEFE',
-      textSecondary: '#9CA3AF',
-      textMuted: '#6B7280',
-      primaryHero: '#10B981',
-      aiHero: '#6366F1',
-      spendHero: '#E11D48',
-      vaultHero: '#D97706',
-      telemetryHero: '#06B6D4',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.12), transparent 70%)',
-    },
-    light: {
-      canvas: '#FAF9F6',
-      card: '#FFFFFF',
-      cardElevated: '#FFFFFF',
-      well: '#F0EEE6',
-      border: '#E2DDD2',
-      borderStrong: '#C8C0AF',
-      textPrimary: '#111827',
-      textSecondary: '#4B5563',
-      textMuted: '#6B7280',
-      primaryHero: '#047857',
-      aiHero: '#4F46E5',
-      spendHero: '#BE123C',
-      vaultHero: '#B45309',
-      telemetryHero: '#0891B2',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(180, 83, 9, 0.06), transparent 70%)',
-    },
-  },
-
-  // ── 5. HIGH-FREQUENCY TERMINAL (Bloomberg / Palantir) ──────────────────────
+  // ── 5. TERMINAL MATRIX (Bloomberg Terminal / Palantir) ─────────────────────
   terminal_matrix: {
     id: 'terminal_matrix',
-    name: 'High-Frequency Terminal',
+    name: 'Terminal Matrix',
     tagline: 'Phosphor Amber & Matrix Green',
-    inspiration: 'Bloomberg Professional • Palantir Foundry',
+    inspiration: 'Bloomberg Terminal • Palantir Foundry',
     badge: 'TERMINAL PRO',
     icon: '📟',
     swatches: {
-      primary: '#FFB800',
-      ai: '#00FF88',
-      spend: '#FF3344',
-      vault: '#FF9900',
-      telemetry: '#00F0FF',
-      bgDark: '#06080A',
-      bgLight: '#F4F5F7',
+      primary: '#00FF66',
+      ai: '#FFB800',
+      spend: '#FF3333',
+      vault: '#00E5FF',
+      telemetry: '#FFFF00',
+      bgDark: '#040804',
+      bgLight: '#F5FAF5',
     },
     dark: {
-      canvas: '#06080A',
-      card: '#0B1015',
-      cardElevated: '#111822',
-      well: '#17212E',
-      border: '#202E40',
-      borderStrong: '#324762',
-      textPrimary: '#E8F0F8',
-      textSecondary: '#8CA0B8',
-      textMuted: '#526880',
-      primaryHero: '#FFB800',
-      aiHero: '#00FF88',
-      spendHero: '#FF3344',
-      vaultHero: '#FF9900',
-      telemetryHero: '#00F0FF',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 184, 0, 0.12), transparent 70%)',
+      canvas: '#040804',
+      card: '#081208',
+      cardElevated: '#0D1E0D',
+      well: '#122812',
+      border: '#1B3D1B',
+      borderStrong: '#295C29',
+      textPrimary: '#00FF66',
+      textSecondary: '#52C452',
+      textMuted: '#2E732E',
+      primaryHero: '#00FF66',
+      aiHero: '#FFB800',
+      spendHero: '#FF3333',
+      vaultHero: '#00E5FF',
+      telemetryHero: '#FFFF00',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 255, 102, 0.15), transparent 70%)',
     },
     light: {
-      canvas: '#F4F5F7',
+      canvas: '#F5FAF5',
       card: '#FFFFFF',
       cardElevated: '#FFFFFF',
-      well: '#E6E9EE',
-      border: '#CCD3DD',
-      borderStrong: '#A0B0C4',
-      textPrimary: '#0C141E',
-      textSecondary: '#445468',
-      textMuted: '#68788C',
-      primaryHero: '#B88000',
-      aiHero: '#009944',
-      spendHero: '#D01020',
-      vaultHero: '#C07000',
-      telemetryHero: '#008899',
-      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(184, 128, 0, 0.08), transparent 70%)',
+      well: '#E8F5E8',
+      border: '#C8E6C8',
+      borderStrong: '#81C784',
+      textPrimary: '#1B5E20',
+      textSecondary: '#2E7D32',
+      textMuted: '#4CAF50',
+      primaryHero: '#2E7D32',
+      aiHero: '#F57F17',
+      spendHero: '#C62828',
+      vaultHero: '#00838F',
+      telemetryHero: '#F9A825',
+      ambientGlow: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(46, 125, 50, 0.08), transparent 70%)',
     },
   },
 };
 
-export const DEFAULT_THEME_ID: ThemeTemplateId = 'royal_indigo';
+export const DEFAULT_THEME_ID: ThemeTemplateId = 'aurora_cyber';
 
 export function getActiveThemeId(): ThemeTemplateId {
-  const saved = localStorage.getItem('bytfloww_theme_template');
-  if (saved && saved in THEME_TEMPLATES) {
-    return saved as ThemeTemplateId;
+  try {
+    const saved = localStorage.getItem('bytfloww_theme_template');
+    if (saved && saved in THEME_TEMPLATES) {
+      return saved as ThemeTemplateId;
+    }
+  } catch (e) {
+    // fallback
   }
   return DEFAULT_THEME_ID;
 }
 
-export function setActiveThemeId(id: ThemeTemplateId): void {
-  localStorage.setItem('bytfloww_theme_template', id);
-  window.dispatchEvent(new CustomEvent('theme-template-change', { detail: id }));
-  applyThemeVariables(id);
+export function setActiveThemeId(themeId: ThemeTemplateId): void {
+  try {
+    localStorage.setItem('bytfloww_theme_template', themeId);
+    window.dispatchEvent(new CustomEvent('theme-template-change', { detail: themeId }));
+  } catch (e) {
+    // ignore
+  }
 }
 
-export function applyThemeVariables(themeId: ThemeTemplateId = getActiveThemeId()): void {
-  const isDark = document.documentElement.classList.contains('dark') || 
-    (!document.documentElement.classList.contains('light') && 
-     (localStorage.getItem('bytfloww_theme_mode') !== 'light'));
-
-  const template = THEME_TEMPLATES[themeId] || THEME_TEMPLATES[DEFAULT_THEME_ID];
+export function applyThemeVariables(isDark: boolean, themeId?: ThemeTemplateId) {
+  const selectedId = themeId || getActiveThemeId();
+  const template = THEME_TEMPLATES[selectedId] || THEME_TEMPLATES.aurora_cyber;
   const t = isDark ? template.dark : template.light;
   const root = document.documentElement;
 
-  root.style.setProperty('--spatial-bg', t.canvas);
+  // Obsidian / Abyss Surface Tokens
   root.style.setProperty('--obsidian-canvas', t.canvas);
   root.style.setProperty('--obsidian-card', t.card);
   root.style.setProperty('--obsidian-elevated', t.cardElevated);
   root.style.setProperty('--obsidian-well', t.well);
   root.style.setProperty('--obsidian-border', t.border);
   root.style.setProperty('--obsidian-border-strong', t.borderStrong);
+
+  // Typography Tokens
   root.style.setProperty('--text-primary', t.textPrimary);
   root.style.setProperty('--text-secondary', t.textSecondary);
   root.style.setProperty('--text-muted', t.textMuted);
 
-  // Hero colors
+  // Hero Semantic Accents
   root.style.setProperty('--color-jade-500', t.primaryHero);
   root.style.setProperty('--color-synapse-500', t.aiHero);
   root.style.setProperty('--color-pulse-500', t.spendHero);
   root.style.setProperty('--color-ochre-500', t.vaultHero);
   root.style.setProperty('--color-telemetry-500', t.telemetryHero);
+
+  // Ambient Glow
+  root.style.setProperty('--ambient-glow-gradient', t.ambientGlow);
 }

@@ -1,113 +1,289 @@
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- * BYTFLOWW GLOBAL THEME TOKENS & BILLION-DOLLAR STARTUP COLOR SYSTEM
+ * BYTFLOWW / BYTLEND GLOBAL DESIGN TOKENS (Single Source of Truth)
  * ─────────────────────────────────────────────────────────────────────────────
- * Single point of truth for all colors, typography, surfaces, and semantic tokens.
+ * Mapped 100% to BytLend Design System V9 & Aurora Cyber-Glassmorphism
+ * Reference Project: cloud-sign-in-hub-main
  */
 
 import { THEME_TEMPLATES, ThemeTemplateId, getActiveThemeId } from './themes';
 
-// ── 1. SOLID RAW PALETTES ────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// BRAND COLOR CONSTANTS (Derived from BytLend Design System V9)
+// ─────────────────────────────────────────────────────────────────────────────
 
-export const SOLID_PALETTE = {
-  // Sovereign Jade (Inflow, Surplus, Brand Hero, Success)
-  jade: {
-    50: '#E6FAF2',
-    100: '#C2F4DF',
-    200: '#8DE7C2',
-    300: '#4FD69F',
-    400: '#1EC882',
-    500: '#00F5A0', // Cyber Emerald
-    600: '#00C882',
-    700: '#00875A', // Light Hero
-    800: '#006342',
-    900: '#003D29',
+export const BRAND = {
+  /** Primary Background — Rich Obsidian Black */
+  obsidian:       '#090909',
+  /** Secondary Background — Premium Graphite */
+  graphite:       '#171717',
+  /** Elevated Surface / Card — Premium Surface */
+  surface:        '#202124',
+  /** Premium Charcoal */
+  charcoal:       '#151312',
+
+  /** Champagne Gold Scale — Accents */
+  goldHighlight:  '#EDC184', // Champagne Gold
+  goldLight:      '#EDC184', // Warm Champagne Gold
+  gold:           '#EDC184', // Warm Gold (Primary Accent)
+  copper:         '#C88A45', // Luxury Gold / Copper
+  bronze:         '#9C6234', // Metallic Bronze
+  darkBronze:     '#8A5A2D', // Deep Bronze Shadow
+
+  /** Stroke & Border Colors */
+  strokeBorder:   'rgba(255, 255, 255, 0.08)',
+  strokeHighlight:'rgba(255, 255, 255, 0.14)',
+  strokeShadow:   'rgba(0, 0, 0, 0.4)',
+  divider:        'rgba(255, 255, 255, 0.06)',
+
+  /** Typography Colors */
+  textPrimary:    '#FFFFFF', // Crisp White
+  textSecondary:  '#94A3B8', // Cool Slate
+  textMuted:      '#64748B', // Muted Slate
+  textGoldTop:    '#EDC184',
+  textGoldBottom: '#9C6234',
+
+  /** Opacity Variations & Glows */
+  goldFaint:      'rgba(237, 193, 132, 0.04)',
+  goldSoft:       'rgba(237, 193, 132, 0.08)',
+  goldGlow:       'rgba(237, 193, 132, 0.20)',
+  goldBorder:     'rgba(237, 193, 132, 0.25)',
+  goldBorderSubtle:'rgba(237, 193, 132, 0.12)',
+
+  /** Status Colors */
+  success:        '#22C55E',
+  successBg:      'rgba(34, 197, 94, 0.12)',
+  successBorder:  'rgba(34, 197, 94, 0.28)',
+  warning:        '#F59E0B',
+  warningBg:      'rgba(245, 158, 11, 0.12)',
+  warningBorder:  'rgba(245, 158, 11, 0.28)',
+  error:          '#EF4444',
+  errorBg:        'rgba(239, 68, 68, 0.12)',
+  errorBorder:    'rgba(239, 68, 68, 0.28)',
+
+  /** AI Intelligence & Aurora Palette */
+  aiBackground:   '#061118',
+  aiSurface:      '#0D1E27',
+  aiCard:         '#10222D',
+  aiIndigo:       '#8B5CF6',
+  aiAccent:       '#A78BFA',
+  aiCyan:         '#06B6D4',
+  aiDeepCyan:     '#0891B2',
+  aiGlowColor:    'rgba(6, 182, 212, 0.25)',
+  aiGradient:     'linear-gradient(135deg, #00D2FF 0%, #06B6D4 30%, #8B5CF6 75%, #D946EF 100%)',
+  aiButtonGradient:'linear-gradient(135deg, #00D2FF 0%, #06B6D4 30%, #8B5CF6 75%, #D946EF 100%)',
+
+  cyan:           '#06B6D4',
+  cyanLight:      '#38BDF8',
+  cyanGlow:       'rgba(6, 182, 212, 0.45)',
+  purple:         '#8B5CF6',
+  purpleLight:    '#A855F7',
+  magenta:        '#D946EF',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LIGHT THEME TOKENS (Champagne Silk & Pure Premium White)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const lightTokens = {
+  background:       '#FFFFFF', // Pure Premium White
+  bgSecondary:      '#F8FAFC',
+  bgElevated:       '#FFFFFF', // Pure White Cards
+  bgHover:          '#F1F5F9',
+ 
+  cardBg:           '#FFFFFF',
+  cardBgSolid:      '#FFFFFF',
+  cardBorder:       'rgba(46, 52, 69, 0.08)',
+  cardBorderSubtle: 'rgba(46, 52, 69, 0.04)',
+
+  textPrimary:   '#2E3445', // Slate
+  textSecondary: '#5E667A', // Slate Gray
+  textMuted:     '#8B95A5',
+  textFaint:     '#B0B8C5',
+  textWhite:     '#FFFFFF',
+
+  indigo:        '#3D5AFE', // Royal AI Indigo
+  indigoLight:   '#74C5FF',
+  indigoSoft:    'rgba(61, 90, 254, 0.08)',
+  indigoBorder:  'rgba(61, 90, 254, 0.15)',
+
+  rose:          '#EF4444',
+  roseSoft:      'rgba(239, 68, 68, 0.08)',
+
+  mint:          '#00884E',
+  mintSoft:      'rgba(0, 136, 78, 0.10)',
+  mintBorder:    'rgba(0, 136, 78, 0.20)',
+
+  gold:          '#C88A45', // Warm Gold for Light
+  goldLight:     '#EDC184',
+  goldSoft:      'rgba(200, 138, 69, 0.08)',
+  goldBorder:    'rgba(200, 138, 69, 0.20)',
+
+  success:       '#22C55E',
+  successBg:     'rgba(34, 197, 94, 0.10)',
+  successBorder: 'rgba(34, 197, 94, 0.20)',
+  warning:       '#F59E0B',
+  warningBg:     'rgba(245, 158, 11, 0.10)',
+  warningBorder: 'rgba(245, 158, 11, 0.20)',
+  danger:        '#EF4444',
+  dangerBg:      'rgba(239, 68, 68, 0.10)',
+  dangerBorder:  'rgba(239, 68, 68, 0.20)',
+  info:          '#06B6D4',
+  infoBg:        'rgba(6, 182, 212, 0.08)',
+
+  border:        'rgba(46, 52, 69, 0.08)',
+  borderStrong:  '#C88A45',
+  borderSubtle:  'rgba(46, 52, 69, 0.04)',
+
+  glassBg:       'rgba(255, 255, 255, 0.90)',
+  glassBorder:   'rgba(46, 52, 69, 0.08)',
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DARK THEME TOKENS (Aurora Cyber-Glassmorphism & Obsidian-Teal)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const darkTokens = {
+  background:       '#061118', // Deep Midnight Obsidian-Teal Canvas
+  bgSecondary:      '#0D1E27', // Rich Dark Teal Slate
+  bgElevated:       '#10222D', // Elevated Dark Frosted Surface
+  bgHover:          '#162A37', // Subtle Teal Hover
+
+  cardBg:           'rgba(16, 26, 35, 0.72)',
+  cardBgSolid:      '#101F2B',
+  cardBorder:       'rgba(255, 255, 255, 0.08)', // Frosted glass light border
+  cardBorderSubtle: 'rgba(255, 255, 255, 0.05)',
+
+  textPrimary:   '#FFFFFF', // Crisp White
+  textSecondary: '#94A3B8', // Cool Slate Gray
+  textMuted:     '#64748B', // Muted Slate
+  textFaint:     '#475569',
+  textWhite:     '#FFFFFF',
+
+  // Aurora Cyber Accents
+  cyan:          '#06B6D4', // Vibrant Electric Cyan
+  cyanLight:     '#38BDF8', // Sky Cyan Highlight
+  cyanSoft:      'rgba(6, 182, 212, 0.15)',
+  cyanGlow:      'rgba(6, 182, 212, 0.45)',
+
+  purple:        '#8B5CF6', // Electric Violet / Purple
+  purpleLight:   '#A855F7',
+  purpleSoft:    'rgba(139, 92, 246, 0.15)',
+  purpleGlow:    'rgba(139, 92, 246, 0.40)',
+
+  magenta:       '#D946EF', // Vivid Magenta
+  magentaSoft:   'rgba(217, 70, 239, 0.15)',
+
+  indigo:        '#38BDF8',
+  indigoLight:   '#74C5FF',
+  indigoSoft:    'rgba(56, 189, 248, 0.15)',
+  indigoBorder:  'rgba(56, 189, 248, 0.28)',
+
+  rose:          '#EF4444',
+  roseSoft:      'rgba(239, 68, 68, 0.15)',
+
+  mint:          '#06B6D4',
+  mintSoft:      'rgba(6, 182, 212, 0.15)',
+  mintBorder:    'rgba(6, 182, 212, 0.35)',
+
+  gold:          '#EDC184',
+  goldLight:     '#FDE047',
+  goldSoft:      'rgba(237, 193, 132, 0.15)',
+  goldBorder:    'rgba(237, 193, 132, 0.25)',
+
+  success:       '#22C55E',
+  successBg:     'rgba(34, 197, 94, 0.14)',
+  warning:       '#F59E0B',
+  warningBg:     'rgba(245, 158, 11, 0.14)',
+  danger:        '#EF4444',
+  dangerBg:      'rgba(239, 68, 68, 0.14)',
+  info:          '#06B6D4',
+  infoBg:        'rgba(6, 182, 212, 0.14)',
+
+  border:        'rgba(255, 255, 255, 0.08)',
+  borderStrong:  'rgba(6, 182, 212, 0.28)',
+  borderSubtle:  'rgba(255, 255, 255, 0.05)',
+
+  glassBg:       'rgba(16, 26, 35, 0.65)',
+  glassBorder:   'rgba(255, 255, 255, 0.08)',
+} as const;
+
+export const radius = {
+  none: '0px', xs: '6px', sm: '10px', md: '14px', lg: '18px',
+  xl: '22px', '2xl': '28px', '3xl': '34px', pill: '9999px', circle: '50%',
+  button: '18px', input: '14px', card: '24px', modal: '28px', badge: '9999px',
+} as const;
+
+export const shadows = {
+  light: {
+    xs:       '0 1px 4px rgba(46, 52, 69, 0.04)',
+    sm:       '0 2px 8px rgba(46, 52, 69, 0.06)',
+    card:     '0 4px 16px rgba(46, 52, 69, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)',
+    hover:    '0 12px 36px rgba(46, 52, 69, 0.08)',
+    floating: '0 20px 60px rgba(46, 52, 69, 0.10)',
+    gold:     '0 6px 24px rgba(200, 138, 69, 0.12)',
   },
-
-  // Synapse Iris (Financial AI Engine, Forensics, Auto-Categorization)
-  synapse: {
-    50: '#F3F0FF',
-    100: '#E5DEFF',
-    200: '#CEBEFF',
-    300: '#AD93FD',
-    400: '#9171FB',
-    500: '#8B5CF6', // Electric Violet
-    600: '#7C3AED',
-    700: '#6D28D9', // Light AI Hero
-    800: '#4520B8',
-    900: '#2B1277',
-  },
-
-  // Crimson Pulse (Outflow, Expenses, Debits, Overdraft, Subscriptions)
-  pulse: {
-    50: '#FFF0F3',
-    100: '#FFE0E6',
-    200: '#FECDD6',
-    300: '#FF8AA5',
-    400: '#FF5C81',
-    500: '#FF4757', // Cyber Vermillion
-    600: '#E61C50',
-    700: '#D91E4E', // Light Spend Hero
-    800: '#A30F36',
-    900: '#66001B',
-  },
-
-  // Aureolin Ochre (Net Worth, Vault, Investments, Asset Allocation)
-  ochre: {
-    50: '#FEF9EE',
-    100: '#FDF0D2',
-    200: '#FCE0A5',
-    300: '#FACD6E',
-    400: '#F7B73E',
-    500: '#FFB800', // Solstice Gold
-    600: '#D9890F',
-    700: '#C67D0A', // Light Net Worth Hero
-    800: '#8A5200',
-    900: '#5C3800',
-  },
-
-  // Electric Cyan (Telemetry, Real-time Sync, Bank Feeds, Connectivity)
-  telemetry: {
-    50: '#E6F8FB',
-    100: '#C0F0F7',
-    200: '#8CE3F0',
-    300: '#47D0E6',
-    400: '#1EBED9',
-    500: '#00E5FF', // Electric Cyan
-    600: '#00ADC7',
-    700: '#0284C7', // Light Telemetry Hero
-    800: '#03628F',
-    900: '#04202B',
-  },
-
-  // Obsidian Abyss (Dark Mode Canvas, Cards, Insets, Borders)
-  abyss: {
-    canvas: '#07090E',
-    card: '#0D111A',
-    elevated: '#141A26',
-    well: '#182030',
-    border: '#1E2840',
-    borderStrong: '#2E3D60',
-    textPrimary: '#F1F5F9',
-    textSecondary: '#94A3B8',
-    textMuted: '#64748B',
-  },
-
-  // Titanium Alabaster (Light Mode Canvas, Cards, Insets, Borders)
-  alabaster: {
-    canvas: '#F5F7FA',
-    card: '#FFFFFF',
-    elevated: '#FFFFFF',
-    well: '#EDF1F7',
-    border: '#DCE3EE',
-    borderStrong: '#B8C6DC',
-    textPrimary: '#0F172A',
-    textSecondary: '#475569',
-    textMuted: '#64748B',
+  dark: {
+    xs:       '0 2px 8px rgba(0, 0, 0, 0.40)',
+    sm:       '0 4px 16px rgba(0, 0, 0, 0.50)',
+    card:     '0 12px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.10)',
+    hover:    '0 20px 48px rgba(0, 0, 0, 0.70), 0 0 28px rgba(6, 182, 212, 0.25)',
+    floating: '0 32px 80px rgba(0, 0, 0, 0.85)',
+    neonCyan: '0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(6, 182, 212, 0.25)',
+    neonPurple: '0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.25)',
+    aurora:   '0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(124, 58, 237, 0.3)',
   },
 } as const;
 
-// ── 2. DYNAMIC SEMANTIC RESOLVER ─────────────────────────────────────────────
+export const motion = {
+  duration: { instant: '80ms', fast: '150ms', normal: '250ms', slow: '400ms', page: '320ms' },
+  easing: {
+    standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  },
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DYNAMIC CATEGORY COLOR MAPPING
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CATEGORY_COLOR_MAP: Record<string, { solid: string; text?: string; bg?: string }> = {
+  'Food & Dining':      { solid: '#F59E0B', text: '#FBBF24', bg: 'rgba(245, 158, 11, 0.15)' },
+  'Groceries':          { solid: '#10B981', text: '#34D399', bg: 'rgba(16, 185, 129, 0.15)' },
+  'Travel & Transit':   { solid: '#06B6D4', text: '#38BDF8', bg: 'rgba(6, 182, 212, 0.15)' },
+  'Shopping & Retail':  { solid: '#EC4899', text: '#F472B6', bg: 'rgba(236, 72, 153, 0.15)' },
+  'Bills & Utilities':  { solid: '#8B5CF6', text: '#A78BFA', bg: 'rgba(139, 92, 246, 0.15)' },
+  'Entertainment':      { solid: '#F43F5E', text: '#FB7185', bg: 'rgba(244, 63, 94, 0.15)' },
+  'Health & Wellness':  { solid: '#14B8A6', text: '#2DD4BF', bg: 'rgba(20, 184, 166, 0.15)' },
+  'Investments':        { solid: '#3B82F6', text: '#60A5FA', bg: 'rgba(59, 130, 246, 0.15)' },
+  'Education':          { solid: '#6366F1', text: '#818CF8', bg: 'rgba(99, 102, 241, 0.15)' },
+  'Fuel':               { solid: '#EAB308', text: '#FACC15', bg: 'rgba(234, 179, 8, 0.15)' },
+  'Transfers & P2P':    { solid: '#06B6D4', text: '#38BDF8', bg: 'rgba(6, 182, 212, 0.15)' },
+  'Loans & Debt':       { solid: '#EF4444', text: '#F87171', bg: 'rgba(239, 68, 68, 0.15)' },
+  'Salary & Income':    { solid: '#22C55E', text: '#4ADE80', bg: 'rgba(34, 197, 94, 0.15)' },
+};
+
+export function getCategoryColor(categoryName: string, isDark: boolean = true) {
+  const norm = categoryName?.trim() || '';
+  if (norm in CATEGORY_COLOR_MAP) {
+    return CATEGORY_COLOR_MAP[norm];
+  }
+  // Case-insensitive lookup
+  const matchedKey = Object.keys(CATEGORY_COLOR_MAP).find(k => k.toLowerCase() === norm.toLowerCase());
+  if (matchedKey) {
+    return CATEGORY_COLOR_MAP[matchedKey];
+  }
+  // Default fallback
+  return {
+    solid: isDark ? '#8B5CF6' : '#6D28D9',
+    text: isDark ? '#A78BFA' : '#4F46E5',
+    bg: isDark ? 'rgba(139, 92, 246, 0.15)' : 'rgba(109, 40, 217, 0.08)',
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DYNAMIC SEMANTIC RESOLVER
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface ThemeTokens {
   isDark: boolean;
@@ -166,7 +342,7 @@ export interface ThemeTokens {
 
 export function getThemeTokens(isDark: boolean, themeId?: ThemeTemplateId): ThemeTokens {
   const activeId = themeId || getActiveThemeId();
-  const template = THEME_TEMPLATES[activeId] || THEME_TEMPLATES.apex_obsidian;
+  const template = THEME_TEMPLATES[activeId] || THEME_TEMPLATES.aurora_cyber;
   const t = isDark ? template.dark : template.light;
 
   return {
@@ -177,7 +353,7 @@ export function getThemeTokens(isDark: boolean, themeId?: ThemeTemplateId): Them
       card: t.card,
       cardElevated: t.cardElevated,
       well: t.well,
-      active: `${t.primaryHero}20`,
+      active: `${t.primaryHero}25`,
     },
     border: {
       subtle: t.border,
@@ -190,171 +366,37 @@ export function getThemeTokens(isDark: boolean, themeId?: ThemeTemplateId): Them
       primary: t.textPrimary,
       secondary: t.textSecondary,
       muted: t.textMuted,
-      inverse: isDark ? '#0F172A' : '#F8FAFC',
+      inverse: isDark ? '#000000' : '#FFFFFF',
     },
     primary: {
       hero: t.primaryHero,
-      hover: t.primaryHero,
-      subtle: `${t.primaryHero}15`,
+      hover: `${t.primaryHero}DD`,
+      subtle: `${t.primaryHero}18`,
       border: `${t.primaryHero}40`,
     },
     ai: {
       hero: t.aiHero,
-      hover: t.aiHero,
-      subtle: `${t.aiHero}15`,
+      hover: `${t.aiHero}DD`,
+      subtle: `${t.aiHero}18`,
       border: `${t.aiHero}40`,
     },
     debit: {
       hero: t.spendHero,
-      hover: t.spendHero,
-      subtle: `${t.spendHero}15`,
+      hover: `${t.spendHero}DD`,
+      subtle: `${t.spendHero}18`,
       border: `${t.spendHero}40`,
     },
     vault: {
       hero: t.vaultHero,
-      hover: t.vaultHero,
-      subtle: `${t.vaultHero}15`,
+      hover: `${t.vaultHero}DD`,
+      subtle: `${t.vaultHero}18`,
       border: `${t.vaultHero}40`,
     },
     telemetry: {
       hero: t.telemetryHero,
-      hover: t.telemetryHero,
-      subtle: `${t.telemetryHero}15`,
+      hover: `${t.telemetryHero}DD`,
+      subtle: `${t.telemetryHero}18`,
       border: `${t.telemetryHero}40`,
     },
   };
 }
-
-// ── 3. CATEGORY SOLID COLOR MAPS ─────────────────────────────────────────────
-
-export interface CategoryColorDef {
-  solidDark: string;
-  solidLight: string;
-  bgDark: string;
-  bgLight: string;
-}
-
-export const CATEGORY_SOLID_COLORS: Record<string, CategoryColorDef> = {
-  Food: {
-    solidDark: '#FF8A3D',
-    solidLight: '#D45A00',
-    bgDark: '#2A1608',
-    bgLight: '#FFF3EB',
-  },
-  'Food & Dining': {
-    solidDark: '#FF8A3D',
-    solidLight: '#D45A00',
-    bgDark: '#2A1608',
-    bgLight: '#FFF3EB',
-  },
-  Shopping: {
-    solidDark: '#FF4757',
-    solidLight: '#E11D48',
-    bgDark: '#2D0B14',
-    bgLight: '#FFF1F2',
-  },
-  Travel: {
-    solidDark: '#00E5FF',
-    solidLight: '#0284C7',
-    bgDark: '#052331',
-    bgLight: '#F0F9FF',
-  },
-  'Travel & Transit': {
-    solidDark: '#00E5FF',
-    solidLight: '#0284C7',
-    bgDark: '#052331',
-    bgLight: '#F0F9FF',
-  },
-  Bills: {
-    solidDark: '#38BDF8',
-    solidLight: '#0284C7',
-    bgDark: '#0C2D48',
-    bgLight: '#F0F9FF',
-  },
-  'Bills & Utilities': {
-    solidDark: '#38BDF8',
-    solidLight: '#0284C7',
-    bgDark: '#0C2D48',
-    bgLight: '#F0F9FF',
-  },
-  Entertainment: {
-    solidDark: '#8B5CF6',
-    solidLight: '#6D28D9',
-    bgDark: '#220D6B',
-    bgLight: '#F5F3FF',
-  },
-  Investment: {
-    solidDark: '#FFB800',
-    solidLight: '#D97706',
-    bgDark: '#2E1B00',
-    bgLight: '#FFFBEB',
-  },
-  'Investments & Wealth': {
-    solidDark: '#FFB800',
-    solidLight: '#D97706',
-    bgDark: '#2E1B00',
-    bgLight: '#FFFBEB',
-  },
-  Salary: {
-    solidDark: '#00F5A0',
-    solidLight: '#059669',
-    bgDark: '#002D22',
-    bgLight: '#ECFDF5',
-  },
-  Income: {
-    solidDark: '#00F5A0',
-    solidLight: '#059669',
-    bgDark: '#002D22',
-    bgLight: '#ECFDF5',
-  },
-  Transfers: {
-    solidDark: '#A78BFA',
-    solidLight: '#6D28D9',
-    bgDark: '#2E1065',
-    bgLight: '#F5F3FF',
-  },
-  Health: {
-    solidDark: '#34D399',
-    solidLight: '#059669',
-    bgDark: '#064E3B',
-    bgLight: '#ECFDF5',
-  },
-  Default: {
-    solidDark: '#8B5CF6',
-    solidLight: '#6D28D9',
-    bgDark: '#182030',
-    bgLight: '#EDF1F7',
-  },
-};
-
-export function getCategoryColor(category: string, isDark: boolean): { solid: string; bg: string } {
-  const match = CATEGORY_SOLID_COLORS[category] || CATEGORY_SOLID_COLORS.Default;
-  return {
-    solid: isDark ? match.solidDark : match.solidLight,
-    bg: isDark ? match.bgDark : match.bgLight,
-  };
-}
-
-// ── 4. CHART SOLID COLOR PALETTES ────────────────────────────────────────────
-
-export const CHART_SOLID_PALETTE_DARK = [
-  '#00F5A0', // Cyber Emerald
-  '#8B5CF6', // Hyper Iris
-  '#FF4757', // Plasma Flame
-  '#FFB800', // Solstice Gold
-  '#00E5FF', // Arctic Cyan
-  '#FF8A3D', // Saffron Tangerine
-  '#A78BFA', // Violet
-  '#34D399', // Mint
-];
-
-export const CHART_SOLID_PALETTE_LIGHT = [
-  '#059669', // Sovereign Jade
-  '#6D28D9', // Deep Iris
-  '#E11D48', // Crimson Pulse
-  '#D97706', // Dark Gold
-  '#0284C7', // Deep Arctic
-  '#D45A00', // Saffron
-  '#7C3AED', // Violet
-  '#047857', // Mint
-];

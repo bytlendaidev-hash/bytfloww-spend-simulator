@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,101 +7,93 @@
 @layer base {
   :root {
     /* ══════════════════════════════════════════════════════════════════════
-       BYTFLOWW ROYAL INDIGO SOVEREIGN FINTECH OS — CSS VARIABLES & DEFAULTS
-       Pure Velvet Midnight Canvas (#050814) with Royal Indigo & Electric Emerald
-    ══════════════════════════════════════════════════════════════════════ */
+       BYTLEND DESIGN SYSTEM V9 — AURORA CYBER-GLASSMORPHISM (DEFAULT DARK)
+       Deep Midnight Obsidian-Teal Canvas (#061118), Frosted Glass & Neon Accents
+       ══════════════════════════════════════════════════════════════════════ */
 
-    --spatial-bg: #050814;
+    --spatial-bg: #061118;
+    --background: #061118;
+    --foreground: #FFFFFF;
+    --card: rgba(16, 26, 35, 0.72);
+    --border: rgba(255, 255, 255, 0.08);
 
-    /* ── PILLAR 1: ROYAL INDIGO & SAPPHIRE (AI Forensics, Synapse Intelligence) ── */
-    --color-synapse-50:  #EEF2FF;
-    --color-synapse-100: #E0E7FF;
-    --color-synapse-200: #C7D2FE;
-    --color-synapse-300: #A5B4FC;
-    --color-synapse-400: #818CF8;
-    --color-synapse-500: #6366F1;  /* ROYAL INDIGO HERO */
-    --color-synapse-600: #4F46E5;
-    --color-synapse-700: #4338CA;
-    --color-synapse-800: #3730A3;
-    --color-synapse-900: #1E1B4B;
+    /* ── PILLAR 1: ELECTRIC CYAN (Primary Accent, Inflow & Currency) ── */
+    --color-jade-50:  #E0FCFF;
+    --color-jade-100: #B8F5FF;
+    --color-jade-200: #7CE8FF;
+    --color-jade-300: #38BDF8;
+    --color-jade-400: #00D2FF;
+    --color-jade-500: #06B6D4;  /* ELECTRIC CYAN HERO */
+    --color-jade-600: #0891B2;
+    --color-jade-700: #0E7490;
+    --color-jade-800: #155E75;
+    --color-jade-900: #164E63;
 
-    /* ── PILLAR 2: CYBER EMERALD MINT (Inflow, Salary, Surplus) ── */
-    --color-jade-50:  #E6FAF2;
-    --color-jade-100: #C2F4DF;
-    --color-jade-200: #8DE7C2;
-    --color-jade-300: #4FD69F;
-    --color-jade-400: #1EC882;
-    --color-jade-500: #00F5A0;   /* DARK HERO — Electric Cyber Emerald */
-    --color-jade-600: #00C882;
-    --color-jade-700: #00875A;   /* LIGHT HERO — Sovereign Forest Jade */
-    --color-jade-800: #004D3B;
-    --color-jade-900: #002D22;
+    /* ── PILLAR 2: ELECTRIC VIOLET & PURPLE (AI Forensics, Synapse Engine) ── */
+    --color-synapse-50:  #F5F3FF;
+    --color-synapse-100: #EDE9FE;
+    --color-synapse-200: #DDD6FE;
+    --color-synapse-300: #C4B5FD;
+    --color-synapse-400: #A78BFA;
+    --color-synapse-500: #8B5CF6;  /* ELECTRIC VIOLET HERO */
+    --color-synapse-600: #7C3AED;
+    --color-synapse-700: #6D28D9;
+    --color-synapse-800: #5B21B6;
+    --color-synapse-900: #4C1D95;
 
-    /* ── PILLAR 3: PLASMA VERMILLION (Outflow, Expenses, Debits) ── */
-    --color-pulse-50:  #FFF4EE;
-    --color-pulse-100: #FFE5D4;
-    --color-pulse-200: #FFC8A4;
-    --color-pulse-300: #FFA070;
-    --color-pulse-400: #FF7A48;
-    --color-pulse-500: #FF4757;  /* DARK HERO — Cyber Vermillion */
-    --color-pulse-600: #E03E0A;
-    --color-pulse-700: #B83000;  /* LIGHT HERO — Burnt Sienna */
-    --color-pulse-800: #851E00;
-    --color-pulse-900: #4A0D00;
+    /* ── PILLAR 3: ROSE VERMILLION (Outflow, Expenses, Debits, Risk) ── */
+    --color-pulse-50:  #FEF2F2;
+    --color-pulse-100: #FEE2E2;
+    --color-pulse-200: #FECACA;
+    --color-pulse-300: #FCA5A5;
+    --color-pulse-400: #F87171;
+    --color-pulse-500: #EF4444;  /* VIVID ROSE RED HERO */
+    --color-pulse-600: #DC2626;
+    --color-pulse-700: #B91C1C;
+    --color-pulse-800: #991B1B;
+    --color-pulse-900: #7F1D1D;
 
-    /* ── PILLAR 4: SOLSTICE GOLD (Vault, Net Worth, Investments) ── */
-    --color-ochre-50:  #FFFCE0;
-    --color-ochre-100: #FFF6B0;
-    --color-ochre-200: #FFEC70;
-    --color-ochre-300: #FFE040;
-    --color-ochre-400: #FFD020;
-    --color-ochre-500: #FFB800;  /* DARK HERO — Solstice Gold */
-    --color-ochre-600: #D9960A;
-    --color-ochre-700: #8A5C00;  /* LIGHT HERO — Dark Gold */
-    --color-ochre-800: #5C3800;
-    --color-ochre-900: #2E1B00;
+    /* ── PILLAR 4: CHAMPAGNE WARM GOLD (Vault, Net Worth, Logo Accent) ── */
+    --color-ochre-50:  #FFFBEB;
+    --color-ochre-100: #FEF3C7;
+    --color-ochre-200: #FDE68A;
+    --color-ochre-300: #FCD34D;
+    --color-ochre-400: #FBBF24;
+    --color-ochre-500: #EDC184;  /* CHAMPAGNE GOLD HERO */
+    --color-ochre-600: #D97706;
+    --color-ochre-700: #B45309;
+    --color-ochre-800: #92400E;
+    --color-ochre-900: #78350F;
 
-    /* ── PILLAR 5: ARCTIC CYAN (Telemetry, Real-time Sync) ── */
-    --color-telemetry-50:  #E0FAFF;
-    --color-telemetry-100: #B3F2FF;
-    --color-telemetry-200: #70E6FF;
-    --color-telemetry-300: #28D8FF;
-    --color-telemetry-400: #00CAFF;
-    --color-telemetry-500: #00E5FF;  /* DARK HERO — Arctic Cyan */
-    --color-telemetry-600: #0090B8;
-    --color-telemetry-700: #006A88;  /* LIGHT HERO — Deep Arctic */
-    --color-telemetry-800: #004460;
-    --color-telemetry-900: #001E2E;
+    /* ── PILLAR 5: SKY CYAN (Telemetry, Real-time Sync) ── */
+    --color-telemetry-50:  #F0F9FF;
+    --color-telemetry-100: #E0F2FE;
+    --color-telemetry-200: #BAE6FD;
+    --color-telemetry-300: #7DD3FC;
+    --color-telemetry-400: #38BDF8;
+    --color-telemetry-500: #38BDF8;  /* SKY CYAN HERO */
+    --color-telemetry-600: #0284C7;
+    --color-telemetry-700: #0369A1;
+    --color-telemetry-800: #075985;
+    --color-telemetry-900: #0C4A6E;
 
-    /* ── PILLAR 6: LUXURY ROYAL SURFACES (Midnight Velvet Obsidian) ── */
-    --obsidian-canvas:       #050814;
-    --obsidian-card:         #0A0F26;
-    --obsidian-elevated:     #101738;
-    --obsidian-well:         #141C42;
-    --obsidian-border:       #1E2B5C;
-    --obsidian-border-strong:#2E3F80;
-    --text-primary:          #F8FAFC;
+    /* ── PILLAR 6: AURORA FROSTED OBSIDIAN-TEAL SURFACES ── */
+    --obsidian-canvas:       #061118;
+    --obsidian-card:         rgba(16, 26, 35, 0.72);
+    --obsidian-elevated:     #10222D;
+    --obsidian-well:         #0D1E27;
+    --obsidian-border:       rgba(255, 255, 255, 0.08);
+    --obsidian-border-strong:rgba(6, 182, 212, 0.28);
+    --text-primary:          #FFFFFF;
     --text-secondary:        #94A3B8;
     --text-muted:            #64748B;
-    --text-subtle:           #3B4E75;
-
-    /* Legacy mapping */
-    --titanium-chrome:         #F8FAFC;
-    --cyber-iris:              #6366F1;
-    --cyber-iris-dark:         #4338CA;
-    --photon-cyan:             #00F5A0;
-    --magma-pulse:             #FF4757;
-    --aerospace-slate:         #050814;
-    --deep-vacuum:             #050814;
-    --spatial-accent:          #6366F1;
-    --spatial-accent-purple:   #818CF8;
-    --spatial-accent-indigo:   #4F46E5;
+    --text-subtle:           #475569;
   }
 
   body {
-    background-color: var(--obsidian-canvas, #050814);
-    color: var(--text-primary, #F8FAFC);
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background-color: var(--obsidian-canvas, #061118);
+    color: var(--text-primary, #FFFFFF);
+    font-family: 'Outfit', 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
@@ -110,51 +102,72 @@
 
   /* Strict Tabular Numerals for Precise Financial Alignment */
   .font-mono, [data-currency], .tabular-nums {
-    font-family: 'JetBrains Mono', -apple-system, monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-feature-settings: 'tnum' on, 'lnum' on, 'zero' on;
     letter-spacing: -0.015em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--text-primary, #F8FAFC);
+    color: var(--text-primary, #FFFFFF);
     letter-spacing: -0.025em;
     font-weight: 700;
-    font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Outfit', 'Inter', sans-serif;
   }
 }
 
 @layer components {
-  /* ── 1. ROYAL FINTECH WINDOW & SPATIAL CARDS ──────────────────────── */
-  .spatial-window {
-    background-color: var(--obsidian-card, #0A0F26);
-    border: 1px solid var(--obsidian-border, #1E2B5C);
-    box-shadow: 0 32px 80px -16px rgba(5, 8, 20, 0.95), 0 0 40px -10px rgba(99, 102, 241, 0.15);
-    border-radius: 28px;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-  }
-
-  .spatial-card {
-    background-color: var(--obsidian-card, #0A0F26);
-    border: 1px solid var(--obsidian-border, #1E2B5C);
-    box-shadow: 0 4px 20px -2px rgba(5, 8, 20, 0.6);
-    border-radius: 20px;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  /* ══════════════════════════════════════════════════════════════════════
+     AURORA CYBER-GLASSMORPHIC & SPECULAR 3D CARDS (from cloud-sign-in-hub-main)
+     ══════════════════════════════════════════════════════════════════════ */
+  .glass-card,
+  .aurora-glass-card,
+  .spatial-card,
+  .glossy-3d-card {
     position: relative;
+    background: var(--obsidian-card, rgba(16, 26, 35, 0.72));
+    border: 1px solid var(--obsidian-border, rgba(255, 255, 255, 0.08));
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.10);
+    border-radius: 24px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
   }
 
-  .spatial-card:hover {
-    background-color: var(--obsidian-elevated, #101738);
-    border-color: var(--obsidian-border-strong, #2E3F80);
-    transform: translateY(-2px);
-    box-shadow: 0 16px 40px -8px rgba(5, 8, 20, 0.8), 0 0 24px -6px rgba(99, 102, 241, 0.2);
+  .spatial-card:hover,
+  .glass-card:hover,
+  .glossy-3d-card:hover {
+    background-color: var(--obsidian-elevated, #10222D);
+    border-color: var(--obsidian-border-strong, rgba(6, 182, 212, 0.35));
+    transform: translateY(-3px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.70), 0 0 28px rgba(6, 182, 212, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+
+  .glass-card-compact,
+  .bytfloww-card-compact {
+    background-color: rgba(16, 26, 35, 0.60);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+
+  .spatial-window {
+    background-color: var(--obsidian-card, rgba(16, 26, 35, 0.72));
+    border: 1px solid var(--obsidian-border, rgba(255, 255, 255, 0.08));
+    box-shadow: 0 32px 80px -16px rgba(0, 0, 0, 0.90), 0 0 40px -10px rgba(6, 182, 212, 0.25);
+    border-radius: 28px;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
   }
 
   .spatial-card-hero {
-    background: linear-gradient(180deg, var(--obsidian-card, #0A0F26) 0%, var(--obsidian-elevated, #101738) 100%);
-    border: 1px solid var(--obsidian-border-strong, #2E3F80);
-    border-radius: 24px;
-    box-shadow: 0 20px 50px -12px rgba(5, 8, 20, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, var(--obsidian-card, rgba(16, 26, 35, 0.72)) 0%, var(--obsidian-elevated, #10222D) 100%);
+    border: 1px solid var(--obsidian-border-strong, rgba(6, 182, 212, 0.35));
+    border-radius: 28px;
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.85), 0 0 30px rgba(6, 182, 212, 0.20), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
     position: relative;
     overflow: hidden;
   }
@@ -165,166 +178,182 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, var(--color-synapse-500, #6366F1), var(--color-jade-500, #00F5A0), transparent);
-    opacity: 0.9;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00D2FF, #06B6D4, #8B5CF6, #D946EF, transparent);
+    opacity: 0.95;
   }
 
-  /* ── 2. INTERACTIVE ROYAL BUTTONS & PILLS ──────────────────────────── */
+  /* ══════════════════════════════════════════════════════════════════════
+     SHIMMER SWEEP LIGHT ANIMATION
+     ══════════════════════════════════════════════════════════════════════ */
+  .shimmer-container {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      60deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.05) 45%,
+      rgba(255, 255, 255, 0.14) 50%,
+      rgba(255, 255, 255, 0.05) 55%,
+      transparent 80%
+    );
+    transform: rotate(25deg);
+    animation: shimmerSweep 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes shimmerSweep {
+    0% { transform: translateX(-150%) rotate(25deg); }
+    30%, 100% { transform: translateX(150%) rotate(25deg); }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     HIGH-TECH METALLIC & NEON BUTTONS (from cloud-sign-in-hub-main)
+     ══════════════════════════════════════════════════════════════════════ */
+  .glossy-btn-gold {
+    background: linear-gradient(135deg, #EDC184 0%, #C88A45 50%, #9C6234 100%);
+    color: #090909;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(200, 138, 69, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glossy-btn-gold:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(200, 138, 69, 0.50), 0 0 16px rgba(237, 193, 132, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .glossy-btn-ai,
+  .btn-neon-action,
+  .btn-neon-gradient {
+    background: linear-gradient(135deg, #00D2FF 0%, #06B6D4 30%, #8B5CF6 75%, #D946EF 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.50), 0 0 40px rgba(124, 58, 237, 0.30) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  .glossy-btn-ai:hover,
+  .btn-neon-action:hover,
+  .btn-neon-gradient:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 28px rgba(6, 182, 212, 0.65), 0 0 50px rgba(124, 58, 237, 0.45) !important;
+  }
+
   .spatial-btn {
-    background-color: var(--obsidian-elevated, #101738);
-    border: 1px solid var(--obsidian-border, #1E2B5C);
-    border-radius: 9999px;
-    color: var(--text-primary, #F8FAFC);
+    background-color: var(--obsidian-elevated, #10222D);
+    border: 1px solid var(--obsidian-border, rgba(255, 255, 255, 0.08));
+    border-radius: 16px;
+    color: var(--text-primary, #FFFFFF);
     font-weight: 600;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   .spatial-btn:hover {
-    background-color: var(--obsidian-well, #141C42);
-    border-color: var(--color-synapse-500, #6366F1);
+    background-color: var(--obsidian-well, #162A37);
+    border-color: var(--obsidian-border-strong, rgba(6, 182, 212, 0.35));
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 16px rgba(6, 182, 212, 0.25);
   }
 
-  .spatial-btn:active {
-    transform: scale(0.97);
-  }
-
-  /* Selected State: Radiant Royal Indigo Glow */
   .spatial-btn-selected {
-    background-color: var(--color-synapse-500, #6366F1) !important;
-    border-color: var(--color-synapse-400, #818CF8) !important;
+    background: linear-gradient(135deg, #00D2FF 0%, #06B6D4 30%, #8B5CF6 80%, #D946EF 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
     color: #FFFFFF !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 20px 0 rgba(99, 102, 241, 0.45) !important;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.50), 0 0 40px rgba(124, 58, 237, 0.30) !important;
   }
 
-  /* ── 3. FLOATING SEGMENTED ORNAMENT ────────────────────────────────── */
-  .spatial-ornament {
-    background-color: var(--obsidian-well, #141C42);
-    border: 1px solid var(--obsidian-border, #1E2B5C);
+  .glass-pill {
+    background: rgba(16, 26, 35, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
     border-radius: 9999px;
-    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
   }
 
-  /* ── 4. TELEMETRY BADGES & GLOW ────────────────────────────────────── */
-  .telemetry-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    background-color: rgba(99, 102, 241, 0.15);
-    color: var(--color-synapse-400, #818CF8);
-    border: 1px solid rgba(99, 102, 241, 0.35);
+  /* ══════════════════════════════════════════════════════════════════════
+     STATUS BADGES & INDICATORS
+     ══════════════════════════════════════════════════════════════════════ */
+  .badge-emerald {
+    background-color: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.30);
+    color: #4ADE80;
   }
 
-  .glass-card {
-    background: rgba(10, 15, 38, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(30, 43, 92, 0.8);
-    border-radius: 20px;
+  .badge-rose {
+    background-color: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.30);
+    color: #F87171;
   }
 
-  .neon-border-pulse {
-    position: relative;
+  .badge-cyan {
+    background-color: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    color: #38BDF8;
   }
 
-  .neon-border-pulse::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, var(--color-synapse-500, #6366F1), var(--color-jade-500, #00F5A0), transparent);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
+  .badge-gold {
+    background-color: rgba(237, 193, 132, 0.12);
+    border: 1px solid rgba(237, 193, 132, 0.30);
+    color: #EDC184;
   }
 
-  .neon-border-pulse:hover::after {
-    opacity: 1;
+  .badge-purple {
+    background-color: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    color: #A78BFA;
   }
 }
 
-/* ── 5. MICRO ANIMATIONS & TRANSITIONS ──────────────────────────────── */
-@keyframes emergence {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-emergence {
-  animation: emergence 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.15);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 2.5s infinite ease-in-out;
-}
-
-/* Custom Sleek Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--obsidian-border, #1E2B5C);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--obsidian-border-strong, #2E3F80);
+/* ══════════════════════════════════════════════════════════════════════
+   SCROLLBAR & UTILITY HELPERS
+   ══════════════════════════════════════════════════════════════════════ */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* Mobile Safe Area & Fluid Helpers */
-.safe-area-pb {
-  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem));
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.35);
 }
 
-.touch-scroll {
-  -webkit-overflow-scrolling: touch;
+@keyframes emergence {
+  0% { opacity: 0; transform: translateY(8px) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-emergence {
+  animation: emergence 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

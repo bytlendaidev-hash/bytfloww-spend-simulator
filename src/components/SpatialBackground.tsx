@@ -11,7 +11,6 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
   const [activeTheme, setActiveTheme] = useState<ThemeTemplateId>(getActiveThemeId());
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
-  // Listen for custom theme template change events across the app
   useEffect(() => {
     const handleThemeChange = (e: CustomEvent<ThemeTemplateId>) => {
       if (e.detail && e.detail in THEME_TEMPLATES) {
@@ -46,13 +45,17 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
     };
   }, []);
 
-  const currentTemplate = THEME_TEMPLATES[activeTheme] || THEME_TEMPLATES.apex_obsidian;
+  const currentTemplate = THEME_TEMPLATES[activeTheme] || THEME_TEMPLATES.aurora_cyber;
   const t = isDark ? currentTemplate.dark : currentTemplate.light;
 
   return (
     <div
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transition-colors duration-500"
-      style={{ backgroundColor: t.canvas }}
+      style={{ 
+        background: isDark 
+          ? 'radial-gradient(circle at 50% 25%, #0e2430 0%, #06131a 55%, #03080d 100%)' 
+          : '#FFFFFF' 
+      }}
       aria-hidden="true"
     >
       {/* ── 1. DYNAMIC AMBIENT MESH GLOW ─────────────────────────────────── */}
@@ -65,41 +68,74 @@ export const SpatialBackground: React.FC<SpatialBackgroundProps> = ({
         }}
       />
 
-      {/* ── 2. SUBTLE RADIAL HIGHLIGHT (CYBER / SPATIAL AESTHETIC) ───────── */}
-      <div 
-        className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full blur-[140px] opacity-20 pointer-events-none"
-        style={{ backgroundColor: currentTemplate.swatches.ai }}
-      />
-      <div 
-        className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full blur-[140px] opacity-20 pointer-events-none"
-        style={{ backgroundColor: currentTemplate.swatches.primary }}
-      />
+      {/* ── 2. CELESTIAL ORBITAL GLOWS (Aurora Cyan & Violet/Magenta) ────── */}
+      {isDark ? (
+        <>
+          {/* Vibrant Cyan Aura (Top-Left) */}
+          <div 
+            className="absolute -top-32 -left-32 w-[650px] h-[650px] rounded-full blur-[120px] pointer-events-none opacity-40 animate-pulse"
+            style={{ 
+              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(56, 189, 248, 0.12) 40%, transparent 70%)',
+              animationDuration: '8s'
+            }}
+          />
 
-      {/* ── 3. SUBTLE CYBER GRID TEXTURE ─────────────────────────────────── */}
+          {/* Electric Violet/Purple Radiance (Center Depth) */}
+          <div 
+            className="absolute top-1/4 -right-32 w-[700px] h-[700px] rounded-full blur-[130px] pointer-events-none opacity-30 animate-pulse"
+            style={{ 
+              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.30) 0%, rgba(217, 70, 239, 0.10) 45%, transparent 75%)',
+              animationDuration: '10s'
+            }}
+          />
+
+          {/* Soft Amber / Champagne Depth Glow (Bottom-Left) */}
+          <div 
+            className="absolute -bottom-32 left-1/4 w-[500px] h-[500px] rounded-full blur-[110px] pointer-events-none opacity-20"
+            style={{ 
+              background: 'radial-gradient(circle, rgba(237, 193, 132, 0.20) 0%, transparent 70%)'
+            }}
+          />
+        </>
+      ) : (
+        <>
+          {/* Light Mode Champagne & Royal Indigo Glows */}
+          <div 
+            className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full blur-[100px] pointer-events-none opacity-25"
+            style={{ 
+              background: 'radial-gradient(circle, rgba(200, 138, 69, 0.18) 0%, transparent 70%)'
+            }}
+          />
+          <div 
+            className="absolute -bottom-32 -left-32 w-[600px] h-[600px] rounded-full blur-[100px] pointer-events-none opacity-15"
+            style={{ 
+              background: 'radial-gradient(circle, rgba(61, 90, 254, 0.15) 0%, transparent 70%)'
+            }}
+          />
+        </>
+      )}
+
+      {/* ── 3. CYBER PRECISION GRID TEXTURE ──────────────────────────────── */}
       <div 
-        className="absolute inset-0 opacity-[0.03] mix-blend-screen pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(${isDark ? '#FFFFFF' : '#000000'} 1px, transparent 1px)`,
-          backgroundSize: '32px 32px',
+          backgroundImage: isDark
+            ? 'radial-gradient(circle, rgba(6, 182, 212, 0.10) 1px, transparent 1px), linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px)'
+            : 'radial-gradient(circle, rgba(30, 41, 59, 0.08) 1.5px, transparent 1.5px), linear-gradient(to right, rgba(200, 138, 69, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(200, 138, 69, 0.05) 1px, transparent 1px)',
+          backgroundSize: isDark ? '24px 24px, 48px 48px, 48px 48px' : '28px 28px, 56px 56px, 56px 56px',
+          opacity: isDark ? 0.75 : 0.90,
         }}
       />
 
-      {/* ── 4. MICRO-GRAIN NOISE OVERLAY ─────────────────────────────────── */}
-      <svg
-        className="absolute inset-0 w-full h-full opacity-[0.015] mix-blend-overlay"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <filter id="spatialNoise">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.8"
-            numOctaves="3"
-            stitchTiles="stitch"
-          />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-        <rect width="100%" height="100%" filter="url(#spatialNoise)" />
-      </svg>
+      {/* ── 4. TOP EDGE SPECULAR HIGHLIGHT ───────────────────────────────── */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none"
+        style={{
+          background: isDark
+            ? 'linear-gradient(90deg, transparent 0%, rgba(6, 182, 212, 0.35) 30%, rgba(255, 255, 255, 0.6) 50%, rgba(139, 92, 246, 0.35) 70%, transparent 100%)'
+            : 'linear-gradient(90deg, transparent 0%, rgba(200, 138, 69, 0.25) 30%, rgba(255, 255, 255, 0.95) 50%, rgba(200, 138, 69, 0.25) 70%, transparent 100%)',
+        }}
+      />
     </div>
   );
 };

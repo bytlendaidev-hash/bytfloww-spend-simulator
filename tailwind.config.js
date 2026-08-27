@@ -8,156 +8,163 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ── 1. APEX TEAL (Income, Salary, Surplus) — Electric Bioluminescent Teal ──
-        jade: {
-          50:  'var(--color-jade-50,  #E0FFF7)',
-          100: 'var(--color-jade-100, #B3FFE9)',
-          200: 'var(--color-jade-200, #6DFFD5)',
-          300: 'var(--color-jade-300, #00F5C0)',
-          400: 'var(--color-jade-400, #00E0A8)',
-          500: 'var(--color-jade-500, #00C896)',  // Dark Hero — Electric Apex Teal
-          600: 'var(--color-jade-600, #00A07A)',
-          700: 'var(--color-jade-700, #007A5E)',  // Light Hero — Deep Forest Teal
-          800: 'var(--color-jade-800, #004D3B)',
-          900: 'var(--color-jade-900, #002D22)',
-          DEFAULT: 'var(--color-jade-500, #00C896)',
+        // ── 1. AURORA CYBER-GLASS PALETTE (BytLend Flagship) ──────────────────
+        aurora: {
+          bg:        '#061118', // Deep Midnight Obsidian-Teal Canvas
+          teal:      '#0D1E27', // Rich Dark Teal Slate
+          surface:   '#10222D', // Frosted Surface
+          card:      'rgba(16, 26, 35, 0.72)',
+          cardSolid: '#101F2B',
+          border:    'rgba(255, 255, 255, 0.08)',
+          cyan:      '#06B6D4', // Vibrant Electric Cyan
+          cyanLight: '#38BDF8', // Sky Cyan
+          purple:    '#8B5CF6', // Electric Violet
+          magenta:   '#D946EF', // Neon Magenta
         },
 
-        // ── 2. APEX VIOLET (AI Engine, Forensics, Intelligence) — Hyper Violet ──
+        // ── 2. BYTLEND LUXURY FINTECH GOLD PALETTE ───────────────────────────
+        gold: {
+          DEFAULT:   '#EDC184', // Warm Champagne Gold
+          light:     '#F7D7A4', // Light Champagne Highlight
+          champagne: '#EDC184',
+          copper:    '#C88A45', // Luxury Copper
+          bronze:    '#9C6234', // Metallic Bronze
+          deep:      '#8A5A2D', // Deep Bronze Shadow
+          faint:     'rgba(237, 193, 132, 0.04)',
+          glow:      'rgba(237, 193, 132, 0.25)',
+          border:    'rgba(237, 193, 132, 0.25)',
+        },
+
+        // ── 3. BYTLEND OBSIDIAN & GRAPHITE ───────────────────────────────────
+        obsidian: {
+          DEFAULT: '#090909',
+          hover:   '#151312',
+          card:    '#171717',
+          light:   '#C7B9A9',
+        },
+        graphite: {
+          DEFAULT: '#1D1A18',
+          2:       '#25221F',
+          3:       '#2E2A27',
+          4:       '#3B2D22',
+          5:       '#8B7A68',
+          6:       '#C7B9A9',
+        },
+
+        // ── 4. PRIMARY HERO ACCENTS (Dynamic CSS Variable Powered) ───────────
+        jade: {
+          50:  '#E0FCFF',
+          100: '#B8F5FF',
+          200: '#7CE8FF',
+          300: '#38BDF8',
+          400: '#00D2FF',
+          500: 'var(--color-jade-500, #06B6D4)', // Cyan / Emerald Hero
+          600: '#0891B2',
+          700: '#0E7490',
+          800: '#155E75',
+          900: '#164E63',
+          DEFAULT: 'var(--color-jade-500, #06B6D4)',
+        },
         synapse: {
-          50:  'var(--color-synapse-50,  #F4F0FF)',
-          100: 'var(--color-synapse-100, #E8DDFF)',
-          200: 'var(--color-synapse-200, #D4BBFF)',
-          300: 'var(--color-synapse-300, #B990FF)',
-          400: 'var(--color-synapse-400, #A070FF)',
-          500: 'var(--color-synapse-500, #8B5CF6)',  // Dark Hero — Hyper Violet
-          600: 'var(--color-synapse-600, #7340E8)',
-          700: 'var(--color-synapse-700, #5B2EE0)',  // Light Hero — Deep Ultraviolet
-          800: 'var(--color-synapse-800, #3D1AAA)',
-          900: 'var(--color-synapse-900, #220D6B)',
+          50:  '#F5F3FF',
+          100: '#EDE9FE',
+          200: '#DDD6FE',
+          300: '#C4B5FD',
+          400: '#A78BFA',
+          500: 'var(--color-synapse-500, #8B5CF6)', // Violet / Purple AI Hero
+          600: '#7C3AED',
+          700: '#6D28D9',
+          800: '#5B21B6',
+          900: '#4C1D95',
           DEFAULT: 'var(--color-synapse-500, #8B5CF6)',
         },
-
-        // ── 3. APEX FLAME (Outflow, Expenses, Debits) — Plasma Vermillion ──
-        //    RADICAL BREAK: Orange-vermillion, NOT red. Bloomberg energy.
         pulse: {
-          50:  'var(--color-pulse-50,  #FFF4EE)',
-          100: 'var(--color-pulse-100, #FFE5D4)',
-          200: 'var(--color-pulse-200, #FFC8A4)',
-          300: 'var(--color-pulse-300, #FFA070)',
-          400: 'var(--color-pulse-400, #FF7A48)',
-          500: 'var(--color-pulse-500, #FF5722)',  // Dark Hero — Plasma Vermillion
-          600: 'var(--color-pulse-600, #E03E0A)',
-          700: 'var(--color-pulse-700, #B83000)',  // Light Hero — Burnt Sienna
-          800: 'var(--color-pulse-800, #851E00)',
-          900: 'var(--color-pulse-900, #4A0D00)',
-          DEFAULT: 'var(--color-pulse-500, #FF5722)',
+          50:  '#FEF2F2',
+          100: '#FEE2E2',
+          200: '#FECACA',
+          300: '#FCA5A5',
+          400: '#F87171',
+          500: 'var(--color-pulse-500, #EF4444)', // Rose / Red Debits
+          600: '#DC2626',
+          700: '#B91C1C',
+          800: '#991B1B',
+          900: '#7F1D1D',
+          DEFAULT: 'var(--color-pulse-500, #EF4444)',
         },
-
-        // ── 4. APEX GOLD (Vault, Loans, Net Worth) — Pure Electric Gold ──
         ochre: {
-          50:  'var(--color-ochre-50,  #FFFCE0)',
-          100: 'var(--color-ochre-100, #FFF6B0)',
-          200: 'var(--color-ochre-200, #FFEC70)',
-          300: 'var(--color-ochre-300, #FFE040)',
-          400: 'var(--color-ochre-400, #FFD020)',
-          500: 'var(--color-ochre-500, #FFBB00)',  // Dark Hero — Electric Gold
-          600: 'var(--color-ochre-600, #D9960A)',
-          700: 'var(--color-ochre-700, #8A5C00)',  // Light Hero — Dark Gold
-          800: 'var(--color-ochre-800, #5C3800)',
-          900: 'var(--color-ochre-900, #2E1B00)',
-          DEFAULT: 'var(--color-ochre-500, #FFBB00)',
+          50:  '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: 'var(--color-ochre-500, #EDC184)', // Champagne Gold
+          600: '#D97706',
+          700: '#B45309',
+          800: '#92400E',
+          900: '#78350F',
+          DEFAULT: 'var(--color-ochre-500, #EDC184)',
         },
-
-        // ── 5. APEX ICE (Telemetry, EPFO, Real-time Sync) — Arctic Ice ──
         telemetry: {
-          50:  'var(--color-telemetry-50,  #E0FAFF)',
-          100: 'var(--color-telemetry-100, #B3F2FF)',
-          200: 'var(--color-telemetry-200, #70E6FF)',
-          300: 'var(--color-telemetry-300, #28D8FF)',
-          400: 'var(--color-telemetry-400, #00CAFF)',
-          500: 'var(--color-telemetry-500, #00B4E0)',  // Dark Hero — Arctic Ice
-          600: 'var(--color-telemetry-600, #0090B8)',
-          700: 'var(--color-telemetry-700, #006A88)',  // Light Hero — Deep Arctic
-          800: 'var(--color-telemetry-800, #004460)',
-          900: 'var(--color-telemetry-900, #001E2E)',
-          DEFAULT: 'var(--color-telemetry-500, #00B4E0)',
+          50:  '#F0F9FF',
+          100: '#E0F2FE',
+          200: '#BAE6FD',
+          300: '#7DD3FC',
+          400: '#38BDF8',
+          500: 'var(--color-telemetry-500, #38BDF8)', // Sky Cyan Telemetry
+          600: '#0284C7',
+          700: '#0369A1',
+          800: '#075985',
+          900: '#0C4A6E',
+          DEFAULT: 'var(--color-telemetry-500, #38BDF8)',
         },
 
-        // ── 6. ROYAL INDIGO MIDNIGHT SURFACES ────────────────────────
+        // ── 5. ABYSS & ALABASTER SURFACES (Dynamic) ──────────────────────────
         abyss: {
-          canvas:       'var(--obsidian-canvas,       #050814)',
-          card:         'var(--obsidian-card,         #0A0F26)',
-          elevated:     'var(--obsidian-elevated,     #101738)',
-          well:         'var(--obsidian-well,         #141C42)',
-          border:       'var(--obsidian-border,       #1E2B5C)',
-          borderStrong: 'var(--obsidian-border-strong,#2E3F80)',
-          textPrimary:  'var(--text-primary,          #F8FAFC)',
+          canvas:       'var(--obsidian-canvas,       #061118)',
+          card:         'var(--obsidian-card,         rgba(16, 26, 35, 0.72))',
+          elevated:     'var(--obsidian-elevated,     #10222D)',
+          well:         'var(--obsidian-well,         #0D1E27)',
+          border:       'var(--obsidian-border,       rgba(255, 255, 255, 0.08))',
+          borderStrong: 'var(--obsidian-border-strong,rgba(6, 182, 212, 0.28))',
+          textPrimary:  'var(--text-primary,          #FFFFFF)',
           textSecondary:'var(--text-secondary,        #94A3B8)',
           textMuted:    'var(--text-muted,            #64748B)',
-          DEFAULT:      'var(--obsidian-canvas,       #050814)',
+          DEFAULT:      'var(--obsidian-canvas,       #061118)',
         },
-
-        // ── 7. APEX ICE LIGHT SURFACES ─────────────────────────────────
         alabaster: {
-          canvas:      '#F0F4FA',
-          card:        '#FFFFFF',
-          elevated:    '#FFFFFF',
-          well:        '#E6ECFA',
-          border:      '#CCD6EC',
-          borderStrong:'#A8B8D8',
-          textPrimary: '#080C18',
-          textSecondary:'#3A4A6A',
-          textMuted:   '#6070A0',
-          DEFAULT:     '#F0F4FA',
+          canvas:       '#FFFFFF',
+          card:         '#FFFFFF',
+          elevated:     '#FFFFFF',
+          well:         '#F8FAFC',
+          border:       'rgba(46, 52, 69, 0.08)',
+          borderStrong: 'rgba(200, 138, 69, 0.35)',
+          textPrimary:  '#2E3445',
+          textSecondary:'#5E667A',
+          textMuted:    '#8B95A5',
+          DEFAULT:      '#FFFFFF',
         },
-
-        // Backward compatibility
-        quantum:  { 500: '#00C896', 700: '#007A5E', DEFAULT: '#00C896' },
-        amethyst: { 500: '#8B5CF6', 700: '#5B2EE0', DEFAULT: '#8B5CF6' },
-        coral:    { 500: '#FF5722', 700: '#B83000', DEFAULT: '#FF5722' },
-        amber:    { 500: '#FFBB00', 700: '#8A5C00', DEFAULT: '#FFBB00' },
-        obsidian: {
-          50: '#EEF2FF', 100: '#E6ECFA', 200: '#CCD6EC', 300: '#A8B8D8',
-          400: '#8892B0', 500: '#50607A', 600: '#3A4A6A',
-          700: '#1E2840', 800: '#0D1018', 850: '#131926',
-          900: '#07080E', 950: '#04050A', DEFAULT: '#07080E',
-        },
-        bytlend: {
-          gold: '#00C896', goldLight: '#EEF2FF', goldDark: '#007A5E',
-          goldMuted: '#8B5CF6', goldChampagne: '#00B4E0',
-          obsidian: '#07080E', obsidianCanvas: '#07080E',
-          obsidianSurface: '#0D1018', obsidianCard: '#0D1018',
-          obsidianHover: '#131926',
-        },
-        theme: {
-          bg: '#07080E', bgDark: '#04050A', card: '#0D1018',
-          cardSubtle: '#131926', cyan: '#00B4E0', purple: '#8B5CF6',
-          magenta: '#FF5722', gold: '#FFBB00',
-          textMuted: '#8892B0', textSubtle: '#50607A',
-        },
-      },
-      borderRadius: {
-        'spatial-sm': '12px',
-        'spatial-md': '18px',
-        'spatial-lg': '26px',
-        'spatial-xl': '34px',
-        'spatial-2xl': '44px',
-      },
-      fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Outfit', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        heading: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
-        mono: ['JetBrains Mono', 'SF Mono', 'monospace'],
       },
       boxShadow: {
-        'solid-sm': '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-        'solid-md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'solid-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'solid-card-dark': '0 10px 30px -10px rgba(0, 0, 0, 0.7)',
-        'solid-card-light': '0 2px 12px -2px rgba(15, 23, 42, 0.06)',
-        'spatial-sm': '0 2px 8px -1px rgba(0, 0, 0, 0.06)',
-        'spatial-md': '0 8px 24px -4px rgba(0, 0, 0, 0.08)',
-        'spatial-lg': '0 20px 40px -12px rgba(0, 0, 0, 0.18)',
+        'solid-xs': '0 1px 4px rgba(0, 0, 0, 0.3)',
+        'solid-sm': '0 2px 8px rgba(0, 0, 0, 0.4)',
+        'solid-md': '0 12px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.10)',
+        'solid-lg': '0 20px 48px rgba(0, 0, 0, 0.70), 0 0 28px rgba(6, 182, 212, 0.25)',
+        'neon-cyan': '0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(6, 182, 212, 0.25)',
+        'neon-purple': '0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.25)',
+        'neon-aura': '0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(124, 58, 237, 0.3)',
+        'gold-glow': '0 6px 24px rgba(237, 193, 132, 0.25)',
+      },
+      borderRadius: {
+        'spatial-sm': '14px',
+        'spatial-md': '18px',
+        'spatial-lg': '24px',
+        'spatial-xl': '28px',
+        'spatial-2xl': '34px',
+      },
+      fontFamily: {
+        sans: ["'Outfit'", 'Inter', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        heading: ["'Outfit'", 'Inter', 'sans-serif'],
+        mono: ["'JetBrains Mono'", 'SF Mono', 'monospace'],
       },
     },
   },

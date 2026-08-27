@@ -4,7 +4,7 @@ import { BytLendLogo } from './BytLendLogo';
 import { ThemeStudioModal } from './ThemeStudioModal';
 import { SidebarNavigation } from './SidebarNavigation';
 import { MobileBottomNav } from './MobileBottomNav';
-import { THEME_TEMPLATES, ThemeTemplateId, getActiveThemeId, setActiveThemeId } from '../theme/themes';
+import { THEME_TEMPLATES, ThemeTemplateId, getActiveThemeId } from '../theme/themes';
 import { SpendTab, ActiveModule, StatementSection } from '../types';
 
 interface AppShellProps {
@@ -58,24 +58,24 @@ export const AppShell: React.FC<AppShellProps> = ({
     return () => window.removeEventListener('theme-template-change' as any, handleThemeChange);
   }, []);
 
-  const currentTheme = THEME_TEMPLATES[currentThemeId] || THEME_TEMPLATES.royal_indigo;
+  const currentTheme = THEME_TEMPLATES[currentThemeId] || THEME_TEMPLATES.aurora_cyber;
 
   return (
-    <div className="h-screen w-screen relative overflow-hidden flex flex-col bg-abyss-canvas text-abyss-textPrimary selection:bg-synapse-500/30 selection:text-white transition-colors duration-300">
+    <div className="h-screen w-screen relative overflow-hidden flex flex-col bg-abyss-canvas text-abyss-textPrimary selection:bg-cyan-500/30 selection:text-white transition-colors duration-300">
       {/* ── 1. DYNAMIC AMBIENT BACKGROUND ENVIRONMENT ─────────────────────── */}
       <SpatialBackground isDark={isDark} />
 
       {/* ── 2. STICKY TOP APP BAR (HEADER) ────────────────────────────────── */}
-      <header className="h-14 sm:h-16 px-4 sm:px-6 border-b border-abyss-border flex items-center justify-between gap-3 shrink-0 z-40 bg-abyss-card/95 backdrop-blur-xl">
+      <header className="h-14 sm:h-16 px-4 sm:px-6 border-b border-abyss-border flex items-center justify-between gap-3 shrink-0 z-40 bg-abyss-card/90 backdrop-blur-xl">
         {/* Brand Identity */}
         <div className="flex items-center gap-3 shrink-0">
           <BytLendLogo size="sm" />
           <div className="flex items-center gap-2">
-            <span className="font-black text-base sm:text-lg tracking-tight text-abyss-textPrimary">
-              Byt<span className="text-synapse-400">Floww</span>
+            <span className="font-extrabold text-base sm:text-lg tracking-tight text-abyss-textPrimary">
+              Byt<span className="text-cyan-400">Floww</span>
             </span>
-            <span className="hidden sm:inline-flex text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-synapse-500/15 text-synapse-400 border border-synapse-500/30 tracking-wider uppercase items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-synapse-400 animate-pulse" />
+            <span className="hidden sm:inline-flex text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 tracking-wider uppercase items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               FINTECH OS
             </span>
           </div>
@@ -88,7 +88,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               onClick={() => onSwitchModule('BANK_STATEMENTS')}
               className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-2 ${
                 activeModule === 'BANK_STATEMENTS'
-                  ? 'bg-synapse-500 text-white shadow-solid-sm'
+                  ? 'btn-neon-action shadow-neon-cyan'
                   : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-card'
               }`}
             >
@@ -99,7 +99,7 @@ export const AppShell: React.FC<AppShellProps> = ({
               onClick={() => onSwitchModule('SMS_INTELLIGENCE')}
               className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center gap-2 ${
                 activeModule === 'SMS_INTELLIGENCE'
-                  ? 'bg-synapse-500 text-white shadow-solid-sm'
+                  ? 'btn-neon-action shadow-neon-cyan'
                   : 'text-abyss-textSecondary hover:text-abyss-textPrimary hover:bg-abyss-card'
               }`}
             >
@@ -114,7 +114,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           {/* Theme Studio Button */}
           <button
             onClick={() => setShowThemeStudio(true)}
-            className="spatial-btn px-3 py-1.5 text-xs flex items-center gap-1.5 border-synapse-500/30 text-synapse-400 hover:border-synapse-400"
+            className="spatial-btn px-3 py-1.5 text-xs flex items-center gap-1.5 border-cyan-500/30 text-cyan-400 hover:border-cyan-400"
             title="Theme Studio"
           >
             <span>🎨</span>
@@ -135,7 +135,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           {/* User Session Profile Chip */}
           {currentUser && (
             <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-abyss-well border border-abyss-border text-xs">
-              <div className="w-6 h-6 rounded-full bg-synapse-500/20 border border-synapse-500/50 flex items-center justify-center text-[10px] font-bold text-synapse-400">
+              <div className="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center text-[10px] font-bold text-cyan-400">
                 {currentUser.name.charAt(0).toUpperCase()}
               </div>
               <div className="hidden sm:block text-left">
@@ -172,7 +172,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                     setMobileMenuOpen(false);
                     onLogout();
                   }}
-                  className="text-xs text-pulse-500 font-bold px-3 py-1 bg-pulse-500/10 rounded-full border border-pulse-500/20"
+                  className="text-xs text-rose-500 font-bold px-3 py-1 bg-rose-500/10 rounded-full border border-rose-500/20"
                 >
                   Sign Out 🚪
                 </button>
@@ -189,7 +189,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 }}
                 className={`p-2.5 rounded-xl text-xs font-bold text-center border transition ${
                   activeModule === 'BANK_STATEMENTS'
-                    ? 'bg-synapse-500 text-white shadow-solid-sm'
+                    ? 'btn-neon-action shadow-neon-cyan'
                     : 'bg-abyss-well border-abyss-border text-abyss-textSecondary'
                 }`}
               >
@@ -202,7 +202,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 }}
                 className={`p-2.5 rounded-xl text-xs font-bold text-center border transition ${
                   activeModule === 'SMS_INTELLIGENCE'
-                    ? 'bg-synapse-500 text-white shadow-solid-sm'
+                    ? 'btn-neon-action shadow-neon-cyan'
                     : 'bg-abyss-well border-abyss-border text-abyss-textSecondary'
                 }`}
               >
