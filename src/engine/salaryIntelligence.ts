@@ -7,7 +7,7 @@
  *   1. Tier-1: Universal Bank Regex & Lexical Anchor Patterns (NEFT, RTGS, IMPS, ACH, CMS, CLNSAL)
  *   2. Tier-2: Strict Negative Disambiguation Filter (Excludes digital loans, non-salary names, reimbursements)
  *   3. Tier-3: Periodic Cadence & Statistical Amount Clustering (DFT & Recurrence Analysis)
- *   4. Tier-4: Dynamic Employer Entity Extraction & Title-Case Normalization (Multi-Employer Support)
+ *   4. Tier-4: Generic Dynamic Employer Entity Extraction & Normalization (100% Dynamic, 0% Hardcoded)
  */
 
 export interface DetectedEmployerInfo {
@@ -37,10 +37,10 @@ const MONTH_TOKENS = new Set([
 ]);
 
 const SALARY_PREFIX_REGEXES = [
-  /\bSAL[-/_]\s*[A-Z0-9]/i,             // e.g. SAL-CYIENTLIMITED, SAL/AUG2026/CYIENT, SAL_TCS_LTD
-  /\bSAL\s+[A-Z0-9]/i,                  // e.g. SAL CYIENT LIMITED, SAL INFOSYS
+  /\bSAL[-/_]\s*[A-Z0-9]/i,             // e.g. SAL-COMPANY, SAL/MONTH/COMPANY, SAL_COMPANY_LTD
+  /\bSAL\s+[A-Z0-9]/i,                  // e.g. SAL COMPANY LIMITED
   /\bCLNSAL\b/i,                        // e.g. CLNSAL (HDFC / Axis clearing salary code)
-  /\bCMS[/]SALARY\b/i,                  // e.g. CMS/SALARY/WIPRO (Cash Management Services bulk payroll)
+  /\bCMS[/]SALARY\b/i,                  // e.g. CMS/SALARY/COMPANY (Cash Management Services bulk payroll)
   /\bCMS[/]SAL\b/i,                     // e.g. CMS/SAL/COMPANY
   /\bCMS\s*SALARY\b/i,                  // e.g. CMS SALARY
   /\bINF[/]SAL\b/i,                     // e.g. /INF/SAL (HDFC corporate payroll)
@@ -75,6 +75,20 @@ const CORPORATE_ENTITY_INDICATORS = [
   'SOFTWARE', 'CORP', 'CORPORATION', 'INC', 'INCORPORATED', 
   'HOLDINGS', 'INDUSTRIES', 'SYSTEMS', 'LABS', 'GLOBAL', 'ENTERPRISES', 'CONSULTING'
 ];
+
+const CORPORATE_SUFFIX_SPLIT_REGEX = /^([A-Za-z0-9]{2,})(LIMITED|TECHNOLOGIES|PVTLTD|SOLUTIONS|SERVICES|INFOTECH|SOFTWARE|CORPORATION|HOLDINGS|INDUSTRIES|ENTERPRISES|CONSULTING|SYSTEMS|LABS|GLOBAL)$/i;
+
+const KNOWN_ACRONYMS = new Set([
+  'TCS', 'HCL', 'IBM', 'L&T', 'EPFO', 'LIC', 'GE', 'HP', 'EY', 'PWC', 'KPMG', 
+  'SAP', 'AMD', 'ARM', 'ITC', 'LTI', 'SBI', 'HDFC', 'ICICI', 'AXIS', 'IDFC', 'HSBC', 'DMRC', 'IRCTC', 'ISRO', 'DRDO'
+]);
+
+const NOISE_TOKENS = new Set([
+  'SAL', 'SALARY', 'PAYROLL', 'STIPEND', 'WAGES', 'CREDIT', 'FOR', 'MONTH', 
+  'CR', 'DR', 'NEFT', 'RTGS', 'IMPS', 'ACH', 'NACH', 'CMS', 'CLNSAL', 'BY', 
+  'TRANSFER', 'DIR', 'DEP', 'INWARD', 'CLG', 'REF', 'TRF', 'INF', 'TXT', 'FROM', 
+  'FINAL', 'SA', 'NA', 'CLEARING', 'DEPOSIT', 'ORDER'
+]);
 
 // ── 2. STRICT NEGATIVE DISAMBIGUATION (FALSE-POSITIVE ELIMINATION) ────────────
 
@@ -134,7 +148,7 @@ export function isSalaryTransaction(
     return true;
   }
 
-  // 5. Positive Match Tier 2: ACH C- corporate salary credits (e.g. ACH C- SAL-CYIENTLIMITED or ACH C- CYIENTLIMITED-59995 CYIENT FINAL)
+  // 5. Positive Match Tier 2: ACH C- corporate salary credits
   if (/^ACH\s*C[-/\s]|^NACH\s*C[-/\s]/i.test(u)) {
     if (
       u.includes('SAL') || u.includes('SALARY') || u.includes('FINAL') || u.includes('SA') ||
@@ -161,18 +175,18 @@ export function isSalaryTransaction(
   return false;
 }
 
-// ── 4. DYNAMIC EMPLOYER ENTITY EXTRACTION & NORMALIZATION ─────────────────────
+// ── 4. GENERIC DYNAMIC EMPLOYER ENTITY EXTRACTION & NORMALIZATION ────────────
 
 export function extractEmployerFromNarration(narration: string): string {
   let s = (narration || '').toUpperCase().trim();
   if (!s) return 'Corporate Employer';
 
-  // 1. If starts with ACH C- or ACH CR- or NACH C-
+  // 1. Strip rail prefix (ACH C-, NACH C-)
   if (/^ACH\s*C[-/\s]|^NACH\s*C[-/\s]/i.test(s)) {
     s = s.replace(/^ACH\s*C[-/\s]+|^NACH\s*C[-/\s]+/i, '');
   }
 
-  // 2. If NEFT CR-IFSC-COMPANY-BENEFICIARY-UTR
+  // 2. NEFT CR-IFSC-COMPANY-BENEFICIARY-UTR pattern
   const neftParts = s.split(/[-/]+/);
   if (neftParts[0].includes('NEFT') && neftParts.length >= 3) {
     if (/^[A-Z]{4}0[A-Z0-9]{6}$/.test(neftParts[1].trim()) || /^[A-Z0-9]{8,11}$/.test(neftParts[1].trim())) {
@@ -180,7 +194,7 @@ export function extractEmployerFromNarration(narration: string): string {
     }
   }
 
-  // 3. Remove common banking suffixes / account codes / dates / salary noise
+  // 3. Remove banking code artifacts & dates
   s = s.replace(/\bSAL[-/_]?\b/gi, ' ');
   s = s.replace(/\b(SALARY|PAYROLL|STIPEND|WAGES|REMUNERATION|HONORARIUM|MONTHLY|FOR|FROM|BY|TRANSFER|CREDIT|INWARD|CLEARING|DEPOSIT|FINAL|SA|NA)\b/gi, ' ');
   s = s.replace(/\b[A-Z]{3,4}\d{2,4}\b/g, ' ');
@@ -188,28 +202,75 @@ export function extractEmployerFromNarration(narration: string): string {
   s = s.replace(/[A-Z]{4}0[A-Z0-9]{6}/g, ' ');
   s = s.replace(/[0-9]{4,}/g, ' ');
 
+  // 4. Normalize corporate tokens
   s = s.replace(/\bTECH\s+NOLOGIES\b/gi, 'Technologies');
   s = s.replace(/\bLIMITE\b/gi, 'Limited');
   s = s.replace(/\bLIMITED\b/gi, 'Limited');
   s = s.replace(/\bPVT\s*LTD\b/gi, 'Private Limited');
+  s = s.replace(/\bPVTLTD\b/gi, 'Private Limited');
   s = s.replace(/\bLTD\b/gi, 'Limited');
-  s = s.replace(/\bCYIENTLIMITED\b/gi, 'Cyient Limited');
+  s = s.replace(/\bTECHNOLOGIES\b/gi, 'Technologies');
+  s = s.replace(/\bSOLUTIONS\b/gi, 'Solutions');
+  s = s.replace(/\bSOFTWARE\b/gi, 'Software');
+  s = s.replace(/\bSERVICES\b/gi, 'Services');
+  s = s.replace(/\bINFOTECH\b/gi, 'Infotech');
 
-  s = s.replace(/[^A-Za-z0-9\s&.]/g, ' ').replace(/\s+/g, ' ').trim();
+  // 5. Tokenize and split concatenated corporate words dynamically (e.g. CYIENTLIMITED -> Cyient Limited)
+  const rawTokens = s.split(/[^A-Za-z0-9&.]+/).filter(Boolean);
+  const expandedTokens: string[] = [];
 
-  const words = s.split(/\s+/).filter(w => w.length > 1 && !/^[0-9]+$/.test(w));
-  if (words.length === 0) return 'Corporate Employer';
+  for (const t of rawTokens) {
+    const upper = t.toUpperCase();
+    if (NOISE_TOKENS.has(upper) || MONTH_TOKENS.has(upper) || /^\d+$/.test(t) || t.length < 2) continue;
 
-  const titleCased = words.map(w => {
-    if (['TCS', 'HCL', 'IBM', 'L&T', 'EPFO', 'LIC', 'GE', 'HP', 'EY', 'PWC', 'KPMG', 'SAP', 'AMD', 'ARM', 'WIPRO', 'INFOSYS'].includes(w.toUpperCase())) return w.toUpperCase();
-    if (['Limited', 'Technologies', 'Private Limited', 'Solutions', 'Services', 'Software', 'Infotech'].includes(w)) return w;
-    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-  }).join(' ');
+    const concatMatch = t.match(CORPORATE_SUFFIX_SPLIT_REGEX);
+    if (concatMatch) {
+      const p = concatMatch[1];
+      const suf = concatMatch[2].toUpperCase();
+      expandedTokens.push(p);
+      if (suf === 'LIMITED') expandedTokens.push('Limited');
+      else if (suf === 'TECHNOLOGIES') expandedTokens.push('Technologies');
+      else if (suf === 'PVTLTD') { expandedTokens.push('Private'); expandedTokens.push('Limited'); }
+      else if (suf === 'SOLUTIONS') expandedTokens.push('Solutions');
+      else if (suf === 'SERVICES') expandedTokens.push('Services');
+      else if (suf === 'SOFTWARE') expandedTokens.push('Software');
+      else if (suf === 'INFOTECH') expandedTokens.push('Infotech');
+      else expandedTokens.push(suf.charAt(0) + suf.slice(1).toLowerCase());
+    } else {
+      expandedTokens.push(t);
+    }
+  }
 
-  if (titleCased.includes('Cyient')) return 'Cyient Limited';
-  if (titleCased.includes('Newgen')) return 'Newgen Software Technologies Limited';
+  // 6. Generic Title Case & Deduplication of consecutive/repeated entity words
+  const resultWords: string[] = [];
+  const seenWords = new Set<string>();
 
-  return titleCased;
+  for (const token of expandedTokens) {
+    const upper = token.toUpperCase();
+    if (NOISE_TOKENS.has(upper) || MONTH_TOKENS.has(upper) || /^\d+$/.test(token) || token.length < 2) continue;
+
+    let formattedWord = '';
+    if (KNOWN_ACRONYMS.has(upper)) {
+      formattedWord = upper;
+    } else if (['Limited', 'Technologies', 'Private', 'Solutions', 'Services', 'Software', 'Infotech'].includes(token)) {
+      formattedWord = token;
+    } else if (upper === 'LTD') {
+      formattedWord = 'Limited';
+    } else {
+      formattedWord = token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
+    }
+
+    const checkKey = formattedWord.toLowerCase();
+    if (['limited', 'technologies', 'private', 'solutions', 'services', 'software', 'infotech'].includes(checkKey)) {
+      resultWords.push(formattedWord);
+    } else if (!seenWords.has(checkKey)) {
+      seenWords.add(checkKey);
+      resultWords.push(formattedWord);
+    }
+  }
+
+  if (resultWords.length === 0) return 'Corporate Employer';
+  return resultWords.join(' ');
 }
 
 // ── 5. ADVANCED MULTI-EMPLOYER TIMELINE & AGGREGATION ────────────────────────
