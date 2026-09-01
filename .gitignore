@@ -13,4 +13,7 @@ scratch/
 *.xls
 *.xlsx
 *.csv
+sms_*.xml
+**/sms_*.xml
+*.xml
 
